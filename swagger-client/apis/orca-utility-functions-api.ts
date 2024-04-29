@@ -160,7 +160,7 @@ export const OrcaUtilityFunctionsApiFp = function(configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async orcaUtilGetPositionMintGet(position?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array>>> {
+        async orcaUtilGetPositionMintGet(position?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<any>>>> {
             const localVarAxiosArgs = await OrcaUtilityFunctionsApiAxiosParamCreator(configuration).orcaUtilGetPositionMintGet(position, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -208,7 +208,7 @@ export const OrcaUtilityFunctionsApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async orcaUtilGetPositionMintGet(position?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<Array>> {
+        async orcaUtilGetPositionMintGet(position?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<Array<any>>> {
             return OrcaUtilityFunctionsApiFp(configuration).orcaUtilGetPositionMintGet(position, options).then((request) => request(axios, basePath));
         },
         /**
@@ -246,7 +246,7 @@ export class OrcaUtilityFunctionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrcaUtilityFunctionsApi
      */
-    public async orcaUtilGetPositionMintGet(position?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<Array>> {
+    public async orcaUtilGetPositionMintGet(position?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<any>>> {
         return OrcaUtilityFunctionsApiFp(this.configuration).orcaUtilGetPositionMintGet(position, options).then((request) => request(this.axios, this.basePath));
     }
     /**

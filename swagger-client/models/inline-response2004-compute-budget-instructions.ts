@@ -26,7 +26,7 @@ export interface InlineResponse2004ComputeBudgetInstructions {
      * @type {Array}
      * @memberof InlineResponse2004ComputeBudgetInstructions
      */
-    accounts?: Array;
+    accounts?: Array<any>;
 
     /**
      * Encoded data for the compute budget operation.

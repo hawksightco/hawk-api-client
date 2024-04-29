@@ -26,7 +26,7 @@ export interface UtilActiveBinBody {
      * @type {Array}
      * @memberof UtilActiveBinBody
      */
-    pools?: Array;
+    pools?: Array<any>;
 
     /**
      * Commitment level (processed, confirmed, finalized)
