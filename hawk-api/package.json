@@ -7,7 +7,6 @@
   "author": "hawksight.co",
   "license": "MIT",
   "devDependencies": {
-    "@devexperts/swagger-codegen-ts": "^2.0.0-alpha.29",
     "@types/bn.js": "^5.1.5",
     "@types/jest": "^29.5.11",
     "@types/lodash": "^4.14.202",
