@@ -1,5 +1,5 @@
 import * as web3 from "@solana/web3.js";
-import * as client from "../../swagger-client";
+import * as client from "@hawksightco/swagger-client";
 import { HealthResponse, ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, UserPortfolioOut } from "./types";
 
 class Client {
