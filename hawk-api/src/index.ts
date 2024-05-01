@@ -1,5 +1,6 @@
+import * as web3 from "@solana/web3.js";
 import * as client from "../../swagger-client";
-import { HealthResponse, ResponseWithStatus, UserPortfolioOut } from "./types";
+import { HealthResponse, ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, UserPortfolioOut } from "./types";
 
 class Client {
   public readonly config: client.Configuration;
@@ -57,7 +58,7 @@ class General {
     }
   }
   async pools(): Promise<ResponseWithStatus<client.InlineResponse2002[]>> {
-    const result = await this.client.generalEndpoints.poolsGet();
+    const result = await this.client.generalEndpoints.poolsGet().catch(e => e.response);
     return {
       status: result.status,
       data: result.data,
@@ -65,18 +66,18 @@ class General {
   }
 
   async tokens(): Promise<ResponseWithStatus<client.InlineResponse2003[]>> {
-    const result = await this.client.generalEndpoints.tokensGet();
+    const result = await this.client.generalEndpoints.tokensGet().catch(e => e.response);
     return {
       status: result.status,
       data: result.data,
     };
   }
 
-  async register(params: client.RegisterBody): Promise<ResponseWithStatus<client.InlineResponse2004>> {
-    const result = await this.client.generalEndpoints.registerPost(params);
+  async register(connection: web3.Connection, payer: web3.PublicKey, params: client.RegisterBody): Promise<ResponseWithStatus<TransactionMetadata>> {
+    const result = await this.client.generalEndpoints.registerPost(params).catch(e => e.response);
     return {
       status: result.status,
-      data: result.data,
+      data: await createTxMetadata(connection, payer, result.data),
     };
   }
 }
@@ -87,7 +88,7 @@ class Util {
   ) {}
 
   async meteoraDlmmPools(): Promise<ResponseWithStatus<client.InlineResponse2005[]>> {
-    const result = await this.client.meteoraDLMMUtilityFunctionsApi.meteoraDlmmUtilPoolsGet();
+    const result = await this.client.meteoraDLMMUtilityFunctionsApi.meteoraDlmmUtilPoolsGet().catch(e => e.response);
     return {
       status: result.status,
       data: result.data,
@@ -100,7 +101,7 @@ class Util {
       pool?: string,
     }
   ): Promise<ResponseWithStatus<any>> {
-    const result = await this.client.meteoraDLMMUtilityFunctionsApi.meteoraDlmmUtilPositionsGet(params.wallet, params.pool);
+    const result = await this.client.meteoraDLMMUtilityFunctionsApi.meteoraDlmmUtilPositionsGet(params.wallet, params.pool).catch(e => e.response);
     return {
       status: result.status,
       data: result.data,
@@ -108,7 +109,7 @@ class Util {
   }
 
   async meteoraDlmmActiveBin(params: client.UtilActiveBinBody): Promise<ResponseWithStatus<any>> {
-    const result = await this.client.meteoraDLMMUtilityFunctionsApi.meteoraDlmmUtilActiveBinPost(params);
+    const result = await this.client.meteoraDLMMUtilityFunctionsApi.meteoraDlmmUtilActiveBinPost(params).catch(e => e.response);
     return {
       status: result.status,
       data: result.data,
@@ -116,7 +117,7 @@ class Util {
   }
 
   async orcaClmmPools(): Promise<ResponseWithStatus<any>> {
-    return await this.client.orcaUtilityFunctionsApi.orcaUtilPoolsGet();
+    const result = await this.client.orcaUtilityFunctionsApi.orcaUtilPoolsGet().catch(e => e.response);
     return {
       status: result.status,
       data: result.data,
@@ -129,7 +130,7 @@ class Util {
       pool?: string,
     }
   ): Promise<ResponseWithStatus<any>> {
-    return await this.client.orcaUtilityFunctionsApi.orcaUtilPositionsGet(params.wallet, params.pool);
+    const result = await this.client.orcaUtilityFunctionsApi.orcaUtilPositionsGet(params.wallet, params.pool).catch(e => e.response);
     return {
       status: result.status,
       data: result.data,
@@ -141,7 +142,7 @@ class Util {
       position: string,
     }
   ): Promise<ResponseWithStatus<any>> {
-    return await this.client.orcaUtilityFunctionsApi.orcaUtilGetPositionMintGet(params.position);
+    const result = await this.client.orcaUtilityFunctionsApi.orcaUtilGetPositionMintGet(params.position).catch(e => e.response);
     return {
       status: result.status,
       data: result.data,
@@ -154,44 +155,84 @@ class TxGenerator {
     private readonly client: Client,
   ) {}
 
-  async meteoraCreatePositionAndDeposit(params: client.TxCreatePositionAndDepositBody): Promise<ResponseWithStatus<any>> {
-    return await this.client.meteoraDLMMInstructionsApi.meteoraDlmmTxCreatePositionAndDepositPost(params);
+  async meteoraCreatePositionAndDeposit(connection: web3.Connection, payer: web3.PublicKey, params: client.TxCreatePositionAndDepositBody): Promise<ResponseWithStatus<any>> {
+    const result = await this.client.meteoraDLMMInstructionsApi.meteoraDlmmTxCreatePositionAndDepositPost(params).catch(e => e.response);
+    return {
+      status: result.status,
+      data: await createTxMetadata(connection, payer, result.data),
+    };
   }
 
-  async meteoraDeposit(params: client.TxDepositBody): Promise<ResponseWithStatus<any>> {
-    return await this.client.meteoraDLMMInstructionsApi.meteoraDlmmTxDepositPost(params);
+  async meteoraDeposit(connection: web3.Connection, payer: web3.PublicKey, params: client.TxDepositBody): Promise<ResponseWithStatus<any>> {
+    const result = await this.client.meteoraDLMMInstructionsApi.meteoraDlmmTxDepositPost(params).catch(e => e.response);
+    return {
+      status: result.status,
+      data: await createTxMetadata(connection, payer, result.data),
+    };
   }
 
-  async meteoraWithdraw(params: client.TxWithdrawBody): Promise<ResponseWithStatus<any>> {
-    return await this.client.meteoraDLMMInstructionsApi.meteoraDlmmTxWithdrawPost(params);
+  async meteoraWithdraw(connection: web3.Connection, payer: web3.PublicKey, params: client.TxWithdrawBody): Promise<ResponseWithStatus<any>> {
+    const result = await this.client.meteoraDLMMInstructionsApi.meteoraDlmmTxWithdrawPost(params).catch(e => e.response);
+    return {
+      status: result.status,
+      data: await createTxMetadata(connection, payer, result.data),
+    };
   }
 
-  async meteoraClaim(params: client.TxClaimBody): Promise<ResponseWithStatus<any>> {
-    return await this.client.meteoraDLMMInstructionsApi.meteoraDlmmTxClaimPost(params);
+  async meteoraClaim(connection: web3.Connection, payer: web3.PublicKey, params: client.TxClaimBody): Promise<ResponseWithStatus<any>> {
+    const result = await this.client.meteoraDLMMInstructionsApi.meteoraDlmmTxClaimPost(params).catch(e => e.response);
+    return {
+      status: result.status,
+      data: await createTxMetadata(connection, payer, result.data),
+    };
   }
 
-  async meteoraClosePosition(params: client.TxClaimBody): Promise<ResponseWithStatus<any>> {
-    return await this.client.meteoraDLMMInstructionsApi.meteoraDlmmTxClosePositionPost(params);
+  async meteoraClosePosition(connection: web3.Connection, payer: web3.PublicKey, params: client.TxClaimBody): Promise<ResponseWithStatus<any>> {
+    const result = await this.client.meteoraDLMMInstructionsApi.meteoraDlmmTxClosePositionPost(params).catch(e => e.response);
+    return {
+      status: result.status,
+      data: await createTxMetadata(connection, payer, result.data),
+    };
   }
 
-  async orcaOpenPosition(params: client.TxOpenPositionBody): Promise<ResponseWithStatus<any>> {
-    return await this.client.orcaCLMMInstructionsApi.orcaTxOpenPositionPost(params);
+  async orcaOpenPosition(connection: web3.Connection, payer: web3.PublicKey, params: client.TxOpenPositionBody): Promise<ResponseWithStatus<any>> {
+    const result = await this.client.orcaCLMMInstructionsApi.orcaTxOpenPositionPost(params).catch(e => e.response);
+    return {
+      status: result.status,
+      data: await createTxMetadata(connection, payer, result.data),
+    };
   }
 
-  async orcaClosePosition(params: client.TxClosePositionBody1): Promise<ResponseWithStatus<any>> {
-    return await this.client.orcaCLMMInstructionsApi.orcaTxClosePositionPost(params);
+  async orcaClosePosition(connection: web3.Connection, payer: web3.PublicKey, params: client.TxClosePositionBody1): Promise<ResponseWithStatus<any>> {
+    const result = await this.client.orcaCLMMInstructionsApi.orcaTxClosePositionPost(params).catch(e => e.response);
+    return {
+      status: result.status,
+      data: await createTxMetadata(connection, payer, result.data),
+    };
   }
 
-  async orcaDeposit(params: client.TxDepositBody1): Promise<ResponseWithStatus<any>> {
-    return await this.client.orcaCLMMInstructionsApi.orcaTxDepositPost(params);
+  async orcaDeposit(connection: web3.Connection, payer: web3.PublicKey, params: client.TxDepositBody1): Promise<ResponseWithStatus<any>> {
+    const result = await this.client.orcaCLMMInstructionsApi.orcaTxDepositPost(params).catch(e => e.response);
+    return {
+      status: result.status,
+      data: await createTxMetadata(connection, payer, result.data),
+    };
   }
 
-  async orcaWithdraw(params: client.TxWithdrawBody1): Promise<ResponseWithStatus<any>> {
-    return await this.client.orcaCLMMInstructionsApi.orcaTxWithdrawPost(params);
+  async orcaWithdraw(connection: web3.Connection, payer: web3.PublicKey, params: client.TxWithdrawBody1): Promise<ResponseWithStatus<any>> {
+    const result = await this.client.orcaCLMMInstructionsApi.orcaTxWithdrawPost(params).catch(e => e.response);
+    return {
+      status: result.status,
+      data: await createTxMetadata(connection, payer, result.data),
+    };
   }
 
-  async orcaClaimRewards(params: client.TxClaimRewardsBody): Promise<ResponseWithStatus<any>> {
-    return await this.client.orcaCLMMInstructionsApi.orcaTxClaimRewardsPost(params);
+  async orcaClaimRewards(connection: web3.Connection, payer: web3.PublicKey, params: client.TxClaimRewardsBody): Promise<ResponseWithStatus<any>> {
+    const result = await this.client.orcaCLMMInstructionsApi.orcaTxClaimRewardsPost(params).catch(e => e.response);
+    return {
+      status: result.status,
+      data: await createTxMetadata(connection, payer, result.data),
+    };
   }
 }
 
@@ -212,3 +253,42 @@ class HawkAPI {
 }
 
 export default HawkAPI;
+
+async function createTxMetadata(connection: web3.Connection, payerKey: web3.PublicKey, data: TransactionMetadataResponse): Promise<TransactionMetadata> {
+  const alts: web3.AddressLookupTableAccount[] = [];
+  for (const alt of data.addressLookupTableAddresses) {
+    alts.push(
+      (await connection.getAddressLookupTable(new web3.PublicKey(alt))).value as web3.AddressLookupTableAccount
+    );
+  }
+  const computeIxs = data.computeBudgetInstructions.map(ix => {
+    return new web3.TransactionInstruction({
+      keys: ix.accounts.map(meta => {
+        return { pubkey: new web3.PublicKey(meta.pubkey), isSigner: meta.isSigner, isWritable: meta.isWritable };
+      }),
+      programId: new web3.PublicKey(ix.programId),
+      data: Buffer.from(ix.data, 'base64'),
+    });
+  });
+  const mainIxs = data.computeBudgetInstructions.map(ix => {
+    return new web3.TransactionInstruction({
+      keys: ix.accounts.map(meta => {
+        return { pubkey: new web3.PublicKey(meta.pubkey), isSigner: meta.isSigner, isWritable: meta.isWritable };
+      }),
+      programId: new web3.PublicKey(ix.programId),
+      data: Buffer.from(ix.data, 'base64'),
+    });
+  });
+  const { blockhash: recentBlockhash } = await connection.getLatestBlockhash();
+  const txMessage = new web3.TransactionMessage({
+    payerKey,
+    instructions: [...computeIxs, ...mainIxs],
+    recentBlockhash,
+  });
+  const tx = new web3.VersionedTransaction(txMessage.compileToV0Message(alts));
+  return {
+    description: data.description,
+    estimatedFeeInSOL: data.estimatedFeeInSOL,
+    transaction: tx.serialize(),
+  }
+}

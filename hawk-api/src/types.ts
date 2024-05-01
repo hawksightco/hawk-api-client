@@ -139,14 +139,6 @@ export type Instruction = {
   programId: string;
 };
 
-export type TransactionMetadata = {
-  description: string;
-  estimatedFeeInSOL: string,
-  addressLookupTableAddresses: string[]; // "alts" is confusing, copied jup's naming
-  computeBudgetInstructions: Instruction[]; // this enables for ease of access while also making them optional
-  mainInstructions: Instruction[];
-}
-
 export type TransactionPriority = "Default" | "Low" | "Medium" | "High" | "VeryHigh" | "UnsafeMax" | "None";
 
 export type Balance = {
@@ -238,3 +230,18 @@ export type ResponseWithStatus<T> = {
 }
 
 export type HealthResponse = Record<string, "OK" | "NOT OK">;
+
+
+export type TransactionMetadataResponse = {
+  description: string;
+  estimatedFeeInSOL: string,
+  addressLookupTableAddresses: string[]; // "alts" is confusing, copied jup's naming
+  computeBudgetInstructions: Instruction[]; // this enables for ease of access while also making them optional
+  mainInstructions: Instruction[];
+}
+
+export type TransactionMetadata = {
+  description: string,
+  estimatedFeeInSOL: string,
+  transaction: Uint8Array,
+}
