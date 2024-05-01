@@ -30,6 +30,7 @@
     "zod": "^3.22.4"
   },
   "scripts": {
-    "start": "npx ts-node src/index.ts"
+    "start": "npx ts-node src/index.ts",
+    "test": "npx jest"
   }
 }
