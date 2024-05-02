@@ -231,6 +231,7 @@ export type ResponseWithStatus<T> = {
 
 export type HealthResponse = Record<string, "OK" | "NOT OK">;
 
+export type MeteoraDlmmActiveBin = Record<string, number>;
 
 export type TransactionMetadataResponse = {
   description: string;
