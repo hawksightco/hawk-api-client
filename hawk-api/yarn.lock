@@ -337,7 +337,7 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.57.0.tgz#a5417ae8427873f1dd08b70b3574b453e67b5f7f"
   integrity sha512-Ys+3g2TaW7gADOJzPt83SJtCDhMjndcDMFVQ/Tj9iA1BfJzFKD9mAUXT3OenpuPHbI6P/myECxRJrofUsDx/5g==
 
-"@hawksightco/swagger-client@0.0.2":
+"@hawksightco/swagger-client@0.0.3":
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/@hawksightco/swagger-client/-/swagger-client-0.0.3.tgz#70d3621d21563d82c39912be7b14fbd113b9c1df"
   integrity sha512-dbGasRkkzZSAg2tZf0PywUmoUDcxUAjpcT0NdMbIcxc24uzHjrzJ4lkDpUy2g96BjsHLWupdsfw9SWfc//wWcQ==
