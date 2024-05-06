@@ -1,12 +1,15 @@
 {
   "name": "@hawksightco/hawk-sdk",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Hawksight v2 SDK",
   "main": "dist/index.js",
   "repository": "https://github.com/ghabxph/hawk-api-client.git",
   "homepage": "https://hawksight.co/",
   "author": "Hawksight",
   "license": "MIT",
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "@types/bn.js": "^5.1.5",
     "@types/jest": "^29.5.11",
