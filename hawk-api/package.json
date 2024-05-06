@@ -1,37 +1,27 @@
 {
   "name": "@hawksightco/hawk-sdk",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Hawksight v2 SDK",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "repository": "https://github.com/ghabxph/hawk-api-client.git",
   "homepage": "https://hawksight.co/",
   "author": "Hawksight",
   "license": "MIT",
   "files": [
-    "dist"
+    "dist/src"
   ],
   "devDependencies": {
     "@types/bn.js": "^5.1.5",
-    "@types/jest": "^29.5.11",
-    "@types/lodash": "^4.14.202",
+    "@types/jest": "^29.5.12",
     "@types/node": "^20.11.5",
-    "eslint": "^8.56.0",
     "jest": "^29.7.0",
-    "nodemon": "^3.0.3",
     "ts-jest": "^29.1.2",
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@solana/web3.js": "^1.89.1",
     "@hawksightco/swagger-client": "0.0.3",
-    "axios": "^1.6.5",
-    "bn.js": "^5.2.1",
-    "bs58": "^5.0.0",
-    "fp-ts": "^2.16.5",
-    "io-ts": "^2.2.21",
-    "io-ts-types": "^0.5.19",
-    "lodash": "^4.17.21",
-    "zod": "^3.22.4"
+    "@solana/web3.js": "^1.89.1",
+    "bn.js": "^5.2.1"
   },
   "scripts": {
     "start": "npx ts-node src/index.ts",

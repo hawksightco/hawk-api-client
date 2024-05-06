@@ -4,7 +4,7 @@ import HawkAPI from "../src";
 import { ResponseWithStatus } from "../src/types";
 
 const client = new HawkAPI('http://localhost:5001');
-const TIMEOUT = 30_000;
+const TIMEOUT = 60_000;
 const testWallet = 'Ga5jNBh26JHh9zyJcdm7vpyVWRgtKS2cLpNgEc5zBv8G';
 const hawkWallet = 'dche7M2764e8AxNihBdn7uffVzZvTBNeL8x4LZg5E2c';
 const connection = new web3.Connection('https://mainnet-beta.solana.com'); // change this to private rpc
