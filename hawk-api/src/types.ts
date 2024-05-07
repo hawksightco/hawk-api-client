@@ -1,5 +1,6 @@
 import * as web3 from "@solana/web3.js";
 import BN from "bn.js";
+import { Transaction as TransactionClass } from "./classes/Transaction";
 
 export type AccountMeta = {
   isSigner: boolean,
@@ -244,5 +245,13 @@ export type TransactionMetadataResponse = {
 export type TransactionMetadata = {
   description: string,
   estimatedFeeInSOL: string,
-  transaction: Uint8Array,
+  transaction: TransactionClass,
 }
+
+export type SimulatedTransactionResponse = {
+  err: web3.TransactionError | string | null,
+  logs: Array<string> | null,
+  accounts?: (web3.SimulatedTransactionAccountInfo | null)[] | null,
+  unitsConsumed: number,
+  returnData?: web3.TransactionReturnData | null,
+};
