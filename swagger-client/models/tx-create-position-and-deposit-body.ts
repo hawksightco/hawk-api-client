@@ -37,6 +37,14 @@ export interface TxCreatePositionAndDepositBody {
     maxPriorityFee?: number;
 
     /**
+     * Whether to disable computing priority fees. True by default which means it ignores priority parameter
+     *
+     * @type {boolean}
+     * @memberof TxCreatePositionAndDepositBody
+     */
+    disableFeeCompute?: boolean;
+
+    /**
      * Uninitialized account (generate via web3.Keypair.generate() function) that serves as user position
      *
      * @type {string}

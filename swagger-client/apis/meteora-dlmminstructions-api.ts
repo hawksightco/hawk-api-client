@@ -17,8 +17,8 @@ import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
-import { InlineResponse2004 } from '../models';
-import { InlineResponse4001 } from '../models';
+import { InlineResponse400 } from '../models';
+import { TransactionMetadata } from '../models';
 import { TxClaimBody } from '../models';
 import { TxClosePositionBody } from '../models';
 import { TxCreatePositionAndDepositBody } from '../models';
@@ -255,7 +255,7 @@ export const MeteoraDLMMInstructionsApiFp = function(configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async meteoraDlmmTxClaimPost(body: TxClaimBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2004>>> {
+        async meteoraDlmmTxClaimPost(body: TxClaimBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<TransactionMetadata>>> {
             const localVarAxiosArgs = await MeteoraDLMMInstructionsApiAxiosParamCreator(configuration).meteoraDlmmTxClaimPost(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -268,7 +268,7 @@ export const MeteoraDLMMInstructionsApiFp = function(configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async meteoraDlmmTxClosePositionPost(body: TxClosePositionBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2004>>> {
+        async meteoraDlmmTxClosePositionPost(body: TxClosePositionBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<TransactionMetadata>>> {
             const localVarAxiosArgs = await MeteoraDLMMInstructionsApiAxiosParamCreator(configuration).meteoraDlmmTxClosePositionPost(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -281,7 +281,7 @@ export const MeteoraDLMMInstructionsApiFp = function(configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async meteoraDlmmTxCreatePositionAndDepositPost(body: TxCreatePositionAndDepositBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2004>>> {
+        async meteoraDlmmTxCreatePositionAndDepositPost(body: TxCreatePositionAndDepositBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<TransactionMetadata>>> {
             const localVarAxiosArgs = await MeteoraDLMMInstructionsApiAxiosParamCreator(configuration).meteoraDlmmTxCreatePositionAndDepositPost(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -294,7 +294,7 @@ export const MeteoraDLMMInstructionsApiFp = function(configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async meteoraDlmmTxDepositPost(body: TxDepositBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2004>>> {
+        async meteoraDlmmTxDepositPost(body: TxDepositBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<TransactionMetadata>>> {
             const localVarAxiosArgs = await MeteoraDLMMInstructionsApiAxiosParamCreator(configuration).meteoraDlmmTxDepositPost(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -307,7 +307,7 @@ export const MeteoraDLMMInstructionsApiFp = function(configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async meteoraDlmmTxWithdrawPost(body: TxWithdrawBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2004>>> {
+        async meteoraDlmmTxWithdrawPost(body: TxWithdrawBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<TransactionMetadata>>> {
             const localVarAxiosArgs = await MeteoraDLMMInstructionsApiAxiosParamCreator(configuration).meteoraDlmmTxWithdrawPost(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -329,7 +329,7 @@ export const MeteoraDLMMInstructionsApiFactory = function (configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async meteoraDlmmTxClaimPost(body: TxClaimBody, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2004>> {
+        async meteoraDlmmTxClaimPost(body: TxClaimBody, options?: AxiosRequestConfig): Promise<AxiosResponse<TransactionMetadata>> {
             return MeteoraDLMMInstructionsApiFp(configuration).meteoraDlmmTxClaimPost(body, options).then((request) => request(axios, basePath));
         },
         /**
@@ -338,7 +338,7 @@ export const MeteoraDLMMInstructionsApiFactory = function (configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async meteoraDlmmTxClosePositionPost(body: TxClosePositionBody, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2004>> {
+        async meteoraDlmmTxClosePositionPost(body: TxClosePositionBody, options?: AxiosRequestConfig): Promise<AxiosResponse<TransactionMetadata>> {
             return MeteoraDLMMInstructionsApiFp(configuration).meteoraDlmmTxClosePositionPost(body, options).then((request) => request(axios, basePath));
         },
         /**
@@ -347,7 +347,7 @@ export const MeteoraDLMMInstructionsApiFactory = function (configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async meteoraDlmmTxCreatePositionAndDepositPost(body: TxCreatePositionAndDepositBody, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2004>> {
+        async meteoraDlmmTxCreatePositionAndDepositPost(body: TxCreatePositionAndDepositBody, options?: AxiosRequestConfig): Promise<AxiosResponse<TransactionMetadata>> {
             return MeteoraDLMMInstructionsApiFp(configuration).meteoraDlmmTxCreatePositionAndDepositPost(body, options).then((request) => request(axios, basePath));
         },
         /**
@@ -356,7 +356,7 @@ export const MeteoraDLMMInstructionsApiFactory = function (configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async meteoraDlmmTxDepositPost(body: TxDepositBody, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2004>> {
+        async meteoraDlmmTxDepositPost(body: TxDepositBody, options?: AxiosRequestConfig): Promise<AxiosResponse<TransactionMetadata>> {
             return MeteoraDLMMInstructionsApiFp(configuration).meteoraDlmmTxDepositPost(body, options).then((request) => request(axios, basePath));
         },
         /**
@@ -365,7 +365,7 @@ export const MeteoraDLMMInstructionsApiFactory = function (configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async meteoraDlmmTxWithdrawPost(body: TxWithdrawBody, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2004>> {
+        async meteoraDlmmTxWithdrawPost(body: TxWithdrawBody, options?: AxiosRequestConfig): Promise<AxiosResponse<TransactionMetadata>> {
             return MeteoraDLMMInstructionsApiFp(configuration).meteoraDlmmTxWithdrawPost(body, options).then((request) => request(axios, basePath));
         },
     };
@@ -385,7 +385,7 @@ export class MeteoraDLMMInstructionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MeteoraDLMMInstructionsApi
      */
-    public async meteoraDlmmTxClaimPost(body: TxClaimBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2004>> {
+    public async meteoraDlmmTxClaimPost(body: TxClaimBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<TransactionMetadata>> {
         return MeteoraDLMMInstructionsApiFp(this.configuration).meteoraDlmmTxClaimPost(body, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -395,7 +395,7 @@ export class MeteoraDLMMInstructionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MeteoraDLMMInstructionsApi
      */
-    public async meteoraDlmmTxClosePositionPost(body: TxClosePositionBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2004>> {
+    public async meteoraDlmmTxClosePositionPost(body: TxClosePositionBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<TransactionMetadata>> {
         return MeteoraDLMMInstructionsApiFp(this.configuration).meteoraDlmmTxClosePositionPost(body, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -405,7 +405,7 @@ export class MeteoraDLMMInstructionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MeteoraDLMMInstructionsApi
      */
-    public async meteoraDlmmTxCreatePositionAndDepositPost(body: TxCreatePositionAndDepositBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2004>> {
+    public async meteoraDlmmTxCreatePositionAndDepositPost(body: TxCreatePositionAndDepositBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<TransactionMetadata>> {
         return MeteoraDLMMInstructionsApiFp(this.configuration).meteoraDlmmTxCreatePositionAndDepositPost(body, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -415,7 +415,7 @@ export class MeteoraDLMMInstructionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MeteoraDLMMInstructionsApi
      */
-    public async meteoraDlmmTxDepositPost(body: TxDepositBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2004>> {
+    public async meteoraDlmmTxDepositPost(body: TxDepositBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<TransactionMetadata>> {
         return MeteoraDLMMInstructionsApiFp(this.configuration).meteoraDlmmTxDepositPost(body, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -425,7 +425,7 @@ export class MeteoraDLMMInstructionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MeteoraDLMMInstructionsApi
      */
-    public async meteoraDlmmTxWithdrawPost(body: TxWithdrawBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2004>> {
+    public async meteoraDlmmTxWithdrawPost(body: TxWithdrawBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<TransactionMetadata>> {
         return MeteoraDLMMInstructionsApiFp(this.configuration).meteoraDlmmTxWithdrawPost(body, options).then((request) => request(this.axios, this.basePath));
     }
 }

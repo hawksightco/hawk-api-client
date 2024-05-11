@@ -16,23 +16,15 @@
  * 
  *
  * @export
- * @interface UtilActiveBinBody
+ * @interface PriorityFeeEstimate
  */
-export interface UtilActiveBinBody {
+export interface PriorityFeeEstimate {
 
     /**
-     * Pools to search
+     * The priority fee estimate value
      *
-     * @type {Array<string>}
-     * @memberof UtilActiveBinBody
+     * @type {number}
+     * @memberof PriorityFeeEstimate
      */
-    pools?: Array<string>;
-
-    /**
-     * Commitment level (processed, confirmed, finalized)
-     *
-     * @type {string}
-     * @memberof UtilActiveBinBody
-     */
-    commitment?: string;
+    priorityFeeEstimate?: number;
 }

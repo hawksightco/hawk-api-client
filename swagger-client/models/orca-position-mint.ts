@@ -16,23 +16,15 @@
  * 
  *
  * @export
- * @interface UtilActiveBinBody
+ * @interface OrcaPositionMint
  */
-export interface UtilActiveBinBody {
+export interface OrcaPositionMint {
 
     /**
-     * Pools to search
-     *
-     * @type {Array<string>}
-     * @memberof UtilActiveBinBody
-     */
-    pools?: Array<string>;
-
-    /**
-     * Commitment level (processed, confirmed, finalized)
+     * Orca position mint
      *
      * @type {string}
-     * @memberof UtilActiveBinBody
+     * @memberof OrcaPositionMint
      */
-    commitment?: string;
+    positionMint?: string;
 }

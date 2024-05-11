@@ -20,10 +20,9 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 import { InlineResponse2001 } from '../models';
 import { InlineResponse2002 } from '../models';
 import { InlineResponse2003 } from '../models';
-import { InlineResponse2004 } from '../models';
 import { InlineResponse400 } from '../models';
-import { InlineResponse4001 } from '../models';
 import { RegisterBody } from '../models';
+import { TransactionMetadata } from '../models';
 /**
  * GeneralEndpointsApi - axios parameter creator
  * @export
@@ -226,7 +225,7 @@ export const GeneralEndpointsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async registerPost(body: RegisterBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2004>>> {
+        async registerPost(body: RegisterBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<TransactionMetadata>>> {
             const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).registerPost(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -278,7 +277,7 @@ export const GeneralEndpointsApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async registerPost(body: RegisterBody, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2004>> {
+        async registerPost(body: RegisterBody, options?: AxiosRequestConfig): Promise<AxiosResponse<TransactionMetadata>> {
             return GeneralEndpointsApiFp(configuration).registerPost(body, options).then((request) => request(axios, basePath));
         },
         /**
@@ -326,7 +325,7 @@ export class GeneralEndpointsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof GeneralEndpointsApi
      */
-    public async registerPost(body: RegisterBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2004>> {
+    public async registerPost(body: RegisterBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<TransactionMetadata>> {
         return GeneralEndpointsApiFp(this.configuration).registerPost(body, options).then((request) => request(this.axios, this.basePath));
     }
     /**

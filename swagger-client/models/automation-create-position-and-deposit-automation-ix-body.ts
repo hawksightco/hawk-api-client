@@ -37,6 +37,14 @@ export interface AutomationCreatePositionAndDepositAutomationIxBody {
     maxPriorityFee?: number;
 
     /**
+     * Whether to disable computing priority fees. True by default which means it ignores priority parameter
+     *
+     * @type {boolean}
+     * @memberof AutomationCreatePositionAndDepositAutomationIxBody
+     */
+    disableFeeCompute?: boolean;
+
+    /**
      * Meteora pool address
      *
      * @type {string}

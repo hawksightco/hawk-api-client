@@ -37,6 +37,14 @@ export interface TxWithdrawBody {
     maxPriorityFee?: number;
 
     /**
+     * Whether to disable computing priority fees. True by default which means it ignores priority parameter
+     *
+     * @type {boolean}
+     * @memberof TxWithdrawBody
+     */
+    disableFeeCompute?: boolean;
+
+    /**
      * User's position from Meteora (See GET /meteora/dlmm/util/positions).
      *
      * @type {string}

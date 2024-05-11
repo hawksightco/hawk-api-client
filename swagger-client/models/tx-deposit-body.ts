@@ -37,6 +37,14 @@ export interface TxDepositBody {
     maxPriorityFee?: number;
 
     /**
+     * Whether to disable computing priority fees. True by default which means it ignores priority parameter
+     *
+     * @type {boolean}
+     * @memberof TxDepositBody
+     */
+    disableFeeCompute?: boolean;
+
+    /**
      * User's position from meteora (See GET /meteora/dlmm/util/positions)
      *
      * @type {string}

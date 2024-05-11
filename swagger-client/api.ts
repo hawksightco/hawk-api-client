@@ -12,6 +12,7 @@
  * Do not edit the class manually.
  */
 export * from './apis/general-endpoints-api';
+export * from './apis/general-utility-endpoints-api';
 export * from './apis/health-check-api';
 export * from './apis/meteora-dlmmautomation-instructions-api';
 export * from './apis/meteora-dlmminstructions-api';

@@ -17,8 +17,8 @@ import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
-import { InlineResponse2004 } from '../models';
-import { InlineResponse4001 } from '../models';
+import { InlineResponse400 } from '../models';
+import { TransactionMetadata } from '../models';
 import { TxClaimRewardsBody } from '../models';
 import { TxClosePositionBody1 } from '../models';
 import { TxDepositBody1 } from '../models';
@@ -255,7 +255,7 @@ export const OrcaCLMMInstructionsApiFp = function(configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async orcaTxClaimRewardsPost(body: TxClaimRewardsBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2004>>> {
+        async orcaTxClaimRewardsPost(body: TxClaimRewardsBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<TransactionMetadata>>> {
             const localVarAxiosArgs = await OrcaCLMMInstructionsApiAxiosParamCreator(configuration).orcaTxClaimRewardsPost(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -268,7 +268,7 @@ export const OrcaCLMMInstructionsApiFp = function(configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async orcaTxClosePositionPost(body: TxClosePositionBody1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2004>>> {
+        async orcaTxClosePositionPost(body: TxClosePositionBody1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<TransactionMetadata>>> {
             const localVarAxiosArgs = await OrcaCLMMInstructionsApiAxiosParamCreator(configuration).orcaTxClosePositionPost(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -281,7 +281,7 @@ export const OrcaCLMMInstructionsApiFp = function(configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async orcaTxDepositPost(body: TxDepositBody1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2004>>> {
+        async orcaTxDepositPost(body: TxDepositBody1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<TransactionMetadata>>> {
             const localVarAxiosArgs = await OrcaCLMMInstructionsApiAxiosParamCreator(configuration).orcaTxDepositPost(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -294,7 +294,7 @@ export const OrcaCLMMInstructionsApiFp = function(configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async orcaTxOpenPositionPost(body: TxOpenPositionBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2004>>> {
+        async orcaTxOpenPositionPost(body: TxOpenPositionBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<TransactionMetadata>>> {
             const localVarAxiosArgs = await OrcaCLMMInstructionsApiAxiosParamCreator(configuration).orcaTxOpenPositionPost(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -307,7 +307,7 @@ export const OrcaCLMMInstructionsApiFp = function(configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async orcaTxWithdrawPost(body: TxWithdrawBody1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2004>>> {
+        async orcaTxWithdrawPost(body: TxWithdrawBody1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<TransactionMetadata>>> {
             const localVarAxiosArgs = await OrcaCLMMInstructionsApiAxiosParamCreator(configuration).orcaTxWithdrawPost(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -329,7 +329,7 @@ export const OrcaCLMMInstructionsApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async orcaTxClaimRewardsPost(body: TxClaimRewardsBody, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2004>> {
+        async orcaTxClaimRewardsPost(body: TxClaimRewardsBody, options?: AxiosRequestConfig): Promise<AxiosResponse<TransactionMetadata>> {
             return OrcaCLMMInstructionsApiFp(configuration).orcaTxClaimRewardsPost(body, options).then((request) => request(axios, basePath));
         },
         /**
@@ -338,7 +338,7 @@ export const OrcaCLMMInstructionsApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async orcaTxClosePositionPost(body: TxClosePositionBody1, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2004>> {
+        async orcaTxClosePositionPost(body: TxClosePositionBody1, options?: AxiosRequestConfig): Promise<AxiosResponse<TransactionMetadata>> {
             return OrcaCLMMInstructionsApiFp(configuration).orcaTxClosePositionPost(body, options).then((request) => request(axios, basePath));
         },
         /**
@@ -347,7 +347,7 @@ export const OrcaCLMMInstructionsApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async orcaTxDepositPost(body: TxDepositBody1, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2004>> {
+        async orcaTxDepositPost(body: TxDepositBody1, options?: AxiosRequestConfig): Promise<AxiosResponse<TransactionMetadata>> {
             return OrcaCLMMInstructionsApiFp(configuration).orcaTxDepositPost(body, options).then((request) => request(axios, basePath));
         },
         /**
@@ -356,7 +356,7 @@ export const OrcaCLMMInstructionsApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async orcaTxOpenPositionPost(body: TxOpenPositionBody, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2004>> {
+        async orcaTxOpenPositionPost(body: TxOpenPositionBody, options?: AxiosRequestConfig): Promise<AxiosResponse<TransactionMetadata>> {
             return OrcaCLMMInstructionsApiFp(configuration).orcaTxOpenPositionPost(body, options).then((request) => request(axios, basePath));
         },
         /**
@@ -365,7 +365,7 @@ export const OrcaCLMMInstructionsApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async orcaTxWithdrawPost(body: TxWithdrawBody1, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2004>> {
+        async orcaTxWithdrawPost(body: TxWithdrawBody1, options?: AxiosRequestConfig): Promise<AxiosResponse<TransactionMetadata>> {
             return OrcaCLMMInstructionsApiFp(configuration).orcaTxWithdrawPost(body, options).then((request) => request(axios, basePath));
         },
     };
@@ -385,7 +385,7 @@ export class OrcaCLMMInstructionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrcaCLMMInstructionsApi
      */
-    public async orcaTxClaimRewardsPost(body: TxClaimRewardsBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2004>> {
+    public async orcaTxClaimRewardsPost(body: TxClaimRewardsBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<TransactionMetadata>> {
         return OrcaCLMMInstructionsApiFp(this.configuration).orcaTxClaimRewardsPost(body, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -395,7 +395,7 @@ export class OrcaCLMMInstructionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrcaCLMMInstructionsApi
      */
-    public async orcaTxClosePositionPost(body: TxClosePositionBody1, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2004>> {
+    public async orcaTxClosePositionPost(body: TxClosePositionBody1, options?: AxiosRequestConfig) : Promise<AxiosResponse<TransactionMetadata>> {
         return OrcaCLMMInstructionsApiFp(this.configuration).orcaTxClosePositionPost(body, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -405,7 +405,7 @@ export class OrcaCLMMInstructionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrcaCLMMInstructionsApi
      */
-    public async orcaTxDepositPost(body: TxDepositBody1, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2004>> {
+    public async orcaTxDepositPost(body: TxDepositBody1, options?: AxiosRequestConfig) : Promise<AxiosResponse<TransactionMetadata>> {
         return OrcaCLMMInstructionsApiFp(this.configuration).orcaTxDepositPost(body, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -415,7 +415,7 @@ export class OrcaCLMMInstructionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrcaCLMMInstructionsApi
      */
-    public async orcaTxOpenPositionPost(body: TxOpenPositionBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2004>> {
+    public async orcaTxOpenPositionPost(body: TxOpenPositionBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<TransactionMetadata>> {
         return OrcaCLMMInstructionsApiFp(this.configuration).orcaTxOpenPositionPost(body, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -425,7 +425,7 @@ export class OrcaCLMMInstructionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrcaCLMMInstructionsApi
      */
-    public async orcaTxWithdrawPost(body: TxWithdrawBody1, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2004>> {
+    public async orcaTxWithdrawPost(body: TxWithdrawBody1, options?: AxiosRequestConfig) : Promise<AxiosResponse<TransactionMetadata>> {
         return OrcaCLMMInstructionsApiFp(this.configuration).orcaTxWithdrawPost(body, options).then((request) => request(this.axios, this.basePath));
     }
 }

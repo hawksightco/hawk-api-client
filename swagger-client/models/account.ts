@@ -16,23 +16,31 @@
  * 
  *
  * @export
- * @interface UtilActiveBinBody
+ * @interface Account
  */
-export interface UtilActiveBinBody {
+export interface Account {
 
     /**
-     * Pools to search
+     * Indicates if the account is a signer.
      *
-     * @type {Array<string>}
-     * @memberof UtilActiveBinBody
+     * @type {boolean}
+     * @memberof Account
      */
-    pools?: Array<string>;
+    isSigner?: boolean;
 
     /**
-     * Commitment level (processed, confirmed, finalized)
+     * Indicates if the account is writable.
+     *
+     * @type {boolean}
+     * @memberof Account
+     */
+    isWritable?: boolean;
+
+    /**
+     * Public key of the account.
      *
      * @type {string}
-     * @memberof UtilActiveBinBody
+     * @memberof Account
      */
-    commitment?: string;
+    pubkey?: string;
 }

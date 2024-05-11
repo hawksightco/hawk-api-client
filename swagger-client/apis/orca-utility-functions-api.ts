@@ -18,9 +18,9 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 import { InlineResponse2001 } from '../models';
-import { InlineResponse2006 } from '../models';
+import { InlineResponse2005 } from '../models';
 import { InlineResponse400 } from '../models';
-import { InlineResponse4001 } from '../models';
+import { OrcaPositionMint } from '../models';
 /**
  * OrcaUtilityFunctionsApi - axios parameter creator
  * @export
@@ -160,7 +160,7 @@ export const OrcaUtilityFunctionsApiFp = function(configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async orcaUtilGetPositionMintGet(position?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<any>>>> {
+        async orcaUtilGetPositionMintGet(position?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<OrcaPositionMint>>> {
             const localVarAxiosArgs = await OrcaUtilityFunctionsApiAxiosParamCreator(configuration).orcaUtilGetPositionMintGet(position, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -172,7 +172,7 @@ export const OrcaUtilityFunctionsApiFp = function(configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async orcaUtilPoolsGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<InlineResponse2006>>>> {
+        async orcaUtilPoolsGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<InlineResponse2005>>>> {
             const localVarAxiosArgs = await OrcaUtilityFunctionsApiAxiosParamCreator(configuration).orcaUtilPoolsGet(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -208,7 +208,7 @@ export const OrcaUtilityFunctionsApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async orcaUtilGetPositionMintGet(position?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<Array<any>>> {
+        async orcaUtilGetPositionMintGet(position?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<OrcaPositionMint>> {
             return OrcaUtilityFunctionsApiFp(configuration).orcaUtilGetPositionMintGet(position, options).then((request) => request(axios, basePath));
         },
         /**
@@ -216,7 +216,7 @@ export const OrcaUtilityFunctionsApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async orcaUtilPoolsGet(options?: AxiosRequestConfig): Promise<AxiosResponse<Array<InlineResponse2006>>> {
+        async orcaUtilPoolsGet(options?: AxiosRequestConfig): Promise<AxiosResponse<Array<InlineResponse2005>>> {
             return OrcaUtilityFunctionsApiFp(configuration).orcaUtilPoolsGet(options).then((request) => request(axios, basePath));
         },
         /**
@@ -246,7 +246,7 @@ export class OrcaUtilityFunctionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrcaUtilityFunctionsApi
      */
-    public async orcaUtilGetPositionMintGet(position?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<any>>> {
+    public async orcaUtilGetPositionMintGet(position?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<OrcaPositionMint>> {
         return OrcaUtilityFunctionsApiFp(this.configuration).orcaUtilGetPositionMintGet(position, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -255,7 +255,7 @@ export class OrcaUtilityFunctionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrcaUtilityFunctionsApi
      */
-    public async orcaUtilPoolsGet(options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<InlineResponse2006>>> {
+    public async orcaUtilPoolsGet(options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<InlineResponse2005>>> {
         return OrcaUtilityFunctionsApiFp(this.configuration).orcaUtilPoolsGet(options).then((request) => request(this.axios, this.basePath));
     }
     /**

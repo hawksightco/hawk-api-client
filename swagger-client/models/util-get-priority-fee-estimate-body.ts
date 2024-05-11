@@ -12,52 +12,35 @@
  * Do not edit the class manually.
  */
 
+import { TransactionMetadata } from './transaction-metadata';
  /**
  * 
  *
  * @export
- * @interface RegisterBody
+ * @interface UtilGetPriorityFeeEstimateBody
  */
-export interface RegisterBody {
+export interface UtilGetPriorityFeeEstimateBody {
 
     /**
      * Transaction priority level, affects the processing speed and fee.
      *
      * @type {string}
-     * @memberof RegisterBody
+     * @memberof UtilGetPriorityFeeEstimateBody
      */
-    priority?: RegisterBodyPriorityEnum;
+    priority?: UtilGetPriorityFeeEstimateBodyPriorityEnum;
 
     /**
-     * Maximum amount of lamports that can be used as a priority fee.
-     *
-     * @type {number}
-     * @memberof RegisterBody
+     * @type {TransactionMetadata}
+     * @memberof UtilGetPriorityFeeEstimateBody
      */
-    maxPriorityFee?: number;
-
-    /**
-     * Whether to disable computing priority fees. True by default which means it ignores priority parameter
-     *
-     * @type {boolean}
-     * @memberof RegisterBody
-     */
-    disableFeeCompute?: boolean;
-
-    /**
-     * The wallet address of the user to be registered.
-     *
-     * @type {string}
-     * @memberof RegisterBody
-     */
-    userWallet?: string;
+    transaction?: TransactionMetadata;
 }
 
 /**
  * @export
  * @enum {string}
  */
-export enum RegisterBodyPriorityEnum {
+export enum UtilGetPriorityFeeEstimateBodyPriorityEnum {
     Default = 'Default',
     Low = 'Low',
     Medium = 'Medium',

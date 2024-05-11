@@ -1,6 +1,6 @@
 {
   "name": "@hawksightco/swagger-client",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "OpenAPI client for Hawksight v2 Public API",
   "author": "Hawksight",
   "homepage": "https://hawksight.co/",

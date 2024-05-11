@@ -20,8 +20,8 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 import { AutomationClaimFeeAndRewardsAutomationIxBody } from '../models';
 import { AutomationCreatePositionAndDepositAutomationIxBody } from '../models';
 import { AutomationFullWithdrawAndClosePositionAutomationIxBody } from '../models';
-import { InlineResponse2004 } from '../models';
-import { InlineResponse4001 } from '../models';
+import { InlineResponse400 } from '../models';
+import { TransactionMetadata } from '../models';
 /**
  * MeteoraDLMMAutomationInstructionsApi - axios parameter creator
  * @export
@@ -169,7 +169,7 @@ export const MeteoraDLMMAutomationInstructionsApiFp = function(configuration?: C
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async meteoraDlmmAutomationClaimFeeAndRewardsAutomationIxPost(body: AutomationClaimFeeAndRewardsAutomationIxBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2004>>> {
+        async meteoraDlmmAutomationClaimFeeAndRewardsAutomationIxPost(body: AutomationClaimFeeAndRewardsAutomationIxBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<TransactionMetadata>>> {
             const localVarAxiosArgs = await MeteoraDLMMAutomationInstructionsApiAxiosParamCreator(configuration).meteoraDlmmAutomationClaimFeeAndRewardsAutomationIxPost(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -182,7 +182,7 @@ export const MeteoraDLMMAutomationInstructionsApiFp = function(configuration?: C
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async meteoraDlmmAutomationCreatePositionAndDepositAutomationIxPost(body: AutomationCreatePositionAndDepositAutomationIxBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2004>>> {
+        async meteoraDlmmAutomationCreatePositionAndDepositAutomationIxPost(body: AutomationCreatePositionAndDepositAutomationIxBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<TransactionMetadata>>> {
             const localVarAxiosArgs = await MeteoraDLMMAutomationInstructionsApiAxiosParamCreator(configuration).meteoraDlmmAutomationCreatePositionAndDepositAutomationIxPost(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -195,7 +195,7 @@ export const MeteoraDLMMAutomationInstructionsApiFp = function(configuration?: C
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async meteoraDlmmAutomationFullWithdrawAndClosePositionAutomationIxPost(body: AutomationFullWithdrawAndClosePositionAutomationIxBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2004>>> {
+        async meteoraDlmmAutomationFullWithdrawAndClosePositionAutomationIxPost(body: AutomationFullWithdrawAndClosePositionAutomationIxBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<TransactionMetadata>>> {
             const localVarAxiosArgs = await MeteoraDLMMAutomationInstructionsApiAxiosParamCreator(configuration).meteoraDlmmAutomationFullWithdrawAndClosePositionAutomationIxPost(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -217,7 +217,7 @@ export const MeteoraDLMMAutomationInstructionsApiFactory = function (configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async meteoraDlmmAutomationClaimFeeAndRewardsAutomationIxPost(body: AutomationClaimFeeAndRewardsAutomationIxBody, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2004>> {
+        async meteoraDlmmAutomationClaimFeeAndRewardsAutomationIxPost(body: AutomationClaimFeeAndRewardsAutomationIxBody, options?: AxiosRequestConfig): Promise<AxiosResponse<TransactionMetadata>> {
             return MeteoraDLMMAutomationInstructionsApiFp(configuration).meteoraDlmmAutomationClaimFeeAndRewardsAutomationIxPost(body, options).then((request) => request(axios, basePath));
         },
         /**
@@ -226,7 +226,7 @@ export const MeteoraDLMMAutomationInstructionsApiFactory = function (configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async meteoraDlmmAutomationCreatePositionAndDepositAutomationIxPost(body: AutomationCreatePositionAndDepositAutomationIxBody, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2004>> {
+        async meteoraDlmmAutomationCreatePositionAndDepositAutomationIxPost(body: AutomationCreatePositionAndDepositAutomationIxBody, options?: AxiosRequestConfig): Promise<AxiosResponse<TransactionMetadata>> {
             return MeteoraDLMMAutomationInstructionsApiFp(configuration).meteoraDlmmAutomationCreatePositionAndDepositAutomationIxPost(body, options).then((request) => request(axios, basePath));
         },
         /**
@@ -235,7 +235,7 @@ export const MeteoraDLMMAutomationInstructionsApiFactory = function (configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async meteoraDlmmAutomationFullWithdrawAndClosePositionAutomationIxPost(body: AutomationFullWithdrawAndClosePositionAutomationIxBody, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2004>> {
+        async meteoraDlmmAutomationFullWithdrawAndClosePositionAutomationIxPost(body: AutomationFullWithdrawAndClosePositionAutomationIxBody, options?: AxiosRequestConfig): Promise<AxiosResponse<TransactionMetadata>> {
             return MeteoraDLMMAutomationInstructionsApiFp(configuration).meteoraDlmmAutomationFullWithdrawAndClosePositionAutomationIxPost(body, options).then((request) => request(axios, basePath));
         },
     };
@@ -255,7 +255,7 @@ export class MeteoraDLMMAutomationInstructionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MeteoraDLMMAutomationInstructionsApi
      */
-    public async meteoraDlmmAutomationClaimFeeAndRewardsAutomationIxPost(body: AutomationClaimFeeAndRewardsAutomationIxBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2004>> {
+    public async meteoraDlmmAutomationClaimFeeAndRewardsAutomationIxPost(body: AutomationClaimFeeAndRewardsAutomationIxBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<TransactionMetadata>> {
         return MeteoraDLMMAutomationInstructionsApiFp(this.configuration).meteoraDlmmAutomationClaimFeeAndRewardsAutomationIxPost(body, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -265,7 +265,7 @@ export class MeteoraDLMMAutomationInstructionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MeteoraDLMMAutomationInstructionsApi
      */
-    public async meteoraDlmmAutomationCreatePositionAndDepositAutomationIxPost(body: AutomationCreatePositionAndDepositAutomationIxBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2004>> {
+    public async meteoraDlmmAutomationCreatePositionAndDepositAutomationIxPost(body: AutomationCreatePositionAndDepositAutomationIxBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<TransactionMetadata>> {
         return MeteoraDLMMAutomationInstructionsApiFp(this.configuration).meteoraDlmmAutomationCreatePositionAndDepositAutomationIxPost(body, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -275,7 +275,7 @@ export class MeteoraDLMMAutomationInstructionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MeteoraDLMMAutomationInstructionsApi
      */
-    public async meteoraDlmmAutomationFullWithdrawAndClosePositionAutomationIxPost(body: AutomationFullWithdrawAndClosePositionAutomationIxBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2004>> {
+    public async meteoraDlmmAutomationFullWithdrawAndClosePositionAutomationIxPost(body: AutomationFullWithdrawAndClosePositionAutomationIxBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<TransactionMetadata>> {
         return MeteoraDLMMAutomationInstructionsApiFp(this.configuration).meteoraDlmmAutomationFullWithdrawAndClosePositionAutomationIxPost(body, options).then((request) => request(this.axios, this.basePath));
     }
 }

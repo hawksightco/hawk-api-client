@@ -12,27 +12,34 @@
  * Do not edit the class manually.
  */
 
+import { Account } from './account';
  /**
  * 
  *
  * @export
- * @interface UtilActiveBinBody
+ * @interface Instruction
  */
-export interface UtilActiveBinBody {
+export interface Instruction {
 
     /**
-     * Pools to search
-     *
-     * @type {Array<string>}
-     * @memberof UtilActiveBinBody
+     * @type {Array<Account>}
+     * @memberof Instruction
      */
-    pools?: Array<string>;
+    accounts?: Array<Account>;
 
     /**
-     * Commitment level (processed, confirmed, finalized)
+     * Base-64 encoded data for the instruction.
      *
      * @type {string}
-     * @memberof UtilActiveBinBody
+     * @memberof Instruction
      */
-    commitment?: string;
+    data?: string;
+
+    /**
+     * Solana program to execute.
+     *
+     * @type {string}
+     * @memberof Instruction
+     */
+    programId?: string;
 }

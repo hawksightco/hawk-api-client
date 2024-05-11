@@ -37,6 +37,14 @@ export interface TxDepositBody1 {
     maxPriorityFee?: number;
 
     /**
+     * Whether to disable computing priority fees. True by default which means it ignores priority parameter
+     *
+     * @type {boolean}
+     * @memberof TxDepositBody1
+     */
+    disableFeeCompute?: boolean;
+
+    /**
      * User's wallet address who owns the position
      *
      * @type {string}

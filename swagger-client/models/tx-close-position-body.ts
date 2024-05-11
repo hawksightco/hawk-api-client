@@ -37,6 +37,14 @@ export interface TxClosePositionBody {
     maxPriorityFee?: number;
 
     /**
+     * Whether to disable computing priority fees. True by default which means it ignores priority parameter
+     *
+     * @type {boolean}
+     * @memberof TxClosePositionBody
+     */
+    disableFeeCompute?: boolean;
+
+    /**
      * User's wallet address who owns the position.
      *
      * @type {string}
