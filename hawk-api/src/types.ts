@@ -234,6 +234,12 @@ export type HealthResponse = Record<string, "OK" | "NOT OK">;
 
 export type MeteoraDlmmActiveBin = Record<string, number>;
 
+export type BadRequestError = {
+  code: string,
+  message: string,
+  path: string,
+};
+
 export type TransactionMetadataResponse = {
   description: string;
   estimatedFeeInSOL: string,

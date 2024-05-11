@@ -47,7 +47,7 @@ export async function createTxMetadata(
   // });
 
   // Construct main instructions
-  const mainIxs = data.computeBudgetInstructions.map(ix => {
+  const mainIxs = data.mainInstructions.map(ix => {
     return new web3.TransactionInstruction({
       keys: ix.accounts.map(meta => {
         return { pubkey: new web3.PublicKey(meta.pubkey), isSigner: meta.isSigner, isWritable: meta.isWritable };
@@ -102,7 +102,7 @@ export async function createTxMetadata(
 export async function resultOrError<Response, Out>(
   result: { status: number, data: Response },
   successFn: (data: Response) => Promise<Out>
-): Promise<ResponseWithStatus<Out> | ResponseWithStatus<Response>> {
+): Promise<ResponseWithStatus<Out>> {
   if (result.status === 200) {
     // If the status is 200, apply the success function to the data
     return {
@@ -110,14 +110,20 @@ export async function resultOrError<Response, Out>(
       data: await successFn(result.data),
     };
   } else {
-    // If the status is not 200, return the original data without transformation
-    return {
-      status: result.status,
-      data: result.data,
-    }
+    console.error(`Error:`)
+    console.error(result.data);
+    throw new Error();
   }
 }
 
+/**
+ * Retrieves an estimate of the priority fee for a transaction using the provided connection.
+ *
+ * @param connection The web3 connection object used for interacting with the blockchain.
+ * @param priorityLevel The priority level of the transaction.
+ * @param versionedTransaction The versioned transaction object for which the fee estimate is needed.
+ * @returns A Promise resolving to the estimated priority fee for the transaction.
+ */
 export async function getFeeEstimate(
   connection: web3.Connection,
   priorityLevel: TransactionPriority,
