@@ -243,9 +243,11 @@ export type BadRequestError = {
 export type TransactionMetadataResponse = {
   description: string;
   estimatedFeeInSOL: string,
-  addressLookupTableAddresses: string[]; // "alts" is confusing, copied jup's naming
-  computeBudgetInstructions: Instruction[]; // this enables for ease of access while also making them optional
-  mainInstructions: Instruction[];
+  addressLookupTableAddresses: string[], // "alts" is confusing, copied jup's naming
+  computeBudgetInstructions: Instruction[], // this enables for ease of access while also making them optional
+  mainInstructions: Instruction[],
+  payer: string,
+  signature: string,
 }
 
 export type TransactionMetadata = {

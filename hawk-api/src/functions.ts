@@ -1,7 +1,9 @@
+import * as client from "@hawksightco/swagger-client";
 import * as web3 from "@solana/web3.js";
 import { ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, TransactionPriority } from "./types";
 import bs58 from "bs58";
 import { Transaction } from "./classes/Transaction";
+import { GeneralUtility } from "./classes/GeneralUtility";
 
 /**
  * Asynchronously creates transaction metadata based on the provided transaction parameters and network state.
@@ -21,10 +23,11 @@ import { Transaction } from "./classes/Transaction";
  * @throws Error if there is an issue in constructing the transaction or during simulation which includes logs of errors.
  */
 export async function createTxMetadata(
+  generalUtility: GeneralUtility,
   connection: web3.Connection,
   payer: string,
   data: TransactionMetadataResponse,
-  priorityLevel: TransactionPriority,
+  priorityLevel: client.UtilGetPriorityFeeEstimateBodyPriorityEnum,
   maxPriorityFee: number,
 ): Promise<TransactionMetadata> {
   // Retrieve address lookup table accounts
@@ -35,35 +38,13 @@ export async function createTxMetadata(
     );
   }
 
-  // // Construct compute instructions
-  // const computeIxs = data.computeBudgetInstructions.map(ix => {
-  //   return new web3.TransactionInstruction({
-  //     keys: ix.accounts.map(meta => {
-  //       return { pubkey: new web3.PublicKey(meta.pubkey), isSigner: meta.isSigner, isWritable: meta.isWritable };
-  //     }),
-  //     programId: new web3.PublicKey(ix.programId),
-  //     data: Buffer.from(ix.data, 'base64'),
-  //   });
-  // });
-
-  // Construct main instructions
-  const mainIxs = data.mainInstructions.map(ix => {
-    return new web3.TransactionInstruction({
-      keys: ix.accounts.map(meta => {
-        return { pubkey: new web3.PublicKey(meta.pubkey), isSigner: meta.isSigner, isWritable: meta.isWritable };
-      }),
-      programId: new web3.PublicKey(ix.programId),
-      data: Buffer.from(ix.data, 'base64'),
-    });
-  });
-
   // Get the recent blockhash
   const { blockhash: recentBlockhash } = await connection.getLatestBlockhash();
 
   // Create initial transaction instance
   const transaction = new Transaction(
+    data,
     new web3.PublicKey(payer),
-    mainIxs,
     recentBlockhash,
     alts,
   );
@@ -81,7 +62,7 @@ export async function createTxMetadata(
   }
 
   // Include priority fee instructions generated via Helius (assuming we use Helius as RPC)
-  transaction.addPriorityFeeIx(connection, priorityLevel, simulation.unitsConsumed, maxPriorityFee);
+  transaction.addPriorityFeeIx(generalUtility, connection, priorityLevel, simulation.unitsConsumed, maxPriorityFee);
 
   // Return transaction metadatauni
   return {
@@ -125,25 +106,16 @@ export async function resultOrError<Response, Out>(
  * @returns A Promise resolving to the estimated priority fee for the transaction.
  */
 export async function getFeeEstimate(
-  connection: web3.Connection,
-  priorityLevel: TransactionPriority,
-  versionedTransaction: web3.VersionedTransaction
+  generalUtility: GeneralUtility,
+  priority: client.UtilGetPriorityFeeEstimateBodyPriorityEnum,
+  transaction: TransactionMetadataResponse
 ): Promise<number> {
-  const response = await fetch(connection.rpcEndpoint, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      jsonrpc: "2.0",
-      id: "1",
-      method: "getPriorityFeeEstimate",
-      params: [
-        {
-          transaction: bs58.encode(versionedTransaction.serialize()), // Pass the serialized transaction in Base58
-          options: { priorityLevel },
-        },
-      ],
-    }),
+  const response = await generalUtility.getPriorityFeeEstimate({
+    priority,
+    transaction,
   });
-  const data = await response.json();
-  return data.result.priorityFeeEstimate;
+  return (await resultOrError<client.PriorityFeeEstimate, number>(
+    response,
+    async (result) => { return result.priorityFeeEstimate as number },
+  )).data
 }

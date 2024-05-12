@@ -1,7 +1,9 @@
+import * as client from "@hawksightco/swagger-client";
 import * as web3 from "@solana/web3.js";
-import { SimulatedTransactionResponse, TransactionPriority } from "../types";
+import { SimulatedTransactionResponse, TransactionMetadataResponse } from "../types";
 import { getFeeEstimate } from "../functions";
 import { BN } from "bn.js";
+import { GeneralUtility } from "./GeneralUtility";
 
 /**
  * Represents a transaction object in Solana using the web3.js library.
@@ -28,6 +30,7 @@ export class Transaction {
   get recentBlockhash(): string { return this._recentBlockhash; }
 
   /** Array of TransactionInstruction to be executed in this transaction */
+  private _instructions: web3.TransactionInstruction[];
   get instructions(): web3.TransactionInstruction[] { return this._instructions; }
 
   /**
@@ -39,11 +42,34 @@ export class Transaction {
    * @param alts Address lookup tables that optimize account address storage
    */
   constructor(
+    readonly txMetadataResponse: TransactionMetadataResponse,
     readonly payerKey: web3.PublicKey,
-    private _instructions: web3.TransactionInstruction[],
     private _recentBlockhash: string,
     readonly alts: web3.AddressLookupTableAccount[],
   ) {
+    // // Construct compute instructions
+    // const computeIxs = txMetadataResponse.computeBudgetInstructions.map(ix => {
+    //   return new web3.TransactionInstruction({
+    //     keys: ix.accounts.map(meta => {
+    //       return { pubkey: new web3.PublicKey(meta.pubkey), isSigner: meta.isSigner, isWritable: meta.isWritable };
+    //     }),
+    //     programId: new web3.PublicKey(ix.programId),
+    //     data: Buffer.from(ix.data, 'base64'),
+    //   });
+    // });
+
+    // Construct main instructions
+    const mainIxs = txMetadataResponse.mainInstructions.map(ix => {
+      return new web3.TransactionInstruction({
+        keys: ix.accounts.map(meta => {
+          return { pubkey: new web3.PublicKey(meta.pubkey), isSigner: meta.isSigner, isWritable: meta.isWritable };
+        }),
+        programId: new web3.PublicKey(ix.programId),
+        data: Buffer.from(ix.data, 'base64'),
+      });
+    });
+
+    this._instructions = [...mainIxs];
     const [txMessage, versionedTransaction] = this.buildTransaction(_recentBlockhash);
     this._txMessage = txMessage;
     this._versionedTransaction = versionedTransaction;
@@ -94,8 +120,9 @@ export class Transaction {
    * Add priority fee instructions (compute budget)
    */
   async addPriorityFeeIx(
+    generalUtility: GeneralUtility,
     connection: web3.Connection,
-    priorityLevel: TransactionPriority,
+    priorityLevel: client.UtilGetPriorityFeeEstimateBodyPriorityEnum,
     computeUnitLimit: number,
     maxPriorityFee?: number,
   ): Promise<web3.TransactionInstruction[]> {
@@ -103,7 +130,7 @@ export class Transaction {
     this.removePriorityFeeIxs();
 
     // Then get fee estimate by simulating the transaction
-    const estimate = await getFeeEstimate(connection, priorityLevel, this.versionedTransaction);
+    const estimate = await getFeeEstimate(generalUtility, priorityLevel, this.txMetadataResponse);
     const priorityFeeEstimate = maxPriorityFee !== undefined && maxPriorityFee > 0 ? Math.round(Math.min(estimate, maxPriorityFee)) : Math.round(estimate);
 
     // Create priority fee ixs for transaction

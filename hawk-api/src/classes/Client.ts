@@ -16,6 +16,9 @@ export class Client {
   /** API accessor for general endpoints, which include various utility functions that are broadly applicable. */
   public readonly generalEndpoints: client.GeneralEndpointsApi;
 
+  /** API accessor for general utility */
+  public readonly generalUtility: client.GeneralUtilityEndpointsApi;
+
   /** API accessor for utility functions specifically tailored for Meteora Decentralized Liquidity Market Maker (DLMM) operations. */
   public readonly meteoraDLMMUtilityFunctionsApi: client.MeteoraDLMMUtilityFunctionsApi;
 
@@ -45,6 +48,7 @@ export class Client {
     // Initialization of all API accessors with the configured base path.
     this.healthCheck = new client.HealthCheckApi(this.config);
     this.generalEndpoints = new client.GeneralEndpointsApi(this.config);
+    this.generalUtility = new client.GeneralUtilityEndpointsApi(this.config);
     this.meteoraDLMMUtilityFunctionsApi = new client.MeteoraDLMMUtilityFunctionsApi(this.config);
     this.meteoraDLMMInstructionsApi = new client.MeteoraDLMMInstructionsApi(this.config);
     this.meteoraDLMMAutomationInstructionsApi = new client.MeteoraDLMMAutomationInstructionsApi(this.config);

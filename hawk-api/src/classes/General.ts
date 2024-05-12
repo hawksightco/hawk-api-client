@@ -1,8 +1,9 @@
 import * as web3 from "@solana/web3.js";
-import * as client from "@hawksightco/swagger-client";
+import * as _client from "@hawksightco/swagger-client";
 import { ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, TransactionPriority, UserPortfolioOut } from "../types";
 import { Client } from "./Client";
 import { createTxMetadata, resultOrError } from "../functions";
+import { GeneralUtility } from "./GeneralUtility";
 
 /**
  * Provides general utility functions for managing and querying blockchain-related data,
@@ -13,7 +14,7 @@ import { createTxMetadata, resultOrError } from "../functions";
 export class General {
 
   /** The priority level for transactions, influencing transaction fee calculation and processing priority. */
-  protected priorityLevel: TransactionPriority;
+  protected priorityLevel: _client.UtilGetPriorityFeeEstimateBodyPriorityEnum;
 
   /** The maximum priority fee to be included in transaction fee calculations, specified in lamports. */
   protected maxPriorityFee: number;
@@ -24,9 +25,10 @@ export class General {
    */
   constructor(
     private readonly client: Client,
-  ) {
+    private readonly generalUtility: GeneralUtility,
+    ) {
     // Initialize with default values for transaction priority and fees.
-    this.priorityLevel = "Default";
+    this.priorityLevel = _client.UtilGetPriorityFeeEstimateBodyPriorityEnum.Default;
     this.maxPriorityFee = 500_000;
   }
 
@@ -35,7 +37,7 @@ export class General {
    *
    * @param priorityLevel The desired priority level for upcoming transactions.
    */
-  setPriorityLevel(priorityLevel: TransactionPriority) {
+  setPriorityLevel(priorityLevel: _client.UtilGetPriorityFeeEstimateBodyPriorityEnum) {
     this.priorityLevel = priorityLevel;
   }
 
@@ -72,7 +74,7 @@ export class General {
    *
    * @returns A Promise resolving to an array of pools, including metadata such as pool addresses and statistics.
    */
-  async pools(): Promise<ResponseWithStatus<client.InlineResponse2002[]>> {
+  async pools(): Promise<ResponseWithStatus<_client.InlineResponse2002[]>> {
     const result = await this.client.generalEndpoints.poolsGet().catch(e => e.response);
     return {
       status: result.status,
@@ -85,7 +87,7 @@ export class General {
    *
    * @returns A Promise resolving to an array of token details, including names, symbols, and other token-specific information.
    */
-  async tokens(): Promise<ResponseWithStatus<client.InlineResponse2003[]>> {
+  async tokens(): Promise<ResponseWithStatus<_client.InlineResponse2003[]>> {
     const result = await this.client.generalEndpoints.tokensGet().catch(e => e.response);
     return {
       status: result.status,
@@ -101,14 +103,14 @@ export class General {
    * @param params Registration parameters required by the API.
    * @returns A Promise resolving to the transaction metadata or an error response, depending on the outcome of the registration.
    */
-  async register(connection: web3.Connection, payer: string, params: client.RegisterBody): Promise<ResponseWithStatus<TransactionMetadataResponse> | ResponseWithStatus<TransactionMetadata>> {
+  async register(connection: web3.Connection, payer: string, params: _client.RegisterBody): Promise<ResponseWithStatus<TransactionMetadataResponse> | ResponseWithStatus<TransactionMetadata>> {
     const result = await this.client.generalEndpoints.registerPost(params).catch(e => e.response);
     return resultOrError<TransactionMetadataResponse, TransactionMetadata>(
       {
         status: result.status,
         data: result.data,
       },
-      async (data) => await createTxMetadata(connection, payer, data, this.priorityLevel, this.maxPriorityFee),
+      async (data) => await createTxMetadata(this.generalUtility, connection, payer, data, this.priorityLevel, this.maxPriorityFee),
     );
   }
 }

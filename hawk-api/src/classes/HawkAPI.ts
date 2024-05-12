@@ -4,6 +4,7 @@ import { TxGenerator } from "./TxGenerator";
 import { Util } from "./Util";
 import { TxGeneratorAutomations } from "./TxGeneratorAutomations";
 import { Client } from "./Client";
+import { GeneralUtility } from "./GeneralUtility";
 
 /**
  * HawkAPI is a central gateway class that aggregates access to various functional modules
@@ -20,6 +21,9 @@ export class HawkAPI {
 
   /** General module for basic blockchain operations like portfolio management, token information retrieval. */
   public readonly general: General;
+
+  /** General utility endpoint */
+  public readonly generalUtility: GeneralUtility;
 
   /** Util module for various utility functions that assist with blockchain interactions. */
   public readonly util: Util;
@@ -39,9 +43,10 @@ export class HawkAPI {
   ) {
     const client = new Client(url);
     this.health = new Health(client);
-    this.general = new General(client);
+    this.generalUtility = new GeneralUtility(client);
+    this.general = new General(client, this.generalUtility);
     this.util = new Util(client);
-    this.txGenerator = new TxGenerator(client);
-    this.txGeneratorAutomation = new TxGeneratorAutomations(client);
+    this.txGenerator = new TxGenerator(client, this.generalUtility);
+    this.txGeneratorAutomation = new TxGeneratorAutomations(client, this.generalUtility);
   }
 }
