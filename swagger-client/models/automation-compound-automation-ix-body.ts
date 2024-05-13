@@ -59,12 +59,4 @@ export interface AutomationCompoundAutomationIxBody {
      * @memberof AutomationCompoundAutomationIxBody
      */
     position?: string;
-
-    /**
-     * Address of the new position the user wants to move to.
-     *
-     * @type {string}
-     * @memberof AutomationCompoundAutomationIxBody
-     */
-    newPosition?: string;
 }
