@@ -67,12 +67,4 @@ export interface AutomationCompoundAutomationIxBody {
      * @memberof AutomationCompoundAutomationIxBody
      */
     newPosition?: string;
-
-    /**
-     * The distribution strategy for the transaction (SPOT, CURVE, BID-ASK).
-     *
-     * @type {string}
-     * @memberof AutomationCompoundAutomationIxBody
-     */
-    distribution?: string;
 }
