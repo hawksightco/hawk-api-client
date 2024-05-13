@@ -38,65 +38,17 @@ export class TxGeneratorAutomations {
   }
 
   /**
-   * Creates meteora automation instruction that claims fee and rewards
+   * Creates meteora auto-compound instruction (claim fee, reward, and deposit to position)
    * 
    * NOTE: For hawksight devs only.
-   * 
-   * Autocompound IX
    *
    * @param connection The Solana web3 connection object for blockchain interactions.
    * @param payer The public key of the payer for transaction fees.
    * @param params Parameters required
    * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
    */
-  async meteoraClaimFeeAndRewards(connection: web3.Connection, payer: string, params: _client.AutomationClaimFeeAndRewardsAutomationIxBody): Promise<ResponseWithStatus<TransactionMetadataResponse> | ResponseWithStatus<TransactionMetadata>> {
-    const result = await this.client.meteoraDLMMAutomationInstructionsApi.meteoraDlmmAutomationClaimFeeAndRewardsAutomationIxPost(params).catch(e => e.response);
-    return resultOrError<TransactionMetadataResponse, TransactionMetadata>(
-      {
-        status: result.status,
-        data: result.data,
-      },
-      async (data) => await createTxMetadata(this.generalUtility, connection, payer, data, this.priorityLevel, this.maxPriorityFee),
-    );
-  }
-
-  /**
-   * Creates meteora automation instruction fully withdraws position and closes it
-   * 
-   * NOTE: For hawksight devs only.
-   * 
-   * Rebalance IX Part 1
-   *
-   * @param connection The Solana web3 connection object for blockchain interactions.
-   * @param payer The public key of the payer for transaction fees.
-   * @param params Parameters required
-   * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
-   */
-  async meteoraFullWithdrawalAndClosePosition(connection: web3.Connection, payer: string, params: _client.AutomationFullWithdrawAndClosePositionAutomationIxBody): Promise<ResponseWithStatus<TransactionMetadataResponse> | ResponseWithStatus<TransactionMetadata>> {
-    const result = await this.client.meteoraDLMMAutomationInstructionsApi.meteoraDlmmAutomationFullWithdrawAndClosePositionAutomationIxPost(params).catch(e => e.response);
-    return resultOrError<TransactionMetadataResponse, TransactionMetadata>(
-      {
-        status: result.status,
-        data: result.data,
-      },
-      async (data) => await createTxMetadata(this.generalUtility, connection, payer, data, this.priorityLevel, this.maxPriorityFee),
-    );
-  }
-
-  /**
-   * Creates meteora automation instruction that creates new position and deposit to that position
-   * 
-   * NOTE: For hawksight devs only.
-   * 
-   * Rebalance IX Part 2
-   *
-   * @param connection The Solana web3 connection object for blockchain interactions.
-   * @param payer The public key of the payer for transaction fees.
-   * @param params Parameters required
-   * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
-   */
-  async meteoraCreatePositionAndDeposit(connection: web3.Connection, payer: string, params: _client.AutomationCreatePositionAndDepositAutomationIxBody): Promise<ResponseWithStatus<TransactionMetadataResponse> | ResponseWithStatus<TransactionMetadata>> {
-    const result = await this.client.meteoraDLMMAutomationInstructionsApi.meteoraDlmmAutomationCreatePositionAndDepositAutomationIxPost(params).catch(e => e.response);
+  async meteoraCompoundIxs(connection: web3.Connection, payer: string, params: _client.AutomationCompoundAutomationIxBody): Promise<ResponseWithStatus<TransactionMetadata>> {
+    const result = await this.client.meteoraDLMMAutomationInstructionsApi.meteoraDlmmAutomationCompoundAutomationIxPost(params).catch(e => e.response);
     return resultOrError<TransactionMetadataResponse, TransactionMetadata>(
       {
         status: result.status,
