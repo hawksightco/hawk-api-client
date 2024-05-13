@@ -1,5 +1,6 @@
 export * from './account';
 export * from './automation-claim-fee-and-rewards-automation-ix-body';
+export * from './automation-compound-automation-ix-body';
 export * from './automation-create-position-and-deposit-automation-ix-body';
 export * from './automation-full-withdraw-and-close-position-automation-ix-body';
 export * from './inline-response200';

@@ -18,6 +18,7 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 import { AutomationClaimFeeAndRewardsAutomationIxBody } from '../models';
+import { AutomationCompoundAutomationIxBody } from '../models';
 import { AutomationCreatePositionAndDepositAutomationIxBody } from '../models';
 import { AutomationFullWithdrawAndClosePositionAutomationIxBody } from '../models';
 import { InlineResponse400 } from '../models';
@@ -40,6 +41,48 @@ export const MeteoraDLMMAutomationInstructionsApiAxiosParamCreator = function (c
                 throw new RequiredError('body','Required parameter body was null or undefined when calling meteoraDlmmAutomationClaimFeeAndRewardsAutomationIxPost.');
             }
             const localVarPath = `/meteora/dlmm/automation/claimFeeAndRewardsAutomationIx`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions :AxiosRequestConfig = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.params) {
+                query.set(key, options.params[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const needsSerialization = (typeof body !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(body !== undefined ? body : {}) : (body || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Generates a compound transaction instruction for Meteora DLMM, to be signed by Hawksight authority. This allows users to modify their positions based on specified parameters.
+         * @param {AutomationCompoundAutomationIxBody} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        meteoraDlmmAutomationCompoundAutomationIxPost: async (body: AutomationCompoundAutomationIxBody, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'body' is not null or undefined
+            if (body === null || body === undefined) {
+                throw new RequiredError('body','Required parameter body was null or undefined when calling meteoraDlmmAutomationCompoundAutomationIxPost.');
+            }
+            const localVarPath = `/meteora/dlmm/automation/compoundAutomationIx`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -177,6 +220,19 @@ export const MeteoraDLMMAutomationInstructionsApiFp = function(configuration?: C
             };
         },
         /**
+         * Generates a compound transaction instruction for Meteora DLMM, to be signed by Hawksight authority. This allows users to modify their positions based on specified parameters.
+         * @param {AutomationCompoundAutomationIxBody} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async meteoraDlmmAutomationCompoundAutomationIxPost(body: AutomationCompoundAutomationIxBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<TransactionMetadata>>> {
+            const localVarAxiosArgs = await MeteoraDLMMAutomationInstructionsApiAxiosParamCreator(configuration).meteoraDlmmAutomationCompoundAutomationIxPost(body, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Generate deposit Meteora instruction (with init position), to be signed by Hawksight authority.
          * @param {AutomationCreatePositionAndDepositAutomationIxBody} body 
          * @param {*} [options] Override http request option.
@@ -221,6 +277,15 @@ export const MeteoraDLMMAutomationInstructionsApiFactory = function (configurati
             return MeteoraDLMMAutomationInstructionsApiFp(configuration).meteoraDlmmAutomationClaimFeeAndRewardsAutomationIxPost(body, options).then((request) => request(axios, basePath));
         },
         /**
+         * Generates a compound transaction instruction for Meteora DLMM, to be signed by Hawksight authority. This allows users to modify their positions based on specified parameters.
+         * @param {AutomationCompoundAutomationIxBody} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async meteoraDlmmAutomationCompoundAutomationIxPost(body: AutomationCompoundAutomationIxBody, options?: AxiosRequestConfig): Promise<AxiosResponse<TransactionMetadata>> {
+            return MeteoraDLMMAutomationInstructionsApiFp(configuration).meteoraDlmmAutomationCompoundAutomationIxPost(body, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Generate deposit Meteora instruction (with init position), to be signed by Hawksight authority.
          * @param {AutomationCreatePositionAndDepositAutomationIxBody} body 
          * @param {*} [options] Override http request option.
@@ -257,6 +322,16 @@ export class MeteoraDLMMAutomationInstructionsApi extends BaseAPI {
      */
     public async meteoraDlmmAutomationClaimFeeAndRewardsAutomationIxPost(body: AutomationClaimFeeAndRewardsAutomationIxBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<TransactionMetadata>> {
         return MeteoraDLMMAutomationInstructionsApiFp(this.configuration).meteoraDlmmAutomationClaimFeeAndRewardsAutomationIxPost(body, options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
+     * Generates a compound transaction instruction for Meteora DLMM, to be signed by Hawksight authority. This allows users to modify their positions based on specified parameters.
+     * @param {AutomationCompoundAutomationIxBody} body 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MeteoraDLMMAutomationInstructionsApi
+     */
+    public async meteoraDlmmAutomationCompoundAutomationIxPost(body: AutomationCompoundAutomationIxBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<TransactionMetadata>> {
+        return MeteoraDLMMAutomationInstructionsApiFp(this.configuration).meteoraDlmmAutomationCompoundAutomationIxPost(body, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * Generate deposit Meteora instruction (with init position), to be signed by Hawksight authority.
