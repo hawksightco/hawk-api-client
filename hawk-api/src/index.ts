@@ -1,3 +1,2 @@
-import { HawkAPI } from "./classes/HawkAPI";
-
-export default HawkAPI;
+export * from "./types";
+export { HawkAPI } from "./classes/HawkAPI";

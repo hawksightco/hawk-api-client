@@ -1,6 +1,5 @@
 import * as web3 from "@solana/web3.js";
-import BN from "bn.js";
-import HawkAPI from "../src";
+import { HawkAPI } from "../src";
 import { ResponseWithStatus } from "../src/types";
 
 const client = new HawkAPI('https://stagingapi2.hawksight.co');
