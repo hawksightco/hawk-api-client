@@ -1,5 +1,5 @@
 import * as web3 from "@solana/web3.js";
-import { HawkAPI } from "../src";
+import { HawkAPI, TransactionClass } from "../src";
 import { ResponseWithStatus } from "../src/types";
 
 const client = new HawkAPI('https://stagingapi2.hawksight.co');
@@ -59,6 +59,7 @@ describe('General Endpoints', () => {
     const result = await client.general.register(connection, hawkWallet, { userWallet: hawkWallet });
     logIfNot200(result);
     expect(result.status).toBe(200);
+    simulateTransaction(result.data.transaction);
   }, TIMEOUT);
 });
 
@@ -91,6 +92,7 @@ describe('Meteora Endpoints', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
+    simulateTransaction(result.data.transaction);
   }, TIMEOUT);
   it ('POST /meteora/dlmm/tx/deposit', async () => {
     const result = await client.txGenerator.meteoraDeposit(
@@ -106,6 +108,7 @@ describe('Meteora Endpoints', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
+    simulateTransaction(result.data.transaction);
   }, TIMEOUT);
   it ('POST /meteora/dlmm/tx/claim', async () => {
     const result = await client.txGenerator.meteoraClaim(
@@ -118,6 +121,7 @@ describe('Meteora Endpoints', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
+    simulateTransaction(result.data.transaction);
   }, TIMEOUT);
   it ('POST /meteora/dlmm/tx/withdraw', async () => {
     const result = await client.txGenerator.meteoraWithdraw(
@@ -132,6 +136,7 @@ describe('Meteora Endpoints', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
+    simulateTransaction(result.data.transaction);
   }, TIMEOUT);
   it ('POST /meteora/dlmm/tx/closePosition', async () => { // will not work because position is not empty.
     const result = await client.txGenerator.meteoraClosePosition(
@@ -144,49 +149,27 @@ describe('Meteora Endpoints', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
+    simulateTransaction(result.data.transaction);
   }, TIMEOUT);
 });
 
 describe('Meteora Automation Endpoints', () => {
   it ('POST /meteora/dlmm/automation/claimFeeAndRewardsAutomationIx', async () => {
-    const result = await client.txGeneratorAutomation.meteoraClaimFeeAndRewards(
+    const newPositionKp = web3.Keypair.generate();
+    const newPosition = newPositionKp.publicKey.toString();
+    const result = await client.txGeneratorAutomation.meteoraCompoundIxs(
       connection,
       hawkWallet,
       {
         userWallet: testWallet,
         position: testPosition,
+        newPosition,
+        distribution: "SPOT"
       }
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
-  }, TIMEOUT);
-  it ('POST /meteora/dlmm/automation/fullWithdrawAndClosePositionAutomationIx', async () => {
-    const result = await client.txGeneratorAutomation.meteoraFullWithdrawalAndClosePosition(
-      connection,
-      hawkWallet,
-      {
-        userWallet: testWallet,
-        position: testPosition,
-      }
-    );
-    logIfNot200(result);
-    expect(result.status).toBe(200);
-  }, TIMEOUT);
-  it ('POST /meteora/dlmm/automation/createPositionAndDepositAutomationIx', async () => { // can't test...
-    const result = await client.txGeneratorAutomation.meteoraCreatePositionAndDeposit(
-      connection,
-      hawkWallet,
-      {
-        position: web3.Keypair.generate().publicKey.toString(),
-        pool: testPool,
-        userWallet: testWallet,
-        lowerBinRange: activeBin - 20,
-        upperBinRange: activeBin + 20,
-        distribution: 'CURVE',
-      }
-    );
-    logIfNot200(result);
-    expect(result.status).toBe(200);
+    simulateTransaction(result.data.transaction);
   }, TIMEOUT);
 });
 
@@ -208,5 +191,17 @@ function isInteger(value: string): boolean {
 function logIfNot200(result: ResponseWithStatus<any>) {
   if (result.status !== 200) {
     console.log(result.data);
+  }
+}
+
+async function simulateTransaction(tx: TransactionClass) {
+  const simulation = await tx.simulateTransaction(connection);
+  // Check if there's error in transaction
+  if (simulation.err !== null) {
+    console.error(`Transaction Error: ${simulation.err}`);
+    for (const log of simulation.logs as string[]) {
+      console.error(log);
+    }
+    throw new Error(simulation.err.toString());
   }
 }

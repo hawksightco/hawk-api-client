@@ -47,22 +47,23 @@ export async function createTxMetadata(
     new web3.PublicKey(payer),
     recentBlockhash,
     alts,
+    generalUtility,
   );
 
-  // Simulate transaction to get consumed units
-  const simulation = await transaction.simulateTransaction(connection);
+  // // Simulate transaction to get consumed units
+  // const simulation = await transaction.simulateTransaction(connection);
 
-  // Check if there's error in transaction
-  if (simulation.err !== null) {
-    console.error(`Transaction Error: ${simulation.err}`);
-    for (const log in simulation.logs) {
-      console.error(log);
-    }
-    throw new Error(simulation.err.toString());
-  }
+  // // Check if there's error in transaction
+  // if (simulation.err !== null) {
+  //   console.log(`Transaction Error: ${simulation.err}`);
+  //   for (const log of simulation.logs as string[]) {
+  //     console.log(log);
+  //   }
+  //   // throw new Error(simulation.err.toString());
+  // }
 
-  // Include priority fee instructions generated via Helius (assuming we use Helius as RPC)
-  transaction.addPriorityFeeIx(generalUtility, connection, priorityLevel, simulation.unitsConsumed, maxPriorityFee);
+  // // Include priority fee instructions generated via Helius (assuming we use Helius as RPC)
+  // transaction.addPriorityFeeIx(connection, priorityLevel, simulation.unitsConsumed, maxPriorityFee);
 
   // Return transaction metadatauni
   return {

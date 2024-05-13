@@ -103,7 +103,7 @@ export class General {
    * @param params Registration parameters required by the API.
    * @returns A Promise resolving to the transaction metadata or an error response, depending on the outcome of the registration.
    */
-  async register(connection: web3.Connection, payer: string, params: _client.RegisterBody): Promise<ResponseWithStatus<TransactionMetadataResponse> | ResponseWithStatus<TransactionMetadata>> {
+  async register(connection: web3.Connection, payer: string, params: _client.RegisterBody): Promise<ResponseWithStatus<TransactionMetadata>> {
     const result = await this.client.generalEndpoints.registerPost(params).catch(e => e.response);
     return resultOrError<TransactionMetadataResponse, TransactionMetadata>(
       {

@@ -1,6 +1,7 @@
 import * as web3 from "@solana/web3.js";
 import BN from "bn.js";
 import { Transaction as TransactionClass } from "./classes/Transaction";
+export { Transaction as TransactionClass } from "./classes/Transaction";
 
 export type AccountMeta = {
   isSigner: boolean,

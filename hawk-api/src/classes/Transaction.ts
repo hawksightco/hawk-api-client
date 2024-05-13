@@ -46,6 +46,7 @@ export class Transaction {
     readonly payerKey: web3.PublicKey,
     private _recentBlockhash: string,
     readonly alts: web3.AddressLookupTableAccount[],
+    private generalUtility: GeneralUtility,
   ) {
     // // Construct compute instructions
     // const computeIxs = txMetadataResponse.computeBudgetInstructions.map(ix => {
@@ -120,7 +121,6 @@ export class Transaction {
    * Add priority fee instructions (compute budget)
    */
   async addPriorityFeeIx(
-    generalUtility: GeneralUtility,
     connection: web3.Connection,
     priorityLevel: client.UtilGetPriorityFeeEstimateBodyPriorityEnum,
     computeUnitLimit: number,
@@ -130,7 +130,7 @@ export class Transaction {
     this.removePriorityFeeIxs();
 
     // Then get fee estimate by simulating the transaction
-    const estimate = await getFeeEstimate(generalUtility, priorityLevel, this.txMetadataResponse);
+    const estimate = await getFeeEstimate(this.generalUtility, priorityLevel, this.txMetadataResponse);
     const priorityFeeEstimate = maxPriorityFee !== undefined && maxPriorityFee > 0 ? Math.round(Math.min(estimate, maxPriorityFee)) : Math.round(estimate);
 
     // Create priority fee ixs for transaction
@@ -196,7 +196,7 @@ export class Transaction {
   /**
    * Builds transaction object
    */
-  private buildTransaction(recentBlockhash: string): [web3.TransactionMessage, web3.VersionedTransaction] {
+  buildTransaction(recentBlockhash: string): [web3.TransactionMessage, web3.VersionedTransaction] {
     this._txMessage = new web3.TransactionMessage({
       payerKey: this.payerKey,
       instructions: this.instructions,
