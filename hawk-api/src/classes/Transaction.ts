@@ -27,11 +27,14 @@ export class Transaction {
   get priorityFeeEstimate(): string { return this._priorityFeeEstimate; }
 
   /** The blockhash of a recent ledger entry */
-  get recentBlockhash(): string { return this._recentBlockhash; }
+  get recentBlockhash(): string { return this.latestBlockhash.blockhash; }
 
   /** Array of TransactionInstruction to be executed in this transaction */
   private _instructions: web3.TransactionInstruction[];
   get instructions(): web3.TransactionInstruction[] { return this._instructions; }
+
+  /** last valid block height */
+  get lastValidBlockHeight(): number { return this.latestBlockhash.lastValidBlockHeight; }
 
   /**
    * Constructs a new Transaction object.
@@ -44,7 +47,7 @@ export class Transaction {
   constructor(
     readonly txMetadataResponse: TransactionMetadataResponse,
     readonly payerKey: web3.PublicKey,
-    private _recentBlockhash: string,
+    private latestBlockhash: web3.BlockhashWithExpiryBlockHeight,
     readonly alts: web3.AddressLookupTableAccount[],
     private generalUtility: GeneralUtility,
   ) {
@@ -71,7 +74,7 @@ export class Transaction {
     });
 
     this._instructions = [...mainIxs];
-    const [txMessage, versionedTransaction] = this.buildTransaction(_recentBlockhash);
+    const [txMessage, versionedTransaction] = this.buildTransaction(latestBlockhash);
     this._txMessage = txMessage;
     this._versionedTransaction = versionedTransaction;
     this.requiredSigners = this.getRequiredSigners();
@@ -150,7 +153,7 @@ export class Transaction {
     this._instructions.unshift(...priorityFeeIxs);
 
     // Rebuild versioned transaction
-    const { blockhash } = await connection.getLatestBlockhash();
+    const blockhash = await connection.getLatestBlockhash();
     this.buildTransaction(blockhash);
 
     return priorityFeeIxs;
@@ -196,11 +199,12 @@ export class Transaction {
   /**
    * Builds transaction object
    */
-  buildTransaction(recentBlockhash: string): [web3.TransactionMessage, web3.VersionedTransaction] {
+  buildTransaction(latestBlockhash: web3.BlockhashWithExpiryBlockHeight): [web3.TransactionMessage, web3.VersionedTransaction] {
+    this.latestBlockhash = latestBlockhash;
     this._txMessage = new web3.TransactionMessage({
       payerKey: this.payerKey,
       instructions: this.instructions,
-      recentBlockhash,
+      recentBlockhash: this.recentBlockhash,
     });
 
     this._versionedTransaction = new web3.VersionedTransaction(this.txMessage.compileToV0Message(this.alts));

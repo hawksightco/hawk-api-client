@@ -39,13 +39,13 @@ export async function createTxMetadata(
   }
 
   // Get the recent blockhash
-  const { blockhash: recentBlockhash } = await connection.getLatestBlockhash();
+  const latestBlockhash = await connection.getLatestBlockhash();
 
   // Create initial transaction instance
   const transaction = new Transaction(
     data,
     new web3.PublicKey(payer),
-    recentBlockhash,
+    latestBlockhash,
     alts,
     generalUtility,
   );
