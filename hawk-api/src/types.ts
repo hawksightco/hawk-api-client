@@ -113,12 +113,12 @@ export type OrcaPoolConfig = OrcaPoolInfo;
 export type MeteoraPoolConfig = {
   address: string,
   name: string,
-  mint_x: string,
-  mint_y: string,
-  reserve_x: string,
-  reserve_y: string,
-  reward_mint_x: string,
-  reward_mint_y: string,
+  mint_a: string,
+  mint_b: string,
+  reserve_a: string,
+  reserve_b: string,
+  reward_mint_a: string,
+  reward_mint_b: string,
   bin_step: number,
 };
 
