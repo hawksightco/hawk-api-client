@@ -1,8 +1,11 @@
 import * as client from "@hawksightco/swagger-client";
 import * as web3 from "@solana/web3.js";
-import { SimulatedTransactionResponse, TransactionMetadataResponse } from "../types";
-import { getFeeEstimate } from "../functions";
 import { BN } from "bn.js";
+import { getFeeEstimate } from "../functions";
+import {
+  SimulatedTransactionResponse,
+  TransactionMetadataResponse,
+} from "../types";
 import { GeneralUtility } from "./GeneralUtility";
 
 /**
@@ -10,31 +13,42 @@ import { GeneralUtility } from "./GeneralUtility";
  * This class encapsulates the logic for creating, signing, and verifying signatures of transactions.
  */
 export class Transaction {
-
   /** Compiled TransactionMessage which includes payer, instructions, and recent blockhash */
   private _txMessage: web3.TransactionMessage;
-  get txMessage(): web3.TransactionMessage { return this._txMessage }
+  get txMessage(): web3.TransactionMessage {
+    return this._txMessage;
+  }
 
   /** Versioned transaction built from the transaction message */
   private _versionedTransaction: web3.VersionedTransaction;
-  get versionedTransaction(): web3.VersionedTransaction { return this._versionedTransaction; }
+  get versionedTransaction(): web3.VersionedTransaction {
+    return this._versionedTransaction;
+  }
 
   /** A map indicating whether each required signer has signed the transaction */
   readonly requiredSigners: Record<string, boolean>;
 
   /** Estimated fee in SOL for priority fee when addPriorityFee() method is called. */
   private _priorityFeeEstimate: string = "";
-  get priorityFeeEstimate(): string { return this._priorityFeeEstimate; }
+  get priorityFeeEstimate(): string {
+    return this._priorityFeeEstimate;
+  }
 
   /** The blockhash of a recent ledger entry */
-  get recentBlockhash(): string { return this.latestBlockhash.blockhash; }
+  get recentBlockhash(): string {
+    return this.latestBlockhash.blockhash;
+  }
 
   /** Array of TransactionInstruction to be executed in this transaction */
   private _instructions: web3.TransactionInstruction[];
-  get instructions(): web3.TransactionInstruction[] { return this._instructions; }
+  get instructions(): web3.TransactionInstruction[] {
+    return this._instructions;
+  }
 
   /** last valid block height */
-  get lastValidBlockHeight(): number { return this.latestBlockhash.lastValidBlockHeight; }
+  get lastValidBlockHeight(): number {
+    return this.latestBlockhash.lastValidBlockHeight;
+  }
 
   /**
    * Constructs a new Transaction object.
@@ -49,7 +63,7 @@ export class Transaction {
     readonly payerKey: web3.PublicKey,
     private latestBlockhash: web3.BlockhashWithExpiryBlockHeight,
     readonly alts: web3.AddressLookupTableAccount[],
-    private generalUtility: GeneralUtility,
+    private generalUtility: GeneralUtility
   ) {
     // // Construct compute instructions
     // const computeIxs = txMetadataResponse.computeBudgetInstructions.map(ix => {
@@ -63,25 +77,32 @@ export class Transaction {
     // });
 
     // Construct main instructions
-    const mainIxs = txMetadataResponse.mainInstructions.map(ix => {
+    const mainIxs = txMetadataResponse.mainInstructions.map((ix) => {
       return new web3.TransactionInstruction({
-        keys: ix.accounts.map(meta => {
-          return { pubkey: new web3.PublicKey(meta.pubkey), isSigner: meta.isSigner, isWritable: meta.isWritable };
+        keys: ix.accounts.map((meta) => {
+          return {
+            pubkey: new web3.PublicKey(meta.pubkey),
+            isSigner: meta.isSigner,
+            isWritable: meta.isWritable,
+          };
         }),
         programId: new web3.PublicKey(ix.programId),
-        data: Buffer.from(ix.data, 'base64'),
+        data: Buffer.from(ix.data, "base64"),
       });
     });
 
     this._instructions = [...mainIxs];
-    const [txMessage, versionedTransaction] = this.buildTransaction(latestBlockhash);
+    const [txMessage, versionedTransaction] =
+      this.buildTransaction(latestBlockhash);
     this._txMessage = txMessage;
     this._versionedTransaction = versionedTransaction;
     this.requiredSigners = this.getRequiredSigners();
-    if (typeof this.requiredSigners[payerKey.toString()] !== 'boolean') {
-      throw new Error(`Warning: The payer ${payerKey} is not one of the required signers of this transaction.`);
+    if (typeof this.requiredSigners[payerKey.toString()] !== "boolean") {
+      throw new Error(
+        `Warning: The payer ${payerKey} is not one of the required signers of this transaction.`
+      );
     }
-  };
+  }
 
   /**
    * Signs the transaction with provided signers.
@@ -92,18 +113,20 @@ export class Transaction {
    */
   sign(signers: web3.Signer[], idempotent: boolean = false): void {
     // First validate all signers
-    signers.forEach(signer => {
+    signers.forEach((signer) => {
       const key = signer.publicKey.toString();
-      if (typeof this.requiredSigners[key] !== 'boolean') {
+      if (typeof this.requiredSigners[key] !== "boolean") {
         throw new Error(`Key ${key} is not a required signer!`);
       }
       if (!idempotent && this.requiredSigners[key]) {
-        throw new Error(`Key ${key} has already been signed by required signer!`);
+        throw new Error(
+          `Key ${key} has already been signed by required signer!`
+        );
       }
     });
 
     // If all signers are valid and the process is idempotent or they haven't signed yet, update and sign
-    signers.forEach(signer => {
+    signers.forEach((signer) => {
       const key = signer.publicKey.toString();
       this.requiredSigners[key] = true;
     });
@@ -112,12 +135,33 @@ export class Transaction {
   }
 
   /**
+   * Add a signature on the transaction with provided signature.
+   *
+   * @param publicKey The public key of the signer
+   * @param signature A signature of the signed transaction
+   * @throws Error if a signer is not required or has already signed the transaction.
+   */
+  addSignature(publicKey: web3.PublicKey, signature: Uint8Array): void {
+    const key = publicKey.toBase58();
+    if (typeof this.requiredSigners[key] !== "boolean") {
+      throw new Error(`Key ${key} is not a required signer!`);
+    }
+    if (this.requiredSigners[key]) {
+      throw new Error(`Key ${key} has already been signed by required signer!`);
+    }
+
+    this.requiredSigners[key] = true;
+
+    this.versionedTransaction.addSignature(publicKey, signature);
+  }
+
+  /**
    * Checks if all required signers have signed the transaction.
    *
    * @returns Boolean indicating whether all required signers have signed.
    */
   isSignedByRequiredSigners(): boolean {
-    return Object.values(this.requiredSigners).every(isSigned => isSigned);
+    return Object.values(this.requiredSigners).every((isSigned) => isSigned);
   }
 
   /**
@@ -127,27 +171,39 @@ export class Transaction {
     connection: web3.Connection,
     priorityLevel: client.UtilGetPriorityFeeEstimateBodyPriorityEnum,
     computeUnitLimit: number,
-    maxPriorityFee?: number,
+    maxPriorityFee?: number
   ): Promise<web3.TransactionInstruction[]> {
     // First, remove priority fee instructions (compute budget if there is)
     this.removePriorityFeeIxs();
 
     // Then get fee estimate by simulating the transaction
-    const estimate = await getFeeEstimate(this.generalUtility, priorityLevel, this.txMetadataResponse);
-    const priorityFeeEstimate = maxPriorityFee !== undefined && maxPriorityFee > 0 ? Math.round(Math.min(estimate, maxPriorityFee)) : Math.round(estimate);
+    const estimate = await getFeeEstimate(
+      this.generalUtility,
+      priorityLevel,
+      this.txMetadataResponse
+    );
+    const priorityFeeEstimate =
+      maxPriorityFee !== undefined && maxPriorityFee > 0
+        ? Math.round(Math.min(estimate, maxPriorityFee))
+        : Math.round(estimate);
 
     // Create priority fee ixs for transaction
     const priorityFeeIxs = [
-      web3.ComputeBudgetProgram.setComputeUnitLimit({ units: computeUnitLimit }),
+      web3.ComputeBudgetProgram.setComputeUnitLimit({
+        units: computeUnitLimit,
+      }),
       web3.ComputeBudgetProgram.setComputeUnitPrice({
         // CU * CU PRICE -> 1400000 * feeEstimate.priorityFeeEstimate
         microLamports: priorityFeeEstimate,
       }),
     ];
-    this._priorityFeeEstimate = (new BN(priorityFeeEstimate)
-      .mul(new BN(computeUnitLimit))
-      .div(new BN(1_000_000))
-      .add(new BN(5000)).toNumber() / 1_000_000_000).toString();
+    this._priorityFeeEstimate = (
+      new BN(priorityFeeEstimate)
+        .mul(new BN(computeUnitLimit))
+        .div(new BN(1_000_000))
+        .add(new BN(5000))
+        .toNumber() / 1_000_000_000
+    ).toString();
 
     // Append priority fee instruction at the beginning
     this._instructions.unshift(...priorityFeeIxs);
@@ -165,7 +221,9 @@ export class Transaction {
    * @param connection
    * @returns
    */
-  async simulateTransaction(connection: web3.Connection): Promise<SimulatedTransactionResponse> {
+  async simulateTransaction(
+    connection: web3.Connection
+  ): Promise<SimulatedTransactionResponse> {
     const testInstructions = [
       web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 }),
       ...this.instructions,
@@ -177,15 +235,12 @@ export class Transaction {
         recentBlockhash: web3.PublicKey.default.toString(),
       }).compileToV0Message(this.alts)
     );
-    const simulation = await connection.simulateTransaction(
-      testVersionedTxn,
-      {
-        replaceRecentBlockhash: true,
-        sigVerify: false,
-      }
-    );
+    const simulation = await connection.simulateTransaction(testVersionedTxn, {
+      replaceRecentBlockhash: true,
+      sigVerify: false,
+    });
     if (simulation.value.unitsConsumed === undefined) {
-      throw new Error('Unable to calculate compute budget.');
+      throw new Error("Unable to calculate compute budget.");
     }
     return {
       err: simulation.value.err,
@@ -199,7 +254,9 @@ export class Transaction {
   /**
    * Builds transaction object
    */
-  buildTransaction(latestBlockhash: web3.BlockhashWithExpiryBlockHeight): [web3.TransactionMessage, web3.VersionedTransaction] {
+  buildTransaction(
+    latestBlockhash: web3.BlockhashWithExpiryBlockHeight
+  ): [web3.TransactionMessage, web3.VersionedTransaction] {
     this.latestBlockhash = latestBlockhash;
     this._txMessage = new web3.TransactionMessage({
       payerKey: this.payerKey,
@@ -207,7 +264,9 @@ export class Transaction {
       recentBlockhash: this.recentBlockhash,
     });
 
-    this._versionedTransaction = new web3.VersionedTransaction(this.txMessage.compileToV0Message(this.alts));
+    this._versionedTransaction = new web3.VersionedTransaction(
+      this.txMessage.compileToV0Message(this.alts)
+    );
     return [this._txMessage, this._versionedTransaction];
   }
 
@@ -217,11 +276,13 @@ export class Transaction {
    * @returns A record of signer public keys mapped to a boolean indicating whether they have signed.
    */
   private getRequiredSigners(): Record<string, boolean> {
-    const signerKeys = this.instructions.flatMap(ix => 
-      ix.keys.filter(meta => meta.isSigner).map(meta => meta.pubkey.toString())
+    const signerKeys = this.instructions.flatMap((ix) =>
+      ix.keys
+        .filter((meta) => meta.isSigner)
+        .map((meta) => meta.pubkey.toString())
     );
     const result: Record<string, boolean> = {};
-    signerKeys.forEach(key => result[key] = false);
+    signerKeys.forEach((key) => (result[key] = false));
     return result;
   }
 
@@ -229,29 +290,33 @@ export class Transaction {
    * Find setComputeUnitLimit index within the instructions
    */
   private findSetComputeUnitLimitIndex(): number {
-    return this.instructions.findIndex(ix => {
-      const isComputeBudgetProgram = ix.programId.toString() === 'ComputeBudget111111111111111111111111111111';
+    return this.instructions.findIndex((ix) => {
+      const isComputeBudgetProgram =
+        ix.programId.toString() ===
+        "ComputeBudget111111111111111111111111111111";
       const isSetComputeLimitIx = ix.data[0] === 2;
       return isComputeBudgetProgram && isSetComputeLimitIx;
-    })
+    });
   }
 
   /**
    * Find setComputeUnitPrice index within the instructions
    */
   private findSetComputeUnitPriceIndex(): number {
-    return this.instructions.findIndex(ix => {
-      const isComputeBudgetProgram = ix.programId.toString() === 'ComputeBudget111111111111111111111111111111';
+    return this.instructions.findIndex((ix) => {
+      const isComputeBudgetProgram =
+        ix.programId.toString() ===
+        "ComputeBudget111111111111111111111111111111";
       const isSetComputeUnitPriceIx = ix.data[0] === 3;
       return isComputeBudgetProgram && isSetComputeUnitPriceIx;
-    })
+    });
   }
 
   /**
    * Remove priority fee instructions
    */
   private removePriorityFeeIxs() {
-    while(true) {
+    while (true) {
       const setComputeUnitLimitIxIndex = this.findSetComputeUnitLimitIndex();
       const setComputeUnitPriceIxIndex = this.findSetComputeUnitPriceIndex();
       if (setComputeUnitLimitIxIndex !== -1)
