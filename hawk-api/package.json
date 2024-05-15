@@ -1,6 +1,6 @@
 {
   "name": "@hawksightco/hawk-sdk",
-  "version": "0.0.18",
+  "version": "0.0.20",
   "description": "Hawksight v2 SDK",
   "main": "dist/src/index.js",
   "repository": "https://github.com/ghabxph/hawk-api-client.git",
@@ -27,6 +27,7 @@
   "scripts": {
     "start": "npx ts-node src/index.ts",
     "test": "npx jest --silent=false",
-    "build": "tsc --outDir dist/"
+    "build": "tsc --outDir dist/",
+    "prepublishOnly": "npm run build"
   }
 }
