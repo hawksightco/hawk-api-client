@@ -2,11 +2,11 @@ import * as web3 from "@solana/web3.js";
 import { HawkAPI, TransactionMetadata } from "../src";
 import { ResponseWithStatus } from "../src/types";
 
-const client = new HawkAPI('http://localhost:5001');
+const client = new HawkAPI('https://stagingapi2.hawksight.co');
 const TIMEOUT = 60_000;
 const testWallet = 'Ga5jNBh26JHh9zyJcdm7vpyVWRgtKS2cLpNgEc5zBv8G';
 const hawkWallet = 'dche7M2764e8AxNihBdn7uffVzZvTBNeL8x4LZg5E2c';
-const connection = new web3.Connection('https://rpc.helius.xyz/?api-key=cb9b8496-f5ee-42d1-b0b1-c2f7ea964c6c'); // change this to private rpc
+const connection = new web3.Connection('https://mainnet-beta.solana.com'); // change this to private rpc
 const testPool = 'ARwi1S4DaiTG5DX7S4M4ZsrXqpMD1MrTmbu9ue2tpmEq';
 const testPosition = '7kbNjgL5SUtcwqpTRbjxkmSDHeYTnPUgEGUQwm1ETdDp';
 let activeBin: number;

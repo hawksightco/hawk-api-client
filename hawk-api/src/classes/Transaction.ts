@@ -225,9 +225,19 @@ export class Transaction {
     connection: web3.Connection
   ): Promise<SimulatedTransactionResponse> {
     const testInstructions = [
-      web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 }),
       ...this.instructions,
-    ];
+    ]
+    if (this.findSetComputeUnitLimitIndex(testInstructions) === -1) {
+      testInstructions.unshift(web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 }));
+    }
+    if (this.findSetComputeUnitPriceIndex(testInstructions) === -1) {
+      testInstructions.unshift(
+        web3.ComputeBudgetProgram.setComputeUnitPrice({
+          // CU * CU PRICE -> 1400000 * feeEstimate.priorityFeeEstimate
+          microLamports: 100_000,
+        }),
+      );
+    }
     const testVersionedTxn = new web3.VersionedTransaction(
       new web3.TransactionMessage({
         instructions: testInstructions,
@@ -289,8 +299,14 @@ export class Transaction {
   /**
    * Find setComputeUnitLimit index within the instructions
    */
-  private findSetComputeUnitLimitIndex(): number {
-    return this.instructions.findIndex((ix) => {
+  private findSetComputeUnitLimitIndex(instructions?: web3.TransactionInstruction[]): number {
+    let _instructions: web3.TransactionInstruction[] = [];
+    if (instructions !== undefined) {
+      _instructions = instructions;
+    } else {
+      _instructions = this.instructions;
+    }
+    return _instructions.findIndex((ix) => {
       const isComputeBudgetProgram =
         ix.programId.toString() ===
         "ComputeBudget111111111111111111111111111111";
@@ -302,8 +318,14 @@ export class Transaction {
   /**
    * Find setComputeUnitPrice index within the instructions
    */
-  private findSetComputeUnitPriceIndex(): number {
-    return this.instructions.findIndex((ix) => {
+  private findSetComputeUnitPriceIndex(instructions?: web3.TransactionInstruction[]): number {
+    let _instructions: web3.TransactionInstruction[] = [];
+    if (instructions !== undefined) {
+      _instructions = instructions;
+    } else {
+      _instructions = this.instructions;
+    }
+    return _instructions.findIndex((ix) => {
       const isComputeBudgetProgram =
         ix.programId.toString() ===
         "ComputeBudget111111111111111111111111111111";
