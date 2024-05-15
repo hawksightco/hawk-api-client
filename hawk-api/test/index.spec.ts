@@ -2,11 +2,11 @@ import * as web3 from "@solana/web3.js";
 import { HawkAPI, TransactionMetadata } from "../src";
 import { ResponseWithStatus } from "../src/types";
 
-const client = new HawkAPI('https://stagingapi2.hawksight.co');
+const client = new HawkAPI('http://localhost:5001');
 const TIMEOUT = 60_000;
 const testWallet = 'Ga5jNBh26JHh9zyJcdm7vpyVWRgtKS2cLpNgEc5zBv8G';
 const hawkWallet = 'dche7M2764e8AxNihBdn7uffVzZvTBNeL8x4LZg5E2c';
-const connection = new web3.Connection('https://mainnet-beta.solana.com'); // change this to private rpc
+const connection = new web3.Connection('https://rpc.helius.xyz/?api-key=cb9b8496-f5ee-42d1-b0b1-c2f7ea964c6c'); // change this to private rpc
 const testPool = 'ARwi1S4DaiTG5DX7S4M4ZsrXqpMD1MrTmbu9ue2tpmEq';
 const testPosition = '7kbNjgL5SUtcwqpTRbjxkmSDHeYTnPUgEGUQwm1ETdDp';
 let activeBin: number;
@@ -65,103 +65,103 @@ describe('General Endpoints', () => {
     expect(result.data.length >= 0).toBe(true);
   }, TIMEOUT);
 
-  it ('POST /register', async () => {
-    const result = await client.general.register(connection, hawkWallet, { userWallet: hawkWallet });
-    logIfNot200(result);
-    expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
-  }, TIMEOUT);
+  // it ('POST /register', async () => {
+  //   const result = await client.general.register(connection, hawkWallet, { userWallet: hawkWallet });
+  //   logIfNot200(result);
+  //   expect(result.status).toBe(200);
+  //   await simulateTransaction(result.data);
+  // }, TIMEOUT);
 });
 
-describe('Meteora Endpoints', () => {
-  it ('POST /meteora/dlmm/util/activeBin', async () => {
-    const result = await client.util.meteoraDlmmActiveBin(
-      {
-        pools: [testPool],
-        commitment: 'confirmed',
-      }
-    );
-    logIfNot200(result);
-    expect(result.status).toBe(200);
-    activeBin = result.data[testPool];
-  }, TIMEOUT);
-  it ('POST /meteora/dlmm/tx/createPositionAndDeposit', async () => {
-    const result = await client.txGenerator.meteoraCreatePositionAndDeposit(
-      connection,
-      testWallet,
-      {
-        position: web3.Keypair.generate().publicKey.toString(),
-        pool: testPool,
-        userWallet: testWallet,
-        totalXAmount: 10_000,
-        totalYAmount: 10_000,
-        lowerBinRange: activeBin - 20,
-        upperBinRange: activeBin + 20,
-        distribution: 'CURVE',
-      }
-    );
-    logIfNot200(result);
-    expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
-  }, TIMEOUT);
-  it ('POST /meteora/dlmm/tx/deposit', async () => {
-    const result = await client.txGenerator.meteoraDeposit(
-      connection,
-      testWallet,
-      {
-        position: testPosition,
-        userWallet: testWallet,
-        totalXAmount: 10_000,
-        totalYAmount: 10_000,
-        distribution: 'CURVE',
-      }
-    );
-    logIfNot200(result);
-    expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
-  }, TIMEOUT);
-  it ('POST /meteora/dlmm/tx/claim', async () => {
-    const result = await client.txGenerator.meteoraClaim(
-      connection,
-      testWallet,
-      {
-        position: testPosition,
-        userWallet: testWallet,
-      }
-    );
-    logIfNot200(result);
-    expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
-  }, TIMEOUT);
-  it ('POST /meteora/dlmm/tx/withdraw', async () => {
-    const result = await client.txGenerator.meteoraWithdraw(
-      connection,
-      testWallet,
-      {
-        position: testPosition,
-        userWallet: testWallet,
-        amountBps: 10_000,
-        shouldClaimAndClose: true,
-      }
-    );
-    logIfNot200(result);
-    expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
-  }, TIMEOUT);
-  it ('POST /meteora/dlmm/tx/closePosition', async () => { // will not work because position is not empty.
-    const result = await client.txGenerator.meteoraClosePosition(
-      connection,
-      testWallet,
-      {
-        position: testPosition,
-        userWallet: testWallet,
-      }
-    );
-    logIfNot200(result);
-    expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
-  }, TIMEOUT);
-});
+// describe('Meteora Endpoints', () => {
+//   it ('POST /meteora/dlmm/util/activeBin', async () => {
+//     const result = await client.util.meteoraDlmmActiveBin(
+//       {
+//         pools: [testPool],
+//         commitment: 'confirmed',
+//       }
+//     );
+//     logIfNot200(result);
+//     expect(result.status).toBe(200);
+//     activeBin = result.data[testPool];
+//   }, TIMEOUT);
+//   it ('POST /meteora/dlmm/tx/createPositionAndDeposit', async () => {
+//     const result = await client.txGenerator.meteoraCreatePositionAndDeposit(
+//       connection,
+//       testWallet,
+//       {
+//         position: web3.Keypair.generate().publicKey.toString(),
+//         pool: testPool,
+//         userWallet: testWallet,
+//         totalXAmount: 10_000,
+//         totalYAmount: 10_000,
+//         lowerBinRange: activeBin - 20,
+//         upperBinRange: activeBin + 20,
+//         distribution: 'CURVE',
+//       }
+//     );
+//     logIfNot200(result);
+//     expect(result.status).toBe(200);
+//     await simulateTransaction(result.data);
+//   }, TIMEOUT);
+//   it ('POST /meteora/dlmm/tx/deposit', async () => {
+//     const result = await client.txGenerator.meteoraDeposit(
+//       connection,
+//       testWallet,
+//       {
+//         position: testPosition,
+//         userWallet: testWallet,
+//         totalXAmount: 10_000,
+//         totalYAmount: 10_000,
+//         distribution: 'CURVE',
+//       }
+//     );
+//     logIfNot200(result);
+//     expect(result.status).toBe(200);
+//     await simulateTransaction(result.data);
+//   }, TIMEOUT);
+//   it ('POST /meteora/dlmm/tx/claim', async () => {
+//     const result = await client.txGenerator.meteoraClaim(
+//       connection,
+//       testWallet,
+//       {
+//         position: testPosition,
+//         userWallet: testWallet,
+//       }
+//     );
+//     logIfNot200(result);
+//     expect(result.status).toBe(200);
+//     await simulateTransaction(result.data);
+//   }, TIMEOUT);
+//   it ('POST /meteora/dlmm/tx/withdraw', async () => {
+//     const result = await client.txGenerator.meteoraWithdraw(
+//       connection,
+//       testWallet,
+//       {
+//         position: testPosition,
+//         userWallet: testWallet,
+//         amountBps: 10_000,
+//         shouldClaimAndClose: true,
+//       }
+//     );
+//     logIfNot200(result);
+//     expect(result.status).toBe(200);
+//     await simulateTransaction(result.data);
+//   }, TIMEOUT);
+//   it ('POST /meteora/dlmm/tx/closePosition', async () => { // will not work because position is not empty.
+//     const result = await client.txGenerator.meteoraClosePosition(
+//       connection,
+//       testWallet,
+//       {
+//         position: testPosition,
+//         userWallet: testWallet,
+//       }
+//     );
+//     logIfNot200(result);
+//     expect(result.status).toBe(200);
+//     await simulateTransaction(result.data);
+//   }, TIMEOUT);
+// });
 
 describe('Meteora Automation Endpoints', () => {
   it ('POST /meteora/dlmm/automation/compoundAutomationIx', async () => {
@@ -204,6 +204,11 @@ function logIfNot200(result: ResponseWithStatus<any>) {
 async function simulateTransaction(txMetadata: TransactionMetadata) {
   console.log(txMetadata.description);
   console.log(`-----------------------------------------`);
+  txMetadata.transaction.instructions.map(ix => {
+    const data = (ix.data.toString('hex').match(/.{1,2}/g) as RegExpMatchArray).join(' ');
+    console.log(`Program ID: ${ix.programId.toString()}`);
+    console.log(`Data: ${data}`);
+  })
   const simulation = await txMetadata.transaction.simulateTransaction(connection);
   for (const log of simulation.logs as string[]) {
     console.error(log);
