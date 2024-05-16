@@ -73,11 +73,11 @@ export type MeteoraPoolInfo = {
 }
 
 export enum Tags {
-  Stable = "stable",
-  Volatile = "volatile",
-  LiquidStaking = "liquid_staking",
-  Stablecoin = "stablecoins",
-  Deprecated = "deprecated",
+  Memecoin = "memecoin",
+  Ecosystem = "ecosystem",
+  Bluechip = "bluechip",
+  Stablecoin = "stablecoin",
+  SOL = "sol",
 }
 
 export enum Protocol {
@@ -112,7 +112,6 @@ export type SaberPoolConfig = {};
 export type OrcaPoolConfig = OrcaPoolInfo;
 export type MeteoraPoolConfig = {
   address: string,
-  name: string,
   mint_a: string,
   mint_b: string,
   reserve_a: string,
