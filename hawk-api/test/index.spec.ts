@@ -8,7 +8,7 @@ const testWallet = 'Ga5jNBh26JHh9zyJcdm7vpyVWRgtKS2cLpNgEc5zBv8G';
 const hawkWallet = 'dche7M2764e8AxNihBdn7uffVzZvTBNeL8x4LZg5E2c';
 const connection = new web3.Connection('https://mainnet-beta.solana.com'); // change this to private rpc
 const testPool = 'ARwi1S4DaiTG5DX7S4M4ZsrXqpMD1MrTmbu9ue2tpmEq';
-const testPosition = '7kbNjgL5SUtcwqpTRbjxkmSDHeYTnPUgEGUQwm1ETdDp';
+const testPosition = 'EFET5gK1FJnDovjHpG8yScp1NLTc6pPjUtxWUeAUx3i1';
 let activeBin: number;
 
 const jestConsole = console;
@@ -204,11 +204,6 @@ function logIfNot200(result: ResponseWithStatus<any>) {
 async function simulateTransaction(txMetadata: TransactionMetadata) {
   console.log(txMetadata.description);
   console.log(`-----------------------------------------`);
-  txMetadata.transaction.instructions.map(ix => {
-    const data = (ix.data.toString('hex').match(/.{1,2}/g) as RegExpMatchArray).join(' ');
-    console.log(`Program ID: ${ix.programId.toString()}`);
-    console.log(`Data: ${data}`);
-  })
   const simulation = await txMetadata.transaction.simulateTransaction(connection);
   for (const log of simulation.logs as string[]) {
     console.error(log);
