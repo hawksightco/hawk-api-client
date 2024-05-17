@@ -73,8 +73,8 @@ describe('Meteora Endpoints', () => {
         userWallet: testWallet,
         totalXAmount: 10_000,
         totalYAmount: 10_000,
-        lowerBinRange: activeBin - 15,
-        upperBinRange: activeBin + 15,
+        lowerBinRange: activeBin - 34,
+        upperBinRange: activeBin + 35,
         distribution: 'CURVE',
       }
     );
