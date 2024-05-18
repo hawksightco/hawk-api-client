@@ -8,7 +8,7 @@ const testWallet = 'Ga5jNBh26JHh9zyJcdm7vpyVWRgtKS2cLpNgEc5zBv8G';
 const hawkWallet = 'dche7M2764e8AxNihBdn7uffVzZvTBNeL8x4LZg5E2c';
 const connection = new web3.Connection('https://mainnet-beta.solana.com'); // change this to private rpc
 const testPool = 'ARwi1S4DaiTG5DX7S4M4ZsrXqpMD1MrTmbu9ue2tpmEq';
-const testPosition = 'EFET5gK1FJnDovjHpG8yScp1NLTc6pPjUtxWUeAUx3i1';
+const testPosition = '3xbDyEuRKWRtQSoHV2R7fqQpGS1SKacL1gQp1vGzaYgp';
 let activeBin: number;
 
 const jestConsole = console;
