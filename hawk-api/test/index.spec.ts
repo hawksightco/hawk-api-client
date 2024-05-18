@@ -155,6 +155,22 @@ describe('Meteora Automation Endpoints', () => {
     expect(result.status).toBe(200);
     await simulateTransaction(result.data);
   }, TIMEOUT);
+  it ('POST /meteora/dlmm/automation/rebalanceAutomationIxs', async () => {
+    const result = await client.txGeneratorAutomation.meteoraRebalanceIxs(
+      connection,
+      hawkWallet,
+      {
+        userWallet: testWallet,
+        currentPosition: testPosition,
+        newPosition: web3.Keypair.generate().publicKey.toString(),
+        lowerBinRange: activeBin - 34,
+        upperBinRange: activeBin + 35,
+      }
+    );
+    logIfNot200(result);
+    expect(result.status).toBe(200);
+    await simulateTransaction(result.data);
+  }, TIMEOUT);
 });
 
 describe('Orca Endpoints', () => {});
@@ -183,7 +199,7 @@ async function simulateTransaction(txMetadata: TransactionMetadata) {
   console.log(`-----------------------------------------`);
   const simulation = await txMetadata.transaction.simulateTransaction(connection);
   for (const log of simulation.logs as string[]) {
-    console.error(log);
+    console.log(log);
   }
   console.log(``)
   console.log(``)
