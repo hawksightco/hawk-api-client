@@ -71,16 +71,16 @@ export interface AutomationRebalanceAutomationIxBody {
     /**
      * Lower range of the bin for the position.
      *
-     * @type {string}
+     * @type {number}
      * @memberof AutomationRebalanceAutomationIxBody
      */
-    lowerBinRange?: string;
+    lowerBinRange?: number;
 
     /**
      * Upper range of the bin for the position.
      *
-     * @type {string}
+     * @type {number}
      * @memberof AutomationRebalanceAutomationIxBody
      */
-    upperBinRange?: string;
+    upperBinRange?: number;
 }
