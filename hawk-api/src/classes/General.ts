@@ -14,7 +14,7 @@ import { GeneralUtility } from "./GeneralUtility";
 export class General {
 
   /** The priority level for transactions, influencing transaction fee calculation and processing priority. */
-  protected priorityLevel: _client.UtilGetPriorityFeeEstimateBodyPriorityEnum;
+  protected priorityLevel: _client.PriorityLevel;
 
   /** The maximum priority fee to be included in transaction fee calculations, specified in lamports. */
   protected maxPriorityFee: number;
@@ -28,7 +28,7 @@ export class General {
     private readonly generalUtility: GeneralUtility,
     ) {
     // Initialize with default values for transaction priority and fees.
-    this.priorityLevel = _client.UtilGetPriorityFeeEstimateBodyPriorityEnum.Default;
+    this.priorityLevel = _client.PriorityLevel.Default;
     this.maxPriorityFee = 500_000;
   }
 
@@ -37,7 +37,7 @@ export class General {
    *
    * @param priorityLevel The desired priority level for upcoming transactions.
    */
-  setPriorityLevel(priorityLevel: _client.UtilGetPriorityFeeEstimateBodyPriorityEnum) {
+  setPriorityLevel(priorityLevel: _client.PriorityLevel) {
     this.priorityLevel = priorityLevel;
   }
 

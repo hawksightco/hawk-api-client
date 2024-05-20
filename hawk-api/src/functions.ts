@@ -27,7 +27,7 @@ export async function createTxMetadata(
   connection: web3.Connection,
   payer: string,
   data: TransactionMetadataResponse,
-  priorityLevel: client.UtilGetPriorityFeeEstimateBodyPriorityEnum,
+  priorityLevel: client.PriorityLevel,
   maxPriorityFee: number,
 ): Promise<TransactionMetadata> {
   // Retrieve address lookup table accounts
@@ -108,7 +108,7 @@ export async function resultOrError<Response, Out>(
  */
 export async function getFeeEstimate(
   generalUtility: GeneralUtility,
-  priority: client.UtilGetPriorityFeeEstimateBodyPriorityEnum,
+  priority: client.PriorityLevel,
   transaction: TransactionMetadataResponse
 ): Promise<number> {
   const response = await generalUtility.getPriorityFeeEstimate({

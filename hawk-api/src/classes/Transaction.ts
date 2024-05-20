@@ -169,7 +169,7 @@ export class Transaction {
    */
   async addPriorityFeeIx(
     connection: web3.Connection,
-    priorityLevel: client.UtilGetPriorityFeeEstimateBodyPriorityEnum,
+    priorityLevel: client.PriorityLevel,
     computeUnitLimit: number,
     maxPriorityFee?: number
   ): Promise<web3.TransactionInstruction[]> {
