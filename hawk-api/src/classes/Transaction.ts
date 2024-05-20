@@ -97,11 +97,12 @@ export class Transaction {
     this._txMessage = txMessage;
     this._versionedTransaction = versionedTransaction;
     this.requiredSigners = this.getRequiredSigners();
-    if (typeof this.requiredSigners[payerKey.toString()] !== "boolean") {
-      throw new Error(
-        `Warning: The payer ${payerKey} is not one of the required signers of this transaction.`
-      );
-    }
+    // // Commented to allow payer to be a non required signer within the transaction
+    // if (typeof this.requiredSigners[payerKey.toString()] !== "boolean") {
+    //   throw new Error(
+    //     `Warning: The payer ${payerKey} is not one of the required signers of this transaction.`
+    //   );
+    // }
   }
 
   /**
