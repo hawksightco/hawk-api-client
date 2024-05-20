@@ -26,6 +26,7 @@ export * from './orcautilpools-volume-denominated-a';
 export * from './orcautilpools-volume-denominated-b';
 export * from './pools-config';
 export * from './priority-fee-estimate';
+export * from './priority-level';
 export * from './register-body';
 export * from './transaction-metadata';
 export * from './tx-claim-body';

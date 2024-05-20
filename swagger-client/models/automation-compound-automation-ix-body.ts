@@ -12,6 +12,7 @@
  * Do not edit the class manually.
  */
 
+import { PriorityLevel } from './priority-level';
  /**
  * 
  *
@@ -21,12 +22,10 @@
 export interface AutomationCompoundAutomationIxBody {
 
     /**
-     * Transaction priority (Default, Low, Medium, High, VeryHigh, UnsafeMax, None)
-     *
-     * @type {string}
+     * @type {PriorityLevel}
      * @memberof AutomationCompoundAutomationIxBody
      */
-    priority?: string;
+    priority?: PriorityLevel;
 
     /**
      * Optional. Max lamports to consume for priority fee.

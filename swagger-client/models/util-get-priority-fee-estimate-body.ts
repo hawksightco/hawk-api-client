@@ -12,6 +12,7 @@
  * Do not edit the class manually.
  */
 
+import { PriorityLevel } from './priority-level';
 import { TransactionMetadata } from './transaction-metadata';
  /**
  * 
@@ -22,12 +23,10 @@ import { TransactionMetadata } from './transaction-metadata';
 export interface UtilGetPriorityFeeEstimateBody {
 
     /**
-     * Transaction priority level, affects the processing speed and fee.
-     *
-     * @type {string}
+     * @type {PriorityLevel}
      * @memberof UtilGetPriorityFeeEstimateBody
      */
-    priority?: UtilGetPriorityFeeEstimateBodyPriorityEnum;
+    priority?: PriorityLevel;
 
     /**
      * @type {TransactionMetadata}
@@ -35,18 +34,3 @@ export interface UtilGetPriorityFeeEstimateBody {
      */
     transaction?: TransactionMetadata;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum UtilGetPriorityFeeEstimateBodyPriorityEnum {
-    Default = 'Default',
-    Low = 'Low',
-    Medium = 'Medium',
-    High = 'High',
-    VeryHigh = 'VeryHigh',
-    UnsafeMax = 'UnsafeMax',
-    None = 'None'
-}
-

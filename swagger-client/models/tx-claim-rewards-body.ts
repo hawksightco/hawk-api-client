@@ -12,6 +12,7 @@
  * Do not edit the class manually.
  */
 
+import { PriorityLevel } from './priority-level';
  /**
  * 
  *
@@ -21,12 +22,10 @@
 export interface TxClaimRewardsBody {
 
     /**
-     * Transaction priority (Default, Low, Medium, High, VeryHigh, UnsafeMax, None)
-     *
-     * @type {string}
+     * @type {PriorityLevel}
      * @memberof TxClaimRewardsBody
      */
-    priority?: string;
+    priority?: PriorityLevel;
 
     /**
      * Max lamports to consume for priority fee
