@@ -17,7 +17,6 @@ import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
-import { InlineResponse200 } from '../models';
 /**
  * HealthCheckApi - axios parameter creator
  * @export
@@ -71,7 +70,7 @@ export const HealthCheckApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async healthGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse200>>> {
+        async healthGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<string>>> {
             const localVarAxiosArgs = await HealthCheckApiAxiosParamCreator(configuration).healthGet(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -92,7 +91,7 @@ export const HealthCheckApiFactory = function (configuration?: Configuration, ba
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async healthGet(options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse200>> {
+        async healthGet(options?: AxiosRequestConfig): Promise<AxiosResponse<string>> {
             return HealthCheckApiFp(configuration).healthGet(options).then((request) => request(axios, basePath));
         },
     };
@@ -111,7 +110,7 @@ export class HealthCheckApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof HealthCheckApi
      */
-    public async healthGet(options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse200>> {
+    public async healthGet(options?: AxiosRequestConfig) : Promise<AxiosResponse<string>> {
         return HealthCheckApiFp(this.configuration).healthGet(options).then((request) => request(this.axios, this.basePath));
     }
 }

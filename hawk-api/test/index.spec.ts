@@ -165,6 +165,7 @@ describe('Meteora Automation Endpoints', () => {
         newPosition: web3.Keypair.generate().publicKey.toString(),
         lowerBinRange: activeBin - 34,
         upperBinRange: activeBin + 35,
+        distribution: 'CURVE',
       }
     );
     logIfNot200(result);

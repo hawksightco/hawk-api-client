@@ -76,7 +76,7 @@ export interface TxDepositBody {
     totalYAmount?: number;
 
     /**
-     * X and Y token distribution. At the moment, we support default meteora distribution functions: SPOT, CURVE, BID-ASK
+     * X and Y token distribution. At the moment, we support default meteora distribution functions: SPOT, CURVE, BID-ASK, SPOT-IMBALANCED, CURVE-IMBALANCED, BID-ASK-IMBALANCED
      *
      * @type {string}
      * @memberof TxDepositBody

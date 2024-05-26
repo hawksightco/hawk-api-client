@@ -17,9 +17,9 @@ import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
+import { InlineResponse200 } from '../models';
 import { InlineResponse2001 } from '../models';
 import { InlineResponse2002 } from '../models';
-import { InlineResponse2003 } from '../models';
 import { InlineResponse400 } from '../models';
 import { RegisterBody } from '../models';
 import { TransactionMetadata } from '../models';
@@ -152,6 +152,48 @@ export const GeneralEndpointsApiAxiosParamCreator = function (configuration?: Co
             };
         },
         /**
+         * Returns a token supported by Hawksight.
+         * @param {string} address The address of the token.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        tokenGet: async (address: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'address' is not null or undefined
+            if (address === null || address === undefined) {
+                throw new RequiredError('address','Required parameter address was null or undefined when calling tokenGet.');
+            }
+            const localVarPath = `/token`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions :AxiosRequestConfig = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (address !== undefined) {
+                localVarQueryParameter['address'] = address;
+            }
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.params) {
+                query.set(key, options.params[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Returns all tokens supported by Hawksight.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -198,7 +240,7 @@ export const GeneralEndpointsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async poolsGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<InlineResponse2002>>>> {
+        async poolsGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<InlineResponse2001>>>> {
             const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).poolsGet(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -212,7 +254,7 @@ export const GeneralEndpointsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async portfolioGet(wallet: string, pool?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2001>>> {
+        async portfolioGet(wallet: string, pool?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse200>>> {
             const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).portfolioGet(wallet, pool, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -233,11 +275,24 @@ export const GeneralEndpointsApiFp = function(configuration?: Configuration) {
             };
         },
         /**
+         * Returns a token supported by Hawksight.
+         * @param {string} address The address of the token.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async tokenGet(address: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2002>>> {
+            const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).tokenGet(address, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Returns all tokens supported by Hawksight.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async tokensGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<InlineResponse2003>>>> {
+        async tokensGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<InlineResponse2002>>>> {
             const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).tokensGet(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -258,7 +313,7 @@ export const GeneralEndpointsApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async poolsGet(options?: AxiosRequestConfig): Promise<AxiosResponse<Array<InlineResponse2002>>> {
+        async poolsGet(options?: AxiosRequestConfig): Promise<AxiosResponse<Array<InlineResponse2001>>> {
             return GeneralEndpointsApiFp(configuration).poolsGet(options).then((request) => request(axios, basePath));
         },
         /**
@@ -268,7 +323,7 @@ export const GeneralEndpointsApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async portfolioGet(wallet: string, pool?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2001>> {
+        async portfolioGet(wallet: string, pool?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse200>> {
             return GeneralEndpointsApiFp(configuration).portfolioGet(wallet, pool, options).then((request) => request(axios, basePath));
         },
         /**
@@ -281,11 +336,20 @@ export const GeneralEndpointsApiFactory = function (configuration?: Configuratio
             return GeneralEndpointsApiFp(configuration).registerPost(body, options).then((request) => request(axios, basePath));
         },
         /**
+         * Returns a token supported by Hawksight.
+         * @param {string} address The address of the token.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async tokenGet(address: string, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2002>> {
+            return GeneralEndpointsApiFp(configuration).tokenGet(address, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Returns all tokens supported by Hawksight.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async tokensGet(options?: AxiosRequestConfig): Promise<AxiosResponse<Array<InlineResponse2003>>> {
+        async tokensGet(options?: AxiosRequestConfig): Promise<AxiosResponse<Array<InlineResponse2002>>> {
             return GeneralEndpointsApiFp(configuration).tokensGet(options).then((request) => request(axios, basePath));
         },
     };
@@ -304,7 +368,7 @@ export class GeneralEndpointsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof GeneralEndpointsApi
      */
-    public async poolsGet(options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<InlineResponse2002>>> {
+    public async poolsGet(options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<InlineResponse2001>>> {
         return GeneralEndpointsApiFp(this.configuration).poolsGet(options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -315,7 +379,7 @@ export class GeneralEndpointsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof GeneralEndpointsApi
      */
-    public async portfolioGet(wallet: string, pool?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2001>> {
+    public async portfolioGet(wallet: string, pool?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse200>> {
         return GeneralEndpointsApiFp(this.configuration).portfolioGet(wallet, pool, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -329,12 +393,22 @@ export class GeneralEndpointsApi extends BaseAPI {
         return GeneralEndpointsApiFp(this.configuration).registerPost(body, options).then((request) => request(this.axios, this.basePath));
     }
     /**
+     * Returns a token supported by Hawksight.
+     * @param {string} address The address of the token.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof GeneralEndpointsApi
+     */
+    public async tokenGet(address: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2002>> {
+        return GeneralEndpointsApiFp(this.configuration).tokenGet(address, options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
      * Returns all tokens supported by Hawksight.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof GeneralEndpointsApi
      */
-    public async tokensGet(options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<InlineResponse2003>>> {
+    public async tokensGet(options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<InlineResponse2002>>> {
         return GeneralEndpointsApiFp(this.configuration).tokensGet(options).then((request) => request(this.axios, this.basePath));
     }
 }

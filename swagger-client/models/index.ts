@@ -6,7 +6,6 @@ export * from './inline-response2001';
 export * from './inline-response2002';
 export * from './inline-response2003';
 export * from './inline-response2004';
-export * from './inline-response2005';
 export * from './inline-response400';
 export * from './instruction';
 export * from './orca-position-mint';

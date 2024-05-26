@@ -12,6 +12,7 @@
  * Do not edit the class manually.
  */
 
+import { PoolsConfig } from './pools-config';
  /**
  * 
  *
@@ -21,24 +22,62 @@
 export interface InlineResponse2001 {
 
     /**
-     * The wallet address of the user.
+     * The unique identifier of the pool.
      *
      * @type {string}
      * @memberof InlineResponse2001
+     * @example ARwi1S4DaiTG5DX7S4M4ZsrXqpMD1MrTmbu9ue2tpmEq
      */
-    wallet?: string;
+    id?: string;
 
     /**
-     * The associated Program Derived Address (PDA) of the user.
+     * The name of the pool.
      *
      * @type {string}
      * @memberof InlineResponse2001
+     * @example USDC-USDT
      */
-    userPda?: string;
+    name?: string;
 
     /**
-     * @type {{ [key: string]: Array<any>; }}
+     * The URL of the pool.
+     *
+     * @type {string}
+     * @memberof InlineResponse2001
+     * @example https://app.meteora.ag/dlmm/ARwi1S4DaiTG5DX7S4M4ZsrXqpMD1MrTmbu9ue2tpmEq
+     */
+    url?: string;
+
+    /**
+     * Tags associated with the pool.
+     *
+     * @type {Array<string>}
+     * @memberof InlineResponse2001
+     * @example ["stable","stablecoins"]
+     */
+    tags?: Array<string>;
+
+    /**
+     * The protocol of the pool.
+     *
+     * @type {string}
+     * @memberof InlineResponse2001
+     * @example meteora
+     */
+    protocol?: string;
+
+    /**
+     * Whether pool is hidden or not.
+     *
+     * @type {boolean}
+     * @memberof InlineResponse2001
+     * @example false
+     */
+    hidden?: boolean;
+
+    /**
+     * @type {PoolsConfig}
      * @memberof InlineResponse2001
      */
-    pools?: { [key: string]: Array<any>; };
+    config?: PoolsConfig;
 }

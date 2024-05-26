@@ -21,20 +21,24 @@
 export interface InlineResponse200 {
 
     /**
-     * Status of different services
+     * The wallet address of the user.
      *
-     * @type {{ [key: string]: string; }}
+     * @type {string}
      * @memberof InlineResponse200
      */
-    services?: { [key: string]: string; };
-}
+    wallet?: string;
 
-/**
- * @export
- * @enum {string}
- */
-export enum InlineResponse200ServicesEnum {
-    OK = 'OK',
-    NotOK = 'Not OK'
-}
+    /**
+     * The associated Program Derived Address (PDA) of the user.
+     *
+     * @type {string}
+     * @memberof InlineResponse200
+     */
+    userPda?: string;
 
+    /**
+     * @type {{ [key: string]: Array<any>; }}
+     * @memberof InlineResponse200
+     */
+    pools?: { [key: string]: Array<any>; };
+}

@@ -21,7 +21,7 @@ export class Util {
    *
    * @returns A Promise resolving to a response object containing the status and array of pool information.
    */
-  async meteoraDlmmPools(): Promise<ResponseWithStatus<client.InlineResponse2005[]>> {
+  async meteoraDlmmPools(): Promise<ResponseWithStatus<client.InlineResponse2003[]>> {
     const result = await this.client.meteoraDLMMUtilityFunctionsApi.meteoraDlmmUtilPoolsGet().catch(e => e.response);
     return {
       status: result.status,
