@@ -65,17 +65,6 @@ export class Transaction {
     readonly alts: web3.AddressLookupTableAccount[],
     private generalUtility: GeneralUtility
   ) {
-    // // Construct compute instructions
-    // const computeIxs = txMetadataResponse.computeBudgetInstructions.map(ix => {
-    //   return new web3.TransactionInstruction({
-    //     keys: ix.accounts.map(meta => {
-    //       return { pubkey: new web3.PublicKey(meta.pubkey), isSigner: meta.isSigner, isWritable: meta.isWritable };
-    //     }),
-    //     programId: new web3.PublicKey(ix.programId),
-    //     data: Buffer.from(ix.data, 'base64'),
-    //   });
-    // });
-
     // Construct main instructions
     const mainIxs = txMetadataResponse.mainInstructions.map((ix) => {
       return new web3.TransactionInstruction({
@@ -97,12 +86,6 @@ export class Transaction {
     this._txMessage = txMessage;
     this._versionedTransaction = versionedTransaction;
     this.requiredSigners = this.getRequiredSigners();
-    // // Commented to allow payer to be a non required signer within the transaction
-    // if (typeof this.requiredSigners[payerKey.toString()] !== "boolean") {
-    //   throw new Error(
-    //     `Warning: The payer ${payerKey} is not one of the required signers of this transaction.`
-    //   );
-    // }
   }
 
   /**
@@ -215,6 +198,39 @@ export class Transaction {
 
     return priorityFeeIxs;
   }
+
+  /**
+   * Gets the compute unit limit from a transaction simulation.
+   * 
+   * This function simulates a transaction and calculates the compute unit limit 
+   * based on the simulation results. If an additional compute limit is provided, 
+   * it is added to the units consumed in the simulation. Otherwise, the units 
+   * consumed are increased by 10%.
+   * 
+   * @param {web3.Connection} connection - The connection object to the Solana cluster.
+   * @param {number} [additionalComputeLimit] - Optional additional compute limit to add to the units consumed.
+   * @returns {Promise<number>} - A promise that resolves to the total compute unit limit.
+   * @throws {Error} - Throws an error if the transaction simulation fails.
+   */
+  async getComputeUnitLimit(
+    connection: web3.Connection,
+    additionalComputeLimit?: number
+  ): Promise<number> {
+    const simulation = await this.simulateTransaction(connection);
+    if (simulation.err !== null) {
+      if (simulation.logs === null) {
+        console.log(simulation.err);
+      } else {
+        for (const log of simulation.logs) {
+          console.log(log);
+        }
+      }
+      throw new Error(`Transaction simulation error. See logs above.`);
+    }
+    const totalUnitLimit = additionalComputeLimit ? simulation.unitsConsumed + additionalComputeLimit : Math.round(simulation.unitsConsumed * 1.1);
+    return totalUnitLimit;
+  }
+
 
   /**
    * Simulate transaction
