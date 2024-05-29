@@ -30,17 +30,23 @@ export class Search {
    * If the token indices or tokens are not yet loaded, it logs a warning and returns an empty array.
    * 
    * @param {string} keyword - The keyword to search for.
+   * @param {number} limit - Number of results to show.
+   * @param {boolean} noLimit - disable limit
    * @returns {Token[]} An array of tokens that match the given keyword.
    */
-  token(keyword: string): Token[] {
+  token(keyword: string, limit: number = 100, noLimit: boolean = false): Token[] {
+    const result = [];
+    keyword = keyword.trim();
     if (this.tokenIndices === undefined || this.tokens === undefined) {
       console.warn("Token list still loading...");
       return [];
     }
     const indices = this.tokenIndices.indices[keyword.toLowerCase()];
-    const result = [];
+    let count = 0;
     for (const index in indices) {
+      count++;
       result.push(this.tokens[index]);
+      if (!noLimit && count >= limit) break;
     }
     return result;
   }
@@ -58,7 +64,7 @@ export class Search {
       this._loaded = true;
       const update = async () => {
         await this.getTokenIndices();
-        setTimeout(update, 60 * 1000);
+        setTimeout(update, 5 * 1000);
       };
       await update();
     }
