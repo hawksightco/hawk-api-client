@@ -33,7 +33,6 @@ describe('Health Endpoints', () => {
 
 describe('Search', () => {
   it ('Search for token (Partial String)', async () => {
-    await client.search.load();
     console.log(client.search.token("USDC"));
   }, TIMEOUT);
 });

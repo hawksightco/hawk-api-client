@@ -53,5 +53,7 @@ export class HawkAPI {
     this.txGenerator = new TxGenerator(client, this.generalUtility);
     this.txGeneratorAutomation = new TxGeneratorAutomations(client, this.generalUtility);
     this.search = new Search(url);
+    // Load search module
+    this.search.load();
   }
 }
