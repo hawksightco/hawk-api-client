@@ -5,6 +5,7 @@ import { Util } from "./Util";
 import { TxGeneratorAutomations } from "./TxGeneratorAutomations";
 import { Client } from "./Client";
 import { GeneralUtility } from "./GeneralUtility";
+import { Search } from "./Search";
 
 /**
  * HawkAPI is a central gateway class that aggregates access to various functional modules
@@ -34,6 +35,9 @@ export class HawkAPI {
   /** TxGeneratorAutomations module for automating and optimizing transaction creation processes. */
   public readonly txGeneratorAutomation: TxGeneratorAutomations;
 
+  /** Search module (token search only for now...) */
+  public readonly search: Search;
+
   /**
    * Initializes a new instance of the HawkAPI class with a specified API URL.
    * @param url The base URL for the HawkSight API services, defaulted to "https://api2.hawksight.co" if not specified.
@@ -48,5 +52,6 @@ export class HawkAPI {
     this.util = new Util(client);
     this.txGenerator = new TxGenerator(client, this.generalUtility);
     this.txGeneratorAutomation = new TxGeneratorAutomations(client, this.generalUtility);
+    this.search = new Search(url);
   }
 }

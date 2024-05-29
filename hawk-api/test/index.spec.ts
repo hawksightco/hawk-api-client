@@ -31,6 +31,13 @@ describe('Health Endpoints', () => {
   });
 });
 
+describe('Search', () => {
+  it ('Search for token (Partial String)', async () => {
+    await client.search.load();
+    console.log(client.search.token("USDC"));
+  }, TIMEOUT);
+});
+
 describe('General Endpoints', () => {
   it ('GET /portfolio', async () => {
     const result = await client.general.portfolio({ wallet: 'Ga5jNBh26JHh9zyJcdm7vpyVWRgtKS2cLpNgEc5zBv8G' });
@@ -142,6 +149,17 @@ describe('Meteora Endpoints', () => {
 });
 
 describe('Meteora Automation Endpoints', () => {
+  it ('POST /meteora/dlmm/util/activeBin', async () => {
+    const result = await client.util.meteoraDlmmActiveBin(
+      {
+        pools: [testPool],
+        commitment: 'confirmed',
+      }
+    );
+    logIfNot200(result);
+    expect(result.status).toBe(200);
+    activeBin = result.data[testPool];
+  }, TIMEOUT);
   it ('POST /meteora/dlmm/automation/compoundAutomationIx', async () => {
     const result = await client.txGeneratorAutomation.meteoraCompoundIxs(
       connection,
@@ -175,19 +193,6 @@ describe('Meteora Automation Endpoints', () => {
 });
 
 describe('Orca Endpoints', () => {});
-
-function isPublicKey(address: string): boolean {
-  try {
-    new web3.PublicKey(address);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function isInteger(value: string): boolean {
-  return String(parseInt(value)) === value;
-}
 
 function logIfNot200(result: ResponseWithStatus<any>) {
   if (result.status !== 200) {

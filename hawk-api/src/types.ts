@@ -263,3 +263,11 @@ export type SimulatedTransactionResponse = {
   unitsConsumed: number,
   returnData?: web3.TransactionReturnData | null,
 };
+
+/**
+ * Type definition for search indices and their associated hash.
+ */
+export type SearchIndices = {
+  hash: string,
+  indices: Record<string, Record<number, 1>>,
+}
