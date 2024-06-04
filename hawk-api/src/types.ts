@@ -127,6 +127,7 @@ export type Token = {
   symbol: string;
   decimals: number;
   logo: string;
+  verified: boolean;
 };
 
 // This should be serializable to web3.TransactionInstruction
