@@ -64,4 +64,12 @@ export interface InlineResponse2001 {
      * @example https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png
      */
     logo?: string;
+
+    /**
+     * Whether token is community verified or not
+     *
+     * @type {boolean}
+     * @memberof InlineResponse2001
+     */
+    verified?: boolean;
 }
