@@ -39,6 +39,14 @@ export interface HawksightPoolMetrics {
     aprBase?: number;
 
     /**
+     * Base fee percentage set by pool owner.
+     *
+     * @type {number}
+     * @memberof HawksightPoolMetrics
+     */
+    baseFeePercentage?: number;
+
+    /**
      * @type {Array<HawksightPoolMetricsRewardsBase>}
      * @memberof HawksightPoolMetrics
      */
