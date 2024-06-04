@@ -87,7 +87,7 @@ export class General {
    *
    * @returns A Promise resolving to an array of token details, including names, symbols, and other token-specific information.
    */
-  async tokens(): Promise<ResponseWithStatus<_client.InlineResponse2002[]>> {
+  async tokens(): Promise<ResponseWithStatus<_client.InlineResponse2001[]>> {
     const result = await this.client.generalEndpoints.tokensGet().catch(e => e.response);
     return {
       status: result.status,
