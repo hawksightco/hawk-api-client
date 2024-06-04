@@ -305,10 +305,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@hawksightco/swagger-client@0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@hawksightco/swagger-client/-/swagger-client-0.0.13.tgz#88c931f5a896ea6c954a279cdb5166803828b01f"
-  integrity sha512-AKz1SGLFAkKOPeqnRgICUY/eAqun4FWoTVcDMOP9F3x7L9Vx1TljxmbFcJFNDuNdR26Bwsqrxai9r97YYNhYNQ==
+"@hawksightco/swagger-client@0.0.14":
+  version "0.0.14"
+  resolved "https://registry.yarnpkg.com/@hawksightco/swagger-client/-/swagger-client-0.0.14.tgz#787717fb9ecff378ca0e0a09b41a6df790011691"
+  integrity sha512-+IyjZkEYA8UfXUsFLpspD6qUE/nGFX7Nxzn8MoTaZ9RVPn7lx2Xr2X/AAsvF0eVl0OqMbRK0Ud+STC/gyt3Y5A==
   dependencies:
     axios "^1.6.8"
 
