@@ -18,7 +18,7 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 import { InlineResponse200 } from '../models';
-import { InlineResponse2003 } from '../models';
+import { InlineResponse2002 } from '../models';
 import { InlineResponse400 } from '../models';
 import { UtilActiveBinBody } from '../models';
 /**
@@ -176,7 +176,7 @@ export const MeteoraDLMMUtilityFunctionsApiFp = function(configuration?: Configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async meteoraDlmmUtilPoolsGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<InlineResponse2003>>>> {
+        async meteoraDlmmUtilPoolsGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<InlineResponse2002>>>> {
             const localVarAxiosArgs = await MeteoraDLMMUtilityFunctionsApiAxiosParamCreator(configuration).meteoraDlmmUtilPoolsGet(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -220,7 +220,7 @@ export const MeteoraDLMMUtilityFunctionsApiFactory = function (configuration?: C
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async meteoraDlmmUtilPoolsGet(options?: AxiosRequestConfig): Promise<AxiosResponse<Array<InlineResponse2003>>> {
+        async meteoraDlmmUtilPoolsGet(options?: AxiosRequestConfig): Promise<AxiosResponse<Array<InlineResponse2002>>> {
             return MeteoraDLMMUtilityFunctionsApiFp(configuration).meteoraDlmmUtilPoolsGet(options).then((request) => request(axios, basePath));
         },
         /**
@@ -259,7 +259,7 @@ export class MeteoraDLMMUtilityFunctionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MeteoraDLMMUtilityFunctionsApi
      */
-    public async meteoraDlmmUtilPoolsGet(options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<InlineResponse2003>>> {
+    public async meteoraDlmmUtilPoolsGet(options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<InlineResponse2002>>> {
         return MeteoraDLMMUtilityFunctionsApiFp(this.configuration).meteoraDlmmUtilPoolsGet(options).then((request) => request(this.axios, this.basePath));
     }
     /**

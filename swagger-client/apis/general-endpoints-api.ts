@@ -17,9 +17,9 @@ import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
+import { HawksightPool } from '../models';
 import { InlineResponse200 } from '../models';
 import { InlineResponse2001 } from '../models';
-import { InlineResponse2002 } from '../models';
 import { InlineResponse400 } from '../models';
 import { RegisterBody } from '../models';
 import { TransactionMetadata } from '../models';
@@ -195,10 +195,13 @@ export const GeneralEndpointsApiAxiosParamCreator = function (configuration?: Co
         },
         /**
          * Returns all tokens supported by Hawksight.
+         * @param {string} [keyword] Keyword for search
+         * @param {number} [limit] Max number of results returned
+         * @param {boolean} [all] show all (bypass limit)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        tokensGet: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        tokensGet: async (keyword?: string, limit?: number, all?: boolean, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/tokens`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -209,6 +212,18 @@ export const GeneralEndpointsApiAxiosParamCreator = function (configuration?: Co
             const localVarRequestOptions :AxiosRequestConfig = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (all !== undefined) {
+                localVarQueryParameter['all'] = all;
+            }
 
             const query = new URLSearchParams(localVarUrlObj.search);
             for (const key in localVarQueryParameter) {
@@ -240,7 +255,7 @@ export const GeneralEndpointsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async poolsGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<InlineResponse2001>>>> {
+        async poolsGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<HawksightPool>>>> {
             const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).poolsGet(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -280,7 +295,7 @@ export const GeneralEndpointsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async tokenGet(address: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2002>>> {
+        async tokenGet(address: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2001>>> {
             const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).tokenGet(address, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -289,11 +304,14 @@ export const GeneralEndpointsApiFp = function(configuration?: Configuration) {
         },
         /**
          * Returns all tokens supported by Hawksight.
+         * @param {string} [keyword] Keyword for search
+         * @param {number} [limit] Max number of results returned
+         * @param {boolean} [all] show all (bypass limit)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async tokensGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<InlineResponse2002>>>> {
-            const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).tokensGet(options);
+        async tokensGet(keyword?: string, limit?: number, all?: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<InlineResponse2001>>>> {
+            const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).tokensGet(keyword, limit, all, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -313,7 +331,7 @@ export const GeneralEndpointsApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async poolsGet(options?: AxiosRequestConfig): Promise<AxiosResponse<Array<InlineResponse2001>>> {
+        async poolsGet(options?: AxiosRequestConfig): Promise<AxiosResponse<Array<HawksightPool>>> {
             return GeneralEndpointsApiFp(configuration).poolsGet(options).then((request) => request(axios, basePath));
         },
         /**
@@ -341,16 +359,19 @@ export const GeneralEndpointsApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async tokenGet(address: string, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2002>> {
+        async tokenGet(address: string, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2001>> {
             return GeneralEndpointsApiFp(configuration).tokenGet(address, options).then((request) => request(axios, basePath));
         },
         /**
          * Returns all tokens supported by Hawksight.
+         * @param {string} [keyword] Keyword for search
+         * @param {number} [limit] Max number of results returned
+         * @param {boolean} [all] show all (bypass limit)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async tokensGet(options?: AxiosRequestConfig): Promise<AxiosResponse<Array<InlineResponse2002>>> {
-            return GeneralEndpointsApiFp(configuration).tokensGet(options).then((request) => request(axios, basePath));
+        async tokensGet(keyword?: string, limit?: number, all?: boolean, options?: AxiosRequestConfig): Promise<AxiosResponse<Array<InlineResponse2001>>> {
+            return GeneralEndpointsApiFp(configuration).tokensGet(keyword, limit, all, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -368,7 +389,7 @@ export class GeneralEndpointsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof GeneralEndpointsApi
      */
-    public async poolsGet(options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<InlineResponse2001>>> {
+    public async poolsGet(options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<HawksightPool>>> {
         return GeneralEndpointsApiFp(this.configuration).poolsGet(options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -399,16 +420,19 @@ export class GeneralEndpointsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof GeneralEndpointsApi
      */
-    public async tokenGet(address: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2002>> {
+    public async tokenGet(address: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2001>> {
         return GeneralEndpointsApiFp(this.configuration).tokenGet(address, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * Returns all tokens supported by Hawksight.
+     * @param {string} [keyword] Keyword for search
+     * @param {number} [limit] Max number of results returned
+     * @param {boolean} [all] show all (bypass limit)
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof GeneralEndpointsApi
      */
-    public async tokensGet(options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<InlineResponse2002>>> {
-        return GeneralEndpointsApiFp(this.configuration).tokensGet(options).then((request) => request(this.axios, this.basePath));
+    public async tokensGet(keyword?: string, limit?: number, all?: boolean, options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<InlineResponse2001>>> {
+        return GeneralEndpointsApiFp(this.configuration).tokensGet(keyword, limit, all, options).then((request) => request(this.axios, this.basePath));
     }
 }

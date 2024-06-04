@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-import { PoolsConfig } from './pools-config';
  /**
  * 
  *
@@ -22,62 +21,47 @@ import { PoolsConfig } from './pools-config';
 export interface InlineResponse2001 {
 
     /**
-     * The unique identifier of the pool.
+     * The address of the token.
      *
      * @type {string}
      * @memberof InlineResponse2001
-     * @example ARwi1S4DaiTG5DX7S4M4ZsrXqpMD1MrTmbu9ue2tpmEq
+     * @example EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
      */
-    id?: string;
+    address?: string;
 
     /**
-     * The name of the pool.
+     * The name of the token.
      *
      * @type {string}
      * @memberof InlineResponse2001
-     * @example USDC-USDT
+     * @example USD Coin
      */
     name?: string;
 
     /**
-     * The URL of the pool.
+     * The symbol of the token.
      *
      * @type {string}
      * @memberof InlineResponse2001
-     * @example https://app.meteora.ag/dlmm/ARwi1S4DaiTG5DX7S4M4ZsrXqpMD1MrTmbu9ue2tpmEq
+     * @example USDC
      */
-    url?: string;
+    symbol?: string;
 
     /**
-     * Tags associated with the pool.
+     * The number of decimal places for the token.
      *
-     * @type {Array<string>}
+     * @type {number}
      * @memberof InlineResponse2001
-     * @example ["stable","stablecoins"]
+     * @example 6
      */
-    tags?: Array<string>;
+    decimals?: number;
 
     /**
-     * The protocol of the pool.
+     * The URL of the token's logo.
      *
      * @type {string}
      * @memberof InlineResponse2001
-     * @example meteora
+     * @example https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png
      */
-    protocol?: string;
-
-    /**
-     * Whether pool is hidden or not.
-     *
-     * @type {boolean}
-     * @memberof InlineResponse2001
-     * @example false
-     */
-    hidden?: boolean;
-
-    /**
-     * @type {PoolsConfig}
-     * @memberof InlineResponse2001
-     */
-    config?: PoolsConfig;
+    logo?: string;
 }
