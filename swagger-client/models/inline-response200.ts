@@ -21,24 +21,55 @@
 export interface InlineResponse200 {
 
     /**
-     * The wallet address of the user.
+     * The address of the token.
      *
      * @type {string}
      * @memberof InlineResponse200
+     * @example EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
      */
-    wallet?: string;
+    address?: string;
 
     /**
-     * The associated Program Derived Address (PDA) of the user.
+     * The name of the token.
      *
      * @type {string}
      * @memberof InlineResponse200
+     * @example USD Coin
      */
-    userPda?: string;
+    name?: string;
 
     /**
-     * @type {{ [key: string]: Array<any>; }}
+     * The symbol of the token.
+     *
+     * @type {string}
+     * @memberof InlineResponse200
+     * @example USDC
+     */
+    symbol?: string;
+
+    /**
+     * The number of decimal places for the token.
+     *
+     * @type {number}
+     * @memberof InlineResponse200
+     * @example 6
+     */
+    decimals?: number;
+
+    /**
+     * The URL of the token's logo.
+     *
+     * @type {string}
+     * @memberof InlineResponse200
+     * @example https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png
+     */
+    logo?: string;
+
+    /**
+     * Whether token is community verified or not
+     *
+     * @type {boolean}
      * @memberof InlineResponse200
      */
-    pools?: { [key: string]: Array<any>; };
+    verified?: boolean;
 }

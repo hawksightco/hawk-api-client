@@ -12,19 +12,20 @@
  * Do not edit the class manually.
  */
 
+import { UserPools } from './user-pools';
  /**
  * 
  *
  * @export
- * @interface InlineResponse2002
+ * @interface UserPortfolio
  */
-export interface InlineResponse2002 {
+export interface UserPortfolio {
 
     /**
      * The wallet address of the user.
      *
      * @type {string}
-     * @memberof InlineResponse2002
+     * @memberof UserPortfolio
      */
     wallet?: string;
 
@@ -32,13 +33,13 @@ export interface InlineResponse2002 {
      * The associated Program Derived Address (PDA) of the user.
      *
      * @type {string}
-     * @memberof InlineResponse2002
+     * @memberof UserPortfolio
      */
     userPda?: string;
 
     /**
-     * @type {{ [key: string]: Array<any>; }}
-     * @memberof InlineResponse2002
+     * @type {{ [key: string]: UserPools; }}
+     * @memberof UserPortfolio
      */
-    pools?: { [key: string]: Array<any>; };
+    pools?: { [key: string]: UserPools; };
 }

@@ -16,29 +16,23 @@
  * 
  *
  * @export
- * @interface InlineResponse2002
+ * @interface Balance
  */
-export interface InlineResponse2002 {
+export interface Balance {
 
     /**
-     * The wallet address of the user.
+     * Amount of the asset.
      *
      * @type {string}
-     * @memberof InlineResponse2002
+     * @memberof Balance
      */
-    wallet?: string;
+    amount?: string;
 
     /**
-     * The associated Program Derived Address (PDA) of the user.
+     * The mint address of the asset.
      *
      * @type {string}
-     * @memberof InlineResponse2002
+     * @memberof Balance
      */
-    userPda?: string;
-
-    /**
-     * @type {{ [key: string]: Array<any>; }}
-     * @memberof InlineResponse2002
-     */
-    pools?: { [key: string]: Array<any>; };
+    mint?: string;
 }

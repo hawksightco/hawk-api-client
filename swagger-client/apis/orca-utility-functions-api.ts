@@ -17,7 +17,7 @@ import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
-import { InlineResponse200 } from '../models';
+import { InlineResponse2002 } from '../models';
 import { InlineResponse2003 } from '../models';
 import { InlineResponse400 } from '../models';
 import { OrcaPositionMint } from '../models';
@@ -186,7 +186,7 @@ export const OrcaUtilityFunctionsApiFp = function(configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async orcaUtilPositionsGet(wallet: string, pool?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse200>>> {
+        async orcaUtilPositionsGet(wallet: string, pool?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2002>>> {
             const localVarAxiosArgs = await OrcaUtilityFunctionsApiAxiosParamCreator(configuration).orcaUtilPositionsGet(wallet, pool, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -226,7 +226,7 @@ export const OrcaUtilityFunctionsApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async orcaUtilPositionsGet(wallet: string, pool?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse200>> {
+        async orcaUtilPositionsGet(wallet: string, pool?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2002>> {
             return OrcaUtilityFunctionsApiFp(configuration).orcaUtilPositionsGet(wallet, pool, options).then((request) => request(axios, basePath));
         },
     };
@@ -266,7 +266,7 @@ export class OrcaUtilityFunctionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrcaUtilityFunctionsApi
      */
-    public async orcaUtilPositionsGet(wallet: string, pool?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse200>> {
+    public async orcaUtilPositionsGet(wallet: string, pool?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2002>> {
         return OrcaUtilityFunctionsApiFp(this.configuration).orcaUtilPositionsGet(wallet, pool, options).then((request) => request(this.axios, this.basePath));
     }
 }

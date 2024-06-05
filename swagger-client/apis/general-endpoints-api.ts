@@ -19,10 +19,10 @@ import { Configuration } from '../configuration';
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 import { HawksightPool } from '../models';
 import { InlineResponse200 } from '../models';
-import { InlineResponse2001 } from '../models';
 import { InlineResponse400 } from '../models';
 import { RegisterBody } from '../models';
 import { TransactionMetadata } from '../models';
+import { UserPortfolio } from '../models';
 /**
  * GeneralEndpointsApi - axios parameter creator
  * @export
@@ -269,7 +269,7 @@ export const GeneralEndpointsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async portfolioGet(wallet: string, pool?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse200>>> {
+        async portfolioGet(wallet: string, pool?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<UserPortfolio>>> {
             const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).portfolioGet(wallet, pool, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -295,7 +295,7 @@ export const GeneralEndpointsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async tokenGet(address: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2001>>> {
+        async tokenGet(address: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse200>>> {
             const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).tokenGet(address, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -310,7 +310,7 @@ export const GeneralEndpointsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async tokensGet(keyword?: string, limit?: number, all?: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<InlineResponse2001>>>> {
+        async tokensGet(keyword?: string, limit?: number, all?: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<InlineResponse200>>>> {
             const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).tokensGet(keyword, limit, all, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -341,7 +341,7 @@ export const GeneralEndpointsApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async portfolioGet(wallet: string, pool?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse200>> {
+        async portfolioGet(wallet: string, pool?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<UserPortfolio>> {
             return GeneralEndpointsApiFp(configuration).portfolioGet(wallet, pool, options).then((request) => request(axios, basePath));
         },
         /**
@@ -359,7 +359,7 @@ export const GeneralEndpointsApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async tokenGet(address: string, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2001>> {
+        async tokenGet(address: string, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse200>> {
             return GeneralEndpointsApiFp(configuration).tokenGet(address, options).then((request) => request(axios, basePath));
         },
         /**
@@ -370,7 +370,7 @@ export const GeneralEndpointsApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async tokensGet(keyword?: string, limit?: number, all?: boolean, options?: AxiosRequestConfig): Promise<AxiosResponse<Array<InlineResponse2001>>> {
+        async tokensGet(keyword?: string, limit?: number, all?: boolean, options?: AxiosRequestConfig): Promise<AxiosResponse<Array<InlineResponse200>>> {
             return GeneralEndpointsApiFp(configuration).tokensGet(keyword, limit, all, options).then((request) => request(axios, basePath));
         },
     };
@@ -400,7 +400,7 @@ export class GeneralEndpointsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof GeneralEndpointsApi
      */
-    public async portfolioGet(wallet: string, pool?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse200>> {
+    public async portfolioGet(wallet: string, pool?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<UserPortfolio>> {
         return GeneralEndpointsApiFp(this.configuration).portfolioGet(wallet, pool, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -420,7 +420,7 @@ export class GeneralEndpointsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof GeneralEndpointsApi
      */
-    public async tokenGet(address: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2001>> {
+    public async tokenGet(address: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse200>> {
         return GeneralEndpointsApiFp(this.configuration).tokenGet(address, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -432,7 +432,7 @@ export class GeneralEndpointsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof GeneralEndpointsApi
      */
-    public async tokensGet(keyword?: string, limit?: number, all?: boolean, options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<InlineResponse2001>>> {
+    public async tokensGet(keyword?: string, limit?: number, all?: boolean, options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<InlineResponse200>>> {
         return GeneralEndpointsApiFp(this.configuration).tokensGet(keyword, limit, all, options).then((request) => request(this.axios, this.basePath));
     }
 }
