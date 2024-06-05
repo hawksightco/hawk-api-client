@@ -1,5 +1,5 @@
 import * as client from "@hawksightco/swagger-client";
-import { MeteoraDlmmActiveBin, ResponseWithStatus } from "../types";
+import { MeteoraDlmmActiveBin, ResponseWithStatus, UserPortfolio } from "../types";
 import { Client } from "./Client";
 
 /**
@@ -40,7 +40,7 @@ export class Util {
       wallet: string,
       pool?: string,
     }
-  ): Promise<ResponseWithStatus<any>> {
+  ): Promise<ResponseWithStatus<UserPortfolio>> {
     const result = await this.client.meteoraDLMMUtilityFunctionsApi.meteoraDlmmUtilPositionsGet(params.wallet, params.pool).catch(e => e.response);
     return {
       status: result.status,

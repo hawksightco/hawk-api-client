@@ -154,7 +154,29 @@ export type UserPositionBalances = {
   rewards: Balance[],
 };
 
-export type PoolOut = UserPositionBalances & {
+export type UserPositionInfo = UserPositionBalances & ({
+  protocol: Protocol.Meteora,
+  info: {
+    lowerBinId: number,
+    upperBinId: number,
+  }
+} | {
+  protocol: Protocol.Orca,
+  info: null
+} | {
+  protocol: Protocol.Saber,
+  info: null
+});
+
+export type UserPools = Record<string, UserPositionInfo>; // position, balances / rewards
+
+export type UserPortfolio = {
+  wallet: string,
+  userPda: string,
+  pools: Record<string, UserPools>, // pool, positions
+}
+
+export type PoolOut = UserPositionInfo & {
   positionAddress: string,
 }
 

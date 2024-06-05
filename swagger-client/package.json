@@ -1,9 +1,8 @@
 {
-  "name": "@hawksightco/swagger-client",
-  "version": "0.0.16",
-  "description": "OpenAPI client for Hawksight v2 Public API",
-  "author": "Hawksight",
-  "homepage": "https://hawksight.co/",
+  "name": "",
+  "version": "1.0.0",
+  "description": "OpenAPI client for ",
+  "author": "OpenAPI-Generator Contributors",
   "keywords": [
     "axios",
     "typescript",
@@ -11,7 +10,7 @@
     "openapi-generator",
     ""
   ],
-  "license": "MIT",
+  "license": "Unlicense",
   "main": "./dist/index.js",
   "typings": "./dist/index.d.ts",
   "scripts": {
@@ -19,10 +18,10 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "axios": "^1.6.8"
+    "axios": "^0.21.1"
   },
   "devDependencies": {
     "@types/node": "^12.11.5",
-    "typescript": "^5.4.5"
+    "typescript": "^3.6.4"
   }
 }
