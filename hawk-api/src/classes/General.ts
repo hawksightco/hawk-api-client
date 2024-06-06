@@ -74,7 +74,7 @@ export class General {
    *
    * @returns A Promise resolving to an array of pools, including metadata such as pool addresses and statistics.
    */
-  async pools(): Promise<ResponseWithStatus<_client.InlineResponse2001[]>> {
+  async pools(): Promise<ResponseWithStatus<_client.HawksightPool[]>> {
     const result = await this.client.generalEndpoints.poolsGet().catch(e => e.response);
     return {
       status: result.status,
@@ -87,7 +87,7 @@ export class General {
    *
    * @returns A Promise resolving to an array of token details, including names, symbols, and other token-specific information.
    */
-  async tokens(): Promise<ResponseWithStatus<_client.InlineResponse2001[]>> {
+  async tokens(): Promise<ResponseWithStatus<_client.InlineResponse200[]>> {
     const result = await this.client.generalEndpoints.tokensGet().catch(e => e.response);
     return {
       status: result.status,
