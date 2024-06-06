@@ -166,28 +166,31 @@ export class Transaction {
       priorityLevel,
       this.txMetadataResponse
     );
-    const priorityFeeEstimate =
-      maxPriorityFee !== undefined && maxPriorityFee > 0
-        ? Math.round(Math.min(estimate, maxPriorityFee))
-        : Math.round(estimate);
 
-    // Create priority fee ixs for transaction
+    // Calculate the total fee in lamports
+    let totalPriorityFeeLamports = (new BN(estimate).mul(new BN(computeUnitLimit)).div(new BN(1_000_000))).toNumber();
+
+    // If maxPriorityFee is defined and it is less than the total calculated fee, cap it
+    if (maxPriorityFee !== undefined && maxPriorityFee > 0 && totalPriorityFeeLamports > maxPriorityFee) {
+      totalPriorityFeeLamports = maxPriorityFee;
+    }
+
+    // Convert the total priority fee back to microLamports per compute unit
+    const priorityFeePerUnitMicroLamports = (new BN(totalPriorityFeeLamports).mul(new BN(1_000_000)).div(new BN(computeUnitLimit))).toNumber()
+
+    // Create priority fee instructions for transaction
     const priorityFeeIxs = [
       web3.ComputeBudgetProgram.setComputeUnitLimit({
         units: computeUnitLimit,
       }),
       web3.ComputeBudgetProgram.setComputeUnitPrice({
         // CU * CU PRICE -> 1400000 * feeEstimate.priorityFeeEstimate
-        microLamports: priorityFeeEstimate,
+        microLamports: priorityFeePerUnitMicroLamports,
       }),
     ];
-    this._priorityFeeEstimate = (
-      new BN(priorityFeeEstimate)
-        .mul(new BN(computeUnitLimit))
-        .div(new BN(1_000_000))
-        .add(new BN(5000))
-        .toNumber() / 1_000_000_000
-    ).toString();
+
+    // Store the total priority fee in lamports
+    this._priorityFeeEstimate = totalPriorityFeeLamports.toString();
 
     // Append priority fee instruction at the beginning
     this._instructions.unshift(...priorityFeeIxs);
