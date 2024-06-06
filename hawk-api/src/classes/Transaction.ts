@@ -150,6 +150,16 @@ export class Transaction {
 
   /**
    * Add priority fee instructions (compute budget)
+   * 
+   * This method adds priority fee instructions to the transaction based on the specified
+   * priority level and compute unit limit. It ensures that the total fee does not exceed
+   * the specified maximum priority fee (in SOL) if provided.
+   * 
+   * @param connection - The connection to the Solana cluster.
+   * @param priorityLevel - The priority level for the fee estimation.
+   * @param computeUnitLimit - The limit on the number of compute units.
+   * @param maxPriorityFee - The maximum priority fee in SOL (optional).
+   * @returns An array of transaction instructions.
    */
   async addPriorityFeeIx(
     connection: web3.Connection,
@@ -167,16 +177,19 @@ export class Transaction {
       this.txMetadataResponse
     );
 
+    // Convert maxPriorityFee from SOL to lamports (1 SOL = 1_000_000_000 lamports)
+    const maxPriorityFeeLamports = maxPriorityFee !== undefined ? maxPriorityFee * 1_000_000_000 : undefined;
+
     // Calculate the total fee in lamports
-    let totalPriorityFeeLamports = (new BN(estimate).mul(new BN(computeUnitLimit)).div(new BN(1_000_000))).toNumber();
+    let totalPriorityFeeLamports = new BN(estimate).mul(new BN(computeUnitLimit)).div(new BN(1_000_000)).toNumber();
 
     // If maxPriorityFee is defined and it is less than the total calculated fee, cap it
-    if (maxPriorityFee !== undefined && maxPriorityFee > 0 && totalPriorityFeeLamports > maxPriorityFee) {
-      totalPriorityFeeLamports = maxPriorityFee;
+    if (maxPriorityFeeLamports !== undefined && totalPriorityFeeLamports > maxPriorityFeeLamports) {
+      totalPriorityFeeLamports = maxPriorityFeeLamports;
     }
 
     // Convert the total priority fee back to microLamports per compute unit
-    const priorityFeePerUnitMicroLamports = (new BN(totalPriorityFeeLamports).mul(new BN(1_000_000)).div(new BN(computeUnitLimit))).toNumber()
+    const priorityFeePerUnitMicroLamports = new BN(totalPriorityFeeLamports).mul(new BN(1_000_000)).div(new BN(computeUnitLimit)).toNumber();
 
     // Create priority fee instructions for transaction
     const priorityFeeIxs = [
