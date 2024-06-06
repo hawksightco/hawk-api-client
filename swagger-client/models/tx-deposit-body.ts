@@ -76,6 +76,14 @@ export interface TxDepositBody {
     totalYAmount?: number;
 
     /**
+     * Liquidity slippage (default: 3. 3 means 0.03%)
+     *
+     * @type {number}
+     * @memberof TxDepositBody
+     */
+    slippage?: number;
+
+    /**
      * X and Y token distribution. At the moment, we support default meteora distribution functions: SPOT, CURVE, BID-ASK, SPOT-IMBALANCED, CURVE-IMBALANCED, BID-ASK-IMBALANCED
      *
      * @type {string}
