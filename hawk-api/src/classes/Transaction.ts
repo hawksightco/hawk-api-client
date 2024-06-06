@@ -149,6 +149,46 @@ export class Transaction {
   }
 
   /**
+   * Add priority fee instructions (compute budget) with a fixed priority fee.
+   * 
+   * This method adds priority fee instructions to the transaction based on a fixed priority fee.
+   * 
+   * @param connection - The connection to the Solana cluster.
+   * @param computeUnitLimit - The limit on the number of compute units.
+   * @param fixedPriority - Set to true to indicate a fixed priority fee.
+   * @param fixedPriorityFee - The fixed priority fee in lamports.
+   * @returns An array of transaction instructions.
+   */
+  async addPriorityFeeIx(
+    connection: web3.Connection,
+    computeUnitLimit: number,
+    fixedPriority: true,
+    fixedPriorityFee: number,
+  ): Promise<web3.TransactionInstruction[]>;
+
+  /**
+   * Add priority fee instructions (compute budget) with a variable priority defined by Helius.
+   * 
+   * This method adds priority fee instructions to the transaction based on the specified
+   * priority level and compute unit limit. It ensures that the total fee does not exceed
+   * the specified maximum priority fee (in SOL) if provided.
+   * 
+   * @param connection - The connection to the Solana cluster.
+   * @param computeUnitLimit - The limit on the number of compute units.
+   * @param fixedPriority - Set to false to indicate a variable priority fee.
+   * @param priorityLevel - The priority level for the fee estimation.
+   * @param maxPriorityFee - The maximum priority fee in SOL (optional).
+   * @returns An array of transaction instructions.
+   */
+  async addPriorityFeeIx(
+    connection: web3.Connection,
+    computeUnitLimit: number,
+    fixedPriority: false,
+    priorityLevel: client.PriorityLevel,
+    maxPriorityFee?: number,
+  ): Promise<web3.TransactionInstruction[]>;
+
+  /**
    * Add priority fee instructions (compute budget)
    * 
    * This method adds priority fee instructions to the transaction based on the specified
@@ -156,48 +196,58 @@ export class Transaction {
    * the specified maximum priority fee (in SOL) if provided.
    * 
    * @param connection - The connection to the Solana cluster.
-   * @param priorityLevel - The priority level for the fee estimation.
    * @param computeUnitLimit - The limit on the number of compute units.
-   * @param maxPriorityFee - The maximum priority fee in SOL (optional).
+   * @param fixedPriority - If true, a fixed priority fee is used; if false, the fee is based on priority level.
+   * @param priorityLevelOrPriorityFee - The priority level for the fee estimation or the fixed priority fee.
+   * @param maxPriorityFee - The maximum priority fee in SOL (optional, only applicable when fixedPriority is false).
    * @returns An array of transaction instructions.
    */
   async addPriorityFeeIx(
     connection: web3.Connection,
-    priorityLevel: client.PriorityLevel,
     computeUnitLimit: number,
-    maxPriorityFee?: number
+    fixedPriority: boolean = false,
+    priorityLevelOrPriorityFee: client.PriorityLevel | number,
+    maxPriorityFee?: number,
   ): Promise<web3.TransactionInstruction[]> {
-    // First, remove priority fee instructions (compute budget if there is)
+    // First, remove any existing priority fee instructions
     this.removePriorityFeeIxs();
 
-    // Then get fee estimate by simulating the transaction
-    const estimate = await getFeeEstimate(
-      this.generalUtility,
-      priorityLevel,
-      this.txMetadataResponse
-    );
+    let totalPriorityFeeLamports: number;
 
-    // Convert maxPriorityFee from SOL to lamports (1 SOL = 1_000_000_000 lamports)
-    const maxPriorityFeeLamports = maxPriorityFee !== undefined ? maxPriorityFee * 1_000_000_000 : undefined;
+    if (fixedPriority && typeof priorityLevelOrPriorityFee === 'number') {
+      // For fixed priority, directly use the provided fixed priority fee
+      totalPriorityFeeLamports = priorityLevelOrPriorityFee - 5000;
+    } else if (typeof priorityLevelOrPriorityFee === 'string') {
+      // Convert maxPriorityFee from SOL to lamports (1 SOL = 1_000_000_000 lamports)
+      const maxPriorityFeeLamports = maxPriorityFee !== undefined ? maxPriorityFee * 1_000_000_000 : undefined;
 
-    // Calculate the total fee in lamports
-    let totalPriorityFeeLamports = new BN(estimate).mul(new BN(computeUnitLimit)).div(new BN(1_000_000)).toNumber();
+      // Get fee estimate by simulating the transaction
+      const estimate = await getFeeEstimate(
+        this.generalUtility,
+        priorityLevelOrPriorityFee,
+        this.txMetadataResponse
+      );
 
-    // If maxPriorityFee is defined and it is less than the total calculated fee, cap it
-    if (maxPriorityFeeLamports !== undefined && totalPriorityFeeLamports > maxPriorityFeeLamports) {
-      totalPriorityFeeLamports = maxPriorityFeeLamports - 5000;
+      // Calculate the total fee in lamports
+      totalPriorityFeeLamports = new BN(estimate).mul(new BN(computeUnitLimit)).div(new BN(1_000_000)).toNumber();
+
+      // If maxPriorityFee is defined and it is less than the total calculated fee, cap it
+      if (maxPriorityFeeLamports !== undefined && totalPriorityFeeLamports > maxPriorityFeeLamports) {
+        totalPriorityFeeLamports = maxPriorityFeeLamports - 5000;
+      }
+    } else {
+      throw new Error('Invalid parameters');
     }
 
     // Convert the total priority fee back to microLamports per compute unit
     const priorityFeePerUnitMicroLamports = new BN(totalPriorityFeeLamports).mul(new BN(1_000_000)).div(new BN(computeUnitLimit)).toNumber();
 
-    // Create priority fee instructions for transaction
+    // Create priority fee instructions for the transaction
     const priorityFeeIxs = [
       web3.ComputeBudgetProgram.setComputeUnitLimit({
         units: computeUnitLimit,
       }),
       web3.ComputeBudgetProgram.setComputeUnitPrice({
-        // CU * CU PRICE -> 1400000 * feeEstimate.priorityFeeEstimate
         microLamports: priorityFeePerUnitMicroLamports,
       }),
     ];
@@ -205,10 +255,10 @@ export class Transaction {
     // Store the total priority fee in lamports
     this._priorityFeeEstimate = totalPriorityFeeLamports.toString();
 
-    // Append priority fee instruction at the beginning
+    // Append priority fee instructions at the beginning
     this._instructions.unshift(...priorityFeeIxs);
 
-    // Rebuild versioned transaction
+    // Rebuild versioned transaction with the latest blockhash
     const blockhash = await connection.getLatestBlockhash();
     this.buildTransaction(blockhash);
 
