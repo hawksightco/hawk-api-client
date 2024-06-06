@@ -185,7 +185,7 @@ export class Transaction {
 
     // If maxPriorityFee is defined and it is less than the total calculated fee, cap it
     if (maxPriorityFeeLamports !== undefined && totalPriorityFeeLamports > maxPriorityFeeLamports) {
-      totalPriorityFeeLamports = maxPriorityFeeLamports;
+      totalPriorityFeeLamports = maxPriorityFeeLamports - 5000;
     }
 
     // Convert the total priority fee back to microLamports per compute unit

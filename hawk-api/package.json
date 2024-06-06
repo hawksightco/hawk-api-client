@@ -1,6 +1,6 @@
 {
   "name": "@hawksightco/hawk-sdk",
-  "version": "0.0.41",
+  "version": "0.0.42",
   "description": "Hawksight v2 SDK",
   "main": "dist/src/index.js",
   "repository": "https://github.com/ghabxph/hawk-api-client.git",
