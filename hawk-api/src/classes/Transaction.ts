@@ -222,11 +222,16 @@ export class Transaction {
       const maxPriorityFeeLamports = maxPriorityFee !== undefined ? maxPriorityFee * 1_000_000_000 : undefined;
 
       // Get fee estimate by simulating the transaction
-      const estimate = await getFeeEstimate(
+      let estimate = await getFeeEstimate(
         this.generalUtility,
         priorityLevelOrPriorityFee,
         this.txMetadataResponse
       );
+
+      // If priority is set to default or medium, we multiply estimate by 2 to increase its chance on blockchain.
+      if (priorityLevelOrPriorityFee === client.PriorityLevel.Default || priorityLevelOrPriorityFee === client.PriorityLevel.Medium) {
+        estimate = estimate * 2
+      }
 
       // Calculate the total fee in lamports
       totalPriorityFeeLamports = new BN(estimate).mul(new BN(computeUnitLimit)).div(new BN(1_000_000)).toNumber();
