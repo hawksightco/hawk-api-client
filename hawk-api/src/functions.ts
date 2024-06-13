@@ -117,6 +117,21 @@ export async function getFeeEstimate(
   });
   return (await resultOrError<client.PriorityFeeEstimate, number>(
     response,
-    async (result) => { return result.priorityFeeEstimate as number },
+    async (result) => {
+      let priorityFee: number;
+      if (priority === client.PriorityLevel.Default || priority === client.PriorityLevel.Medium) {
+        priorityFee = result.feeLevels!._default as number;
+      } else if (priority === client.PriorityLevel.High) {
+        priorityFee = result.feeLevels!.high as number;
+      } else if (priority === client.PriorityLevel.VeryHigh) {
+        priorityFee = result.feeLevels!.high as number;
+      } else {
+        const max = result.feeLevels!._default as number;
+        const min = result.feeLevels!.low as number;
+        priorityFee = min + ((max - min) / 2);
+
+      }
+      return result.priorityFeeEstimate as number
+    },
   )).data
 }
