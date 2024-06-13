@@ -33,6 +33,7 @@ export * from './orcautilpools-volume-denominated-b';
 export * from './pool-base-config';
 export * from './pool-out';
 export * from './priority-fee-estimate';
+export * from './priority-fee-estimate-fee-levels';
 export * from './priority-level';
 export * from './register-body';
 export * from './transaction-metadata';

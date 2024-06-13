@@ -12,6 +12,7 @@
  * Do not edit the class manually.
  */
 
+import { PriorityFeeEstimateFeeLevels } from './priority-fee-estimate-fee-levels';
  /**
  * 
  *
@@ -27,4 +28,10 @@ export interface PriorityFeeEstimate {
      * @memberof PriorityFeeEstimate
      */
     priorityFeeEstimate?: number;
+
+    /**
+     * @type {PriorityFeeEstimateFeeLevels}
+     * @memberof PriorityFeeEstimate
+     */
+    feeLevels?: PriorityFeeEstimateFeeLevels;
 }
