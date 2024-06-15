@@ -1,4 +1,4 @@
-import { PriorityFeeEstimate, UtilGetPriorityFeeEstimateBody } from "@hawksightco/swagger-client";
+import { PriorityFeeEstimate, UtilGetPriorityFeeEstimateBody, UtilFindAltWithTxBody } from "@hawksightco/swagger-client";
 import { ResponseWithStatus } from "../types";
 import { Client } from "./Client";
 
@@ -35,6 +35,24 @@ export class GeneralUtility {
    */
   async getPriorityFeeEstimate(params: UtilGetPriorityFeeEstimateBody): Promise<ResponseWithStatus<PriorityFeeEstimate>> {
     const result = await this.client.generalUtility.utilGetPriorityFeeEstimatePost(params).catch(e => e.response);
+    return {
+      status: result.status,
+      data: result.data,
+    };
+  }
+
+  /**
+   * Finds alternative public keys related to a given transaction and returns them along with the response status.
+   *
+   * This method sends a request to the `utilFindAltWithTxPost` endpoint with the provided parameters, and returns the response
+   * status and an array of public key strings. In case of an error, it captures the error response and includes the status and
+   * data in the returned object.
+   *
+   * @param {UtilFindAltWithTxBody} params - The parameters for the function, which include the transaction metadata.
+   * @returns {Promise<ResponseWithStatus<Array<string>>>>} A promise that resolves to an object containing the response status and an array of public key strings.
+   */
+  async findAltWithTxPost(params: UtilFindAltWithTxBody): Promise<ResponseWithStatus<Array<string>>> {
+    const result = await this.client.generalUtility.utilFindAltWithTxPost(params).catch(e => e.response);
     return {
       status: result.status,
       data: result.data,

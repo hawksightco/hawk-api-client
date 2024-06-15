@@ -32,10 +32,26 @@ export async function createTxMetadata(
 ): Promise<TransactionMetadata> {
   // Retrieve address lookup table accounts
   const alts: web3.AddressLookupTableAccount[] = [];
+
+  // Find jup alts
+  const jupAlts = await generalUtility.findAltWithTxPost({
+    transaction: data,
+  });
+
   for (const alt of data.addressLookupTableAddresses) {
     alts.push(
       (await connection.getAddressLookupTable(new web3.PublicKey(alt))).value as web3.AddressLookupTableAccount
     );
+  }
+
+  if (jupAlts.status === 200) {
+    for (const alt of jupAlts.data) {
+      alts.push(
+        (await connection.getAddressLookupTable(new web3.PublicKey(alt))).value as web3.AddressLookupTableAccount
+      );
+    }
+  } else {
+    console.error(jupAlts.data);
   }
 
   // Get the recent blockhash
