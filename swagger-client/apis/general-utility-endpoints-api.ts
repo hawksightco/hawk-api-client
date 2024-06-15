@@ -126,7 +126,7 @@ export const GeneralUtilityEndpointsApiFp = function(configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async utilFindAltWithTxPost(body: UtilFindAltWithTxBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<PriorityFeeEstimate>>> {
+        async utilFindAltWithTxPost(body: UtilFindAltWithTxBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<string>>>> {
             const localVarAxiosArgs = await GeneralUtilityEndpointsApiAxiosParamCreator(configuration).utilFindAltWithTxPost(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -161,7 +161,7 @@ export const GeneralUtilityEndpointsApiFactory = function (configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async utilFindAltWithTxPost(body: UtilFindAltWithTxBody, options?: AxiosRequestConfig): Promise<AxiosResponse<PriorityFeeEstimate>> {
+        async utilFindAltWithTxPost(body: UtilFindAltWithTxBody, options?: AxiosRequestConfig): Promise<AxiosResponse<Array<string>>> {
             return GeneralUtilityEndpointsApiFp(configuration).utilFindAltWithTxPost(body, options).then((request) => request(axios, basePath));
         },
         /**
@@ -190,7 +190,7 @@ export class GeneralUtilityEndpointsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof GeneralUtilityEndpointsApi
      */
-    public async utilFindAltWithTxPost(body: UtilFindAltWithTxBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<PriorityFeeEstimate>> {
+    public async utilFindAltWithTxPost(body: UtilFindAltWithTxBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<string>>> {
         return GeneralUtilityEndpointsApiFp(this.configuration).utilFindAltWithTxPost(body, options).then((request) => request(this.axios, this.basePath));
     }
     /**
