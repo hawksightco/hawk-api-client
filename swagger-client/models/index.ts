@@ -52,4 +52,5 @@ export * from './user-portfolio';
 export * from './user-position-balances';
 export * from './user-position-info';
 export * from './util-active-bin-body';
+export * from './util-find-alt-with-tx-body';
 export * from './util-get-priority-fee-estimate-body';
