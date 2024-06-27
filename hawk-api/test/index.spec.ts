@@ -44,7 +44,7 @@ describe('General Endpoints', () => {
   }, TIMEOUT);
 
   it ('GET /pools', async () => {
-    const result = await client.general.pools();
+    const result = await client.general.pools({});
     expect(result.status).toBe(200);
     expect(result.data.length >= 0).toBe(true);
   }, TIMEOUT);

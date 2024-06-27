@@ -72,10 +72,15 @@ export class General {
   /**
    * Fetches a list of pools managed by the platform, providing details about each pool.
    *
+   * @param params Object containing hash of the pools
    * @returns A Promise resolving to an array of pools, including metadata such as pool addresses and statistics.
    */
-  async pools(): Promise<ResponseWithStatus<_client.HawksightPool[]>> {
-    const result = await this.client.generalEndpoints.poolsGet().catch(e => e.response);
+  async pools(
+    params: {
+      hash?: string,
+    }
+  ): Promise<ResponseWithStatus<_client.HawksightPool[]>> {
+    const result = await this.client.generalEndpoints.poolsGet(params.hash).catch(e => e.response);
     return {
       status: result.status,
       data: result.data,
