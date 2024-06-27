@@ -31,10 +31,11 @@ export const GeneralEndpointsApiAxiosParamCreator = function (configuration?: Co
     return {
         /**
          * Returns all pools integrated by Hawksight.
+         * @param {string} [hash] Optional hash parameter
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        poolsGet: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        poolsGet: async (hash?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/pools`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -45,6 +46,10 @@ export const GeneralEndpointsApiAxiosParamCreator = function (configuration?: Co
             const localVarRequestOptions :AxiosRequestConfig = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (hash !== undefined) {
+                localVarQueryParameter['hash'] = hash;
+            }
 
             const query = new URLSearchParams(localVarUrlObj.search);
             for (const key in localVarQueryParameter) {
@@ -252,11 +257,12 @@ export const GeneralEndpointsApiFp = function(configuration?: Configuration) {
     return {
         /**
          * Returns all pools integrated by Hawksight.
+         * @param {string} [hash] Optional hash parameter
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async poolsGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<HawksightPool>>>> {
-            const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).poolsGet(options);
+        async poolsGet(hash?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<HawksightPool>>>> {
+            const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).poolsGet(hash, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -328,11 +334,12 @@ export const GeneralEndpointsApiFactory = function (configuration?: Configuratio
     return {
         /**
          * Returns all pools integrated by Hawksight.
+         * @param {string} [hash] Optional hash parameter
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async poolsGet(options?: AxiosRequestConfig): Promise<AxiosResponse<Array<HawksightPool>>> {
-            return GeneralEndpointsApiFp(configuration).poolsGet(options).then((request) => request(axios, basePath));
+        async poolsGet(hash?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<Array<HawksightPool>>> {
+            return GeneralEndpointsApiFp(configuration).poolsGet(hash, options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieves the user's portfolio based on the provided wallet and optional pool address.
@@ -385,12 +392,13 @@ export const GeneralEndpointsApiFactory = function (configuration?: Configuratio
 export class GeneralEndpointsApi extends BaseAPI {
     /**
      * Returns all pools integrated by Hawksight.
+     * @param {string} [hash] Optional hash parameter
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof GeneralEndpointsApi
      */
-    public async poolsGet(options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<HawksightPool>>> {
-        return GeneralEndpointsApiFp(this.configuration).poolsGet(options).then((request) => request(this.axios, this.basePath));
+    public async poolsGet(hash?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<HawksightPool>>> {
+        return GeneralEndpointsApiFp(this.configuration).poolsGet(hash, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * Retrieves the user's portfolio based on the provided wallet and optional pool address.
