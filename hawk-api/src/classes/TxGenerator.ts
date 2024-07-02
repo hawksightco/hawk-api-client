@@ -29,7 +29,7 @@ export class TxGenerator {
    */
   constructor(
     private readonly client: Client,
-    private readonly generalUtility: GeneralUtility,
+    protected readonly generalUtility: GeneralUtility,
   ) {
     this.priorityLevel = _client.PriorityLevel.Default;
     this.maxPriorityFee = 500_000; // Default max priority fee in lamports
