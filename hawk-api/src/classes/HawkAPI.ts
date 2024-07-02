@@ -12,7 +12,7 @@ import { Search } from "./Search";
  * for interacting with HawkSight's blockchain APIs. This class initializes and exposes modules
  * that manage different aspects of the blockchain interactions such as general utilities,
  * transaction generation, health checks, and automation services.
- * 
+ *
  * Each module connected through this class offers specialized APIs for different tasks,
  * making it easier to manage and use HawkSight's comprehensive blockchain features.
  */

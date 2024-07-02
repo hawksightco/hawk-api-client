@@ -9,7 +9,7 @@ import { GeneralUtility } from "./GeneralUtility";
  * The `TxGeneratorAutomations` class encapsulates methods to generate transactions with various trading operations
  * on decentralized market making platforms like Meteora and Orca within the Solana ecosystem. It allows
  * setting custom transaction priority and fees to manage transaction processing speed and cost.
- * 
+ *
  * NOTE: For hawksight devs only.
  */
 export class TxGeneratorAutomations {
@@ -26,7 +26,7 @@ export class TxGeneratorAutomations {
 
   /**
    * Initializes a new instance of the TxGenerator class with a specified client.
-   * 
+   *
    * @param client An instance of Client used to interact with various APIs for transaction generation.
    */
   constructor(
@@ -39,7 +39,7 @@ export class TxGeneratorAutomations {
 
   /**
    * Creates meteora auto-compound instruction (claim fee, reward, and deposit to position)
-   * 
+   *
    * NOTE: For hawksight devs only.
    *
    * @param connection The Solana web3 connection object for blockchain interactions.
@@ -58,9 +58,9 @@ export class TxGeneratorAutomations {
     );
   }
 
-    /**
+  /**
    * Creates meteora auto-rebalance instruction
-   * 
+   *
    * NOTE: For hawksight devs only.
    *
    * @param connection The Solana web3 connection object for blockchain interactions.

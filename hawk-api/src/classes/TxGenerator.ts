@@ -24,7 +24,7 @@ export class TxGenerator {
 
   /**
    * Initializes a new instance of the TxGenerator class with a specified client.
-   * 
+   *
    * @param client An instance of Client used to interact with various APIs for transaction generation.
    */
   constructor(

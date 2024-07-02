@@ -9,14 +9,14 @@ export class Search {
 
   /**
    * Checks if the token indices and tokens have been loaded.
-   * 
+   *
    * @returns {boolean} True if the token indices and tokens have been loaded, false otherwise.
    */
   get loaded(): boolean { return this._loaded }
 
   /**
    * Constructs a new instance of the Search class.
-   * 
+   *
    * @param {string} url - The base URL for the API.
    */
   constructor(
@@ -25,10 +25,10 @@ export class Search {
 
   /**
    * Retrieves tokens that match the given keyword.
-   * 
+   *
    * This method searches for tokens that match the provided keyword.
    * If the token indices or tokens are not yet loaded, it logs a warning and returns an empty array.
-   * 
+   *
    * @param {string} keyword - The keyword to search for.
    * @param {number} limit - Number of results to show.
    * @param {boolean} noLimit - disable limit
@@ -53,10 +53,10 @@ export class Search {
 
   /**
    * Loads the token indices and tokens.
-   * 
+   *
    * This method loads the token indices and tokens if they are not already loaded.
    * It also sets up a periodic update to refresh the token indices and tokens every minute.
-   * 
+   *
    * @returns {Promise<void>} A promise that resolves when the initial load is complete.
    */
   async load(): Promise<void> {
@@ -72,12 +72,12 @@ export class Search {
 
   /**
    * Retrieves and updates the token indices and tokens if necessary.
-   * 
+   *
    * This method checks if the current token indices and tokens are undefined.
    * If they are, it fetches the token indices and tokens from the API.
    * It then compares the hash of the current token indices with the hash from the server.
    * If the hashes do not match, it updates the token indices and tokens.
-   * 
+   *
    * @private
    * @returns {Promise<void>} A promise that resolves when the token indices and tokens are updated.
    */
@@ -99,9 +99,9 @@ export class Search {
 
   /**
    * Retrieves all tokens from the API.
-   * 
+   *
    * This method makes a GET request to the API to fetch all tokens.
-   * 
+   *
    * @private
    * @returns {Promise<Token[]>} A promise that resolves to an array of tokens.
    */
@@ -111,10 +111,10 @@ export class Search {
 
   /**
    * Retrieves the search indices from the API based on the provided key and optional hash.
-   * 
+   *
    * This method makes a GET request to the API to fetch the search indices for the specified key.
    * If a hash is provided, it includes the hash in the request to check for updated indices.
-   * 
+   *
    * @private
    * @param {string} key - The key to identify the search indices.
    * @param {string} [hash] - Optional hash to validate against the current hash of the indices.

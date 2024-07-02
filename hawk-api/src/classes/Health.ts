@@ -24,7 +24,7 @@ export class Health {
    * @returns A Promise that resolves to a `ResponseWithStatus<HealthResponse>` object containing:
    *          - `status`: The HTTP status code of the health check request.
    *          - `data`: The detailed health check response from the API, typically indicating various service statuses.
-   * 
+   *
    * Example of a health check response might include database connectivity status, API uptime, or other relevant system metrics.
    */
   async health(): Promise<ResponseWithStatus<HealthResponse>> {

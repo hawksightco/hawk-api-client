@@ -168,11 +168,11 @@ export class Transaction {
 
   /**
    * Add priority fee instructions (compute budget) with a variable priority defined by Helius.
-   * 
+   *
    * This method adds priority fee instructions to the transaction based on the specified
    * priority level and compute unit limit. It ensures that the total fee does not exceed
    * the specified maximum priority fee (in SOL) if provided.
-   * 
+   *
    * @param connection - The connection to the Solana cluster.
    * @param computeUnitLimit - The limit on the number of compute units.
    * @param fixedPriority - Set to false to indicate a variable priority fee.
@@ -190,11 +190,11 @@ export class Transaction {
 
   /**
    * Add priority fee instructions (compute budget)
-   * 
+   *
    * This method adds priority fee instructions to the transaction based on the specified
    * priority level and compute unit limit. It ensures that the total fee does not exceed
    * the specified maximum priority fee (in SOL) if provided.
-   * 
+   *
    * @param connection - The connection to the Solana cluster.
    * @param computeUnitLimit - The limit on the number of compute units.
    * @param fixedPriority - If true, a fixed priority fee is used; if false, the fee is based on priority level.
@@ -272,12 +272,12 @@ export class Transaction {
 
   /**
    * Gets the compute unit limit from a transaction simulation.
-   * 
-   * This function simulates a transaction and calculates the compute unit limit 
-   * based on the simulation results. If an additional compute limit is provided, 
-   * it is added to the units consumed in the simulation. Otherwise, the units 
+   *
+   * This function simulates a transaction and calculates the compute unit limit
+   * based on the simulation results. If an additional compute limit is provided,
+   * it is added to the units consumed in the simulation. Otherwise, the units
    * consumed are increased by 10%.
-   * 
+   *
    * @param {web3.Connection} connection - The connection object to the Solana cluster.
    * @param {number} [additionalComputeLimit] - Optional additional compute limit to add to the units consumed.
    * @returns {Promise<number>} - A promise that resolves to the total compute unit limit.
