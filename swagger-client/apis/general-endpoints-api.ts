@@ -20,6 +20,7 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 import { HawksightPool } from '../models';
 import { InlineResponse200 } from '../models';
 import { InlineResponse400 } from '../models';
+import { MeteoraPosition } from '../models';
 import { RegisterBody } from '../models';
 import { TransactionMetadata } from '../models';
 import { UserPortfolio } from '../models';
@@ -29,6 +30,39 @@ import { UserPortfolio } from '../models';
  */
 export const GeneralEndpointsApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * Returns all Meteora positions on Hawksight ever opened, including those already closed.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        allTimeMeteoraPositionsGet: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/allTimeMeteoraPositions`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions :AxiosRequestConfig = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.params) {
+                query.set(key, options.params[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * Returns all pools integrated by Hawksight.
          * @param {string} [hash] Optional hash parameter
@@ -256,6 +290,18 @@ export const GeneralEndpointsApiAxiosParamCreator = function (configuration?: Co
 export const GeneralEndpointsApiFp = function(configuration?: Configuration) {
     return {
         /**
+         * Returns all Meteora positions on Hawksight ever opened, including those already closed.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async allTimeMeteoraPositionsGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<MeteoraPosition>>> {
+            const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).allTimeMeteoraPositionsGet(options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Returns all pools integrated by Hawksight.
          * @param {string} [hash] Optional hash parameter
          * @param {*} [options] Override http request option.
@@ -333,6 +379,14 @@ export const GeneralEndpointsApiFp = function(configuration?: Configuration) {
 export const GeneralEndpointsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     return {
         /**
+         * Returns all Meteora positions on Hawksight ever opened, including those already closed.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async allTimeMeteoraPositionsGet(options?: AxiosRequestConfig): Promise<AxiosResponse<MeteoraPosition>> {
+            return GeneralEndpointsApiFp(configuration).allTimeMeteoraPositionsGet(options).then((request) => request(axios, basePath));
+        },
+        /**
          * Returns all pools integrated by Hawksight.
          * @param {string} [hash] Optional hash parameter
          * @param {*} [options] Override http request option.
@@ -390,6 +444,15 @@ export const GeneralEndpointsApiFactory = function (configuration?: Configuratio
  * @extends {BaseAPI}
  */
 export class GeneralEndpointsApi extends BaseAPI {
+    /**
+     * Returns all Meteora positions on Hawksight ever opened, including those already closed.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof GeneralEndpointsApi
+     */
+    public async allTimeMeteoraPositionsGet(options?: AxiosRequestConfig) : Promise<AxiosResponse<MeteoraPosition>> {
+        return GeneralEndpointsApiFp(this.configuration).allTimeMeteoraPositionsGet(options).then((request) => request(this.axios, this.basePath));
+    }
     /**
      * Returns all pools integrated by Hawksight.
      * @param {string} [hash] Optional hash parameter

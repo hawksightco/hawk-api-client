@@ -11,6 +11,7 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+export * from './apis/auth-endpoints-api';
 export * from './apis/general-endpoints-api';
 export * from './apis/general-utility-endpoints-api';
 export * from './apis/health-check-api';

@@ -1,4 +1,7 @@
 export * from './account';
+export * from './auth-generate-nonce-body';
+export * from './auth-generate-session-message-body';
+export * from './auth-refresh-session-body';
 export * from './automation-compound-automation-ix-body';
 export * from './automation-rebalance-automation-ix-body';
 export * from './balance';
@@ -13,6 +16,8 @@ export * from './inline-response2003';
 export * from './inline-response400';
 export * from './instruction';
 export * from './meteora-config';
+export * from './meteora-position';
+export * from './meteora-position-inner';
 export * from './orca-config';
 export * from './orca-config-rewards';
 export * from './orca-position-mint';
