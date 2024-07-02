@@ -17,6 +17,9 @@ import { Search } from "./Search";
  * making it easier to manage and use HawkSight's comprehensive blockchain features.
  */
 export class HawkAPI {
+  /** Swagger Client Instance. */
+  private readonly client: Client;
+
   /** Health module to check system health and API connectivity. */
   public readonly health: Health;
 
@@ -30,7 +33,8 @@ export class HawkAPI {
   public readonly util: Util;
 
   /** TxGenerator module for creating and managing transactions on the blockchain. */
-  public readonly txGenerator: TxGenerator;
+  private _txGenerator: TxGenerator;
+  get txGenerator() { return this._txGenerator; }
 
   /** TxGeneratorAutomations module for automating and optimizing transaction creation processes. */
   public readonly txGeneratorAutomation: TxGeneratorAutomations;
@@ -46,14 +50,24 @@ export class HawkAPI {
     protected readonly url: string = "https://api2.hawksight.co",
   ) {
     const client = new Client(url);
+    this.client = client;
     this.health = new Health(client);
     this.generalUtility = new GeneralUtility(client);
     this.general = new General(client, this.generalUtility);
     this.util = new Util(client);
-    this.txGenerator = new TxGenerator(client, this.generalUtility);
+    this._txGenerator = new TxGenerator(client, this.generalUtility);
     this.txGeneratorAutomation = new TxGeneratorAutomations(client, this.generalUtility);
     this.search = new Search(url);
     // Load search module
     this.search.load();
+  }
+
+  /**
+   * Override transaction generator
+   *
+   * @param txGenerator
+   */
+  overrideTxGenerator(builderFn: (client: Client, generalUtility: GeneralUtility) => TxGenerator) {
+    this._txGenerator = builderFn(this.client, this.generalUtility);
   }
 }
