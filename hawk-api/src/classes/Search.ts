@@ -1,4 +1,4 @@
-import { SearchIndices, Token } from "../types";
+import { SearchIndices, Token, LoadFromPersistenceFn, StoreToPersistenceFn } from "../types";
 import axios from 'axios';
 
 export class Search {
@@ -6,6 +6,30 @@ export class Search {
   private tokenIndices?: SearchIndices;
   private tokens?: Token[];
   private _loaded: boolean = false;
+  private _loadedFromPersistence = false;
+  private previousHash: string = '';
+  private latestHash: string = '';
+
+  private loadFromPersistenceFn?: LoadFromPersistenceFn;
+  private storeToPersistenceFn?: StoreToPersistenceFn;
+
+  /**
+   * Set load persistence callback
+   *
+   * @param loadFromPersistenceFn
+   */
+  setLoadFromPersistenceFn(loadFromPersistenceFn: LoadFromPersistenceFn) {
+    this.loadFromPersistenceFn = loadFromPersistenceFn;
+  }
+
+  /**
+   * Set store to persistence callback
+   *
+   * @param storeToPersistenceFn
+   */
+  setStoreToPersistenceFn(storeToPersistenceFn: StoreToPersistenceFn) {
+    this.storeToPersistenceFn = storeToPersistenceFn;
+  }
 
   /**
    * Checks if the token indices and tokens have been loaded.
@@ -62,12 +86,46 @@ export class Search {
   async load(): Promise<void> {
     if (!this.loaded) {
       this._loaded = true;
+      let firstRun = true;
       const update = async () => {
         await this.getTokenIndices();
-        setTimeout(update, 5 * 1000);
+        setTimeout(update, 60 * 1000);
       };
-      await update();
+      const updateFromPersistence = async () => {
+        await this.loadFromPersistence();
+        if (firstRun && this.loadFromPersistenceFn !== undefined) {
+          await update();
+          firstRun = false;
+        }
+        if (!!this.tokens && !!this.tokenIndices) {
+          if (!!this.storeToPersistenceFn && this.tokens.length > 0 && this.previousHash !== this.latestHash) {
+            await this.storeToPersistenceFn(this.tokenIndices, this.tokens);
+          }
+          setTimeout(updateFromPersistence, 60 * 1000);
+          return;
+        }
+        setTimeout(updateFromPersistence, 1 * 1000);
+      }
+      await updateFromPersistence();
     }
+  }
+
+  /**
+   * Load tokens and indices from persistence
+   *
+   * @param tokenIndices
+   * @param tokens
+   * @returns
+   */
+  private async loadFromPersistence() {
+    if (this._loadedFromPersistence) return;
+    if (this.loadFromPersistenceFn === undefined) return;
+    const [tokenIndices, tokens] = await this.loadFromPersistenceFn();
+    if (tokenIndices === undefined || tokens === undefined) return;
+    this.tokenIndices = tokenIndices;
+    this.tokens = tokens;
+    this.latestHash = tokenIndices.hash;
+    this._loadedFromPersistence = true;
   }
 
   /**
@@ -82,17 +140,20 @@ export class Search {
    * @returns {Promise<void>} A promise that resolves when the token indices and tokens are updated.
    */
   private async getTokenIndices(): Promise<void> {
-    if (this.tokenIndices === undefined) {
+    if (this.tokenIndices === undefined || this.latestHash === '') {
       this.tokenIndices = await this.getSearchIndices('tokens');
-    }
-    if (this.tokens === undefined) {
       this.tokens = await this.getAllTokens();
+      this.previousHash = '';
+      this.latestHash = this.tokenIndices.hash;
+      return;
     }
     const tokenIndices = await this.getSearchIndices('tokens', this.tokenIndices.hash);
+    this.previousHash = this.tokenIndices.hash;
+    this.latestHash = tokenIndices.hash;
 
     // If hash doesn't match, it means there's a new token.
     if (tokenIndices.hash !== this.tokenIndices.hash) {
-      this.tokenIndices = await this.getSearchIndices('tokens');
+      this.tokenIndices = tokenIndices;
       this.tokens = await this.getAllTokens();
     }
   }

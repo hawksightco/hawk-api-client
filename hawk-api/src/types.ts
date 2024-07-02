@@ -294,3 +294,11 @@ export type SearchIndices = {
   hash: string,
   indices: Record<string, Record<number, 1>>,
 }
+
+export interface SearchTokenStore {
+  tokenIndices: SearchIndices;
+  tokens: Token[];
+};
+
+export type LoadFromPersistenceFn = () => Promise<[SearchIndices | undefined, Token[] | undefined]>;
+export type StoreToPersistenceFn = (tokenIndices: SearchIndices, tokens: Token[]) => Promise<void>;
