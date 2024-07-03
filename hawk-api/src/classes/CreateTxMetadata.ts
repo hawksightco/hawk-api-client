@@ -64,7 +64,9 @@ export class CreateTxMetadata {
       for (const alt in this.alts) {
         this.alts[alt] = (await this.connection.getAddressLookupTable(new web3.PublicKey(alt))).value;
       }
+      return;
     }
+    setTimeout(async () => await this.updateAlts(), 1000); // Update until done
   }
 
   /**
