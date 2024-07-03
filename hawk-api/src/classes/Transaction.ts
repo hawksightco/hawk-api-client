@@ -209,6 +209,7 @@ export class Transaction {
     priorityLevelOrPriorityFee: client.PriorityLevel | number,
     maxPriorityFee?: number,
   ): Promise<web3.TransactionInstruction[]> {
+    console.log(`addPriorityFeeIx`);
     // First, remove any existing priority fee instructions
     this.removePriorityFeeIxs();
 
@@ -222,11 +223,14 @@ export class Transaction {
       const maxPriorityFeeLamports = maxPriorityFee !== undefined ? maxPriorityFee * 1_000_000_000 : undefined;
 
       // Get fee estimate by simulating the transaction
+      const startTime = new Date().getTime() / 1000;
+      console.log(`addPriorityFeeIx: Starting getFeeEstimate function`);
       let estimate = await getFeeEstimate(
         this.generalUtility,
         priorityLevelOrPriorityFee,
         this.txMetadataResponse
       );
+      console.log(`addPriorityFeeIx: Starting getFeeEstimate function: Elapsed Time: ${(new Date().getTime() / 1000) - startTime}`);
 
       // If priority is set to default or medium, we multiply estimate by 2 to increase its chance on blockchain.
       if (priorityLevelOrPriorityFee === client.PriorityLevel.Default || priorityLevelOrPriorityFee === client.PriorityLevel.Medium) {
