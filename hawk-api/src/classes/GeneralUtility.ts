@@ -21,6 +21,28 @@ export class GeneralUtility {
   ) {}
 
   /**
+   * Overridable get priority fee estiamte function
+   *
+   * @param params
+   * @returns
+   */
+  private getPriorityFeeEstimateFn = async (params: any): Promise<ResponseWithStatus<PriorityFeeEstimate>> => {
+    const result = await this.client.generalUtility.utilGetPriorityFeeEstimatePost(params).catch(e => e.response);
+    return {
+      status: result.status,
+      data: result.data,
+    };
+  };
+
+  /**
+   * Override get priority fee estimate function
+   * @param getPriorityFeeEstimateFn
+   */
+  overrideGetPriorityFeeEstimateFn(getPriorityFeeEstimateFn: (params: any) => Promise<ResponseWithStatus<PriorityFeeEstimate>>) {
+    this.getPriorityFeeEstimateFn = getPriorityFeeEstimateFn;
+  }
+
+  /**
    * Fetches the priority fee estimate based on the provided parameters.
    *
    * This method communicates with an HTTP client to retrieve the priority fee estimate
@@ -34,11 +56,7 @@ export class GeneralUtility {
    * @throws Captures and returns any errors encountered during the API call.
    */
   async getPriorityFeeEstimate(params: UtilGetPriorityFeeEstimateBody): Promise<ResponseWithStatus<PriorityFeeEstimate>> {
-    const result = await this.client.generalUtility.utilGetPriorityFeeEstimatePost(params).catch(e => e.response);
-    return {
-      status: result.status,
-      data: result.data,
-    };
+    return await this.getPriorityFeeEstimateFn(params);
   }
 
   /**
