@@ -1,9 +1,8 @@
 import * as client from "@hawksightco/swagger-client";
 import * as web3 from "@solana/web3.js";
-import { ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, TransactionPriority } from "./types";
-import bs58 from "bs58";
-import { Transaction } from "./classes/Transaction";
+import { ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse } from "./types";
 import { GeneralUtility } from "./classes/GeneralUtility";
+import { CreateTxMetadata } from "./classes/CreateTxMetadata";
 
 /**
  * Asynchronously creates transaction metadata based on the provided transaction parameters and network state.
@@ -26,54 +25,12 @@ export async function createTxMetadata(
   payer: string,
   data: TransactionMetadataResponse,
 ): Promise<TransactionMetadata> {
-  // Retrieve address lookup table accounts
-  const alts: web3.AddressLookupTableAccount[] = [];
-  console.log(`createTxMetadata`);
-  const startTime = new Date().getTime() / 1000;
-
-  // Find jup alts
-  const jupAlts = await generalUtility.findAltWithTxPost({
-    transaction: data,
-  });
-  console.log(`createTxMetadata: Checkpoint: (jupAlts) ${(new Date().getTime() / 1000) - startTime}`);
-
-  for (const alt of data.addressLookupTableAddresses) {
-    alts.push(
-      (await connection.getAddressLookupTable(new web3.PublicKey(alt))).value as web3.AddressLookupTableAccount
-    );
-  }
-
-  if (jupAlts.status === 200) {
-    for (const alt of jupAlts.data) {
-      alts.push(
-        (await connection.getAddressLookupTable(new web3.PublicKey(alt))).value as web3.AddressLookupTableAccount
-      );
-    }
-  } else {
-    console.error(jupAlts.data);
-  }
-  console.log(`createTxMetadata: Checkpoint: (jupAlts after loop) ${(new Date().getTime() / 1000) - startTime}`);
-
-  // Get the recent blockhash
-  const latestBlockhash = await connection.getLatestBlockhash();
-  console.log(`createTxMetadata: Checkpoint: (latestBlockhash) ${(new Date().getTime() / 1000) - startTime}`);
-
-  // Create initial transaction instance
-  const transaction = new Transaction(
-    data,
-    new web3.PublicKey(payer),
-    latestBlockhash,
-    alts,
+  return await CreateTxMetadata.instance().createTxMetadata(
     generalUtility,
-  );
-  console.log(`createTxMetadata: Elapsed time: ${(new Date().getTime() / 1000) - startTime}`);
-
-  // Return transaction metadatauni
-  return {
-    description: data.description,
-    estimatedFeeInSOL: data.estimatedFeeInSOL,
-    transaction,
-  };
+    connection,
+    payer,
+    data,
+  )
 }
 
 /**

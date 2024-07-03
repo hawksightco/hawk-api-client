@@ -6,6 +6,7 @@ import { TxGeneratorAutomations } from "./TxGeneratorAutomations";
 import { Client } from "./Client";
 import { GeneralUtility } from "./GeneralUtility";
 import { Search } from "./Search";
+import { CreateTxMetadata } from "./CreateTxMetadata";
 
 /**
  * HawkAPI is a central gateway class that aggregates access to various functional modules
@@ -58,6 +59,10 @@ export class HawkAPI {
     this._txGenerator = new TxGenerator(client, this.generalUtility);
     this.txGeneratorAutomation = new TxGeneratorAutomations(client, this.generalUtility);
     this.search = new Search(url);
+
+    // Load create tx metadata module
+    CreateTxMetadata.instance().load();
+
     // Load search module
     this.search.load();
   }
