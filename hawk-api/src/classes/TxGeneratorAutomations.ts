@@ -54,7 +54,7 @@ export class TxGeneratorAutomations {
         status: result.status,
         data: result.data,
       },
-      async (data) => await createTxMetadata(this.generalUtility, connection, payer, data, this.priorityLevel, this.maxPriorityFee),
+      async (data) => await createTxMetadata(this.generalUtility, connection, payer, data),
     );
   }
 
@@ -75,7 +75,7 @@ export class TxGeneratorAutomations {
           status: result.status,
           data: result.data,
         },
-        async (data) => await createTxMetadata(this.generalUtility, connection, payer, data, this.priorityLevel, this.maxPriorityFee),
+        async (data) => await createTxMetadata(this.generalUtility, connection, payer, data),
       );
     }
 }

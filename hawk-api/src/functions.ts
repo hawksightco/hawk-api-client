@@ -16,8 +16,6 @@ import { GeneralUtility } from "./classes/GeneralUtility";
  *        - computeBudgetInstructions: Array of instructions for setting compute budget.
  *        - description: Description of the transaction.
  *        - estimatedFeeInSOL: Estimated fee in SOL units.
- * @param priorityLevel An enum representing the priority level of the transaction which might influence the fee.
- * @param maxPriorityFee The maximum priority fee willing to be paid on top of the base fee for faster processing (in lamports)
  * @returns A promise resolving to an object containing the transaction metadata including the description,
  *          estimated fee, and the transaction object itself.
  * @throws Error if there is an issue in constructing the transaction or during simulation which includes logs of errors.
@@ -27,16 +25,17 @@ export async function createTxMetadata(
   connection: web3.Connection,
   payer: string,
   data: TransactionMetadataResponse,
-  priorityLevel: client.PriorityLevel,
-  maxPriorityFee: number,
 ): Promise<TransactionMetadata> {
   // Retrieve address lookup table accounts
   const alts: web3.AddressLookupTableAccount[] = [];
+  console.log(`createTxMetadata`);
+  const startTime = new Date().getTime() / 1000;
 
   // Find jup alts
   const jupAlts = await generalUtility.findAltWithTxPost({
     transaction: data,
   });
+  console.log(`createTxMetadata: Checkpoint: (jupAlts) ${(new Date().getTime() / 1000) - startTime}`);
 
   for (const alt of data.addressLookupTableAddresses) {
     alts.push(
@@ -53,9 +52,11 @@ export async function createTxMetadata(
   } else {
     console.error(jupAlts.data);
   }
+  console.log(`createTxMetadata: Checkpoint: (jupAlts after loop) ${(new Date().getTime() / 1000) - startTime}`);
 
   // Get the recent blockhash
   const latestBlockhash = await connection.getLatestBlockhash();
+  console.log(`createTxMetadata: Checkpoint: (latestBlockhash) ${(new Date().getTime() / 1000) - startTime}`);
 
   // Create initial transaction instance
   const transaction = new Transaction(
@@ -65,21 +66,7 @@ export async function createTxMetadata(
     alts,
     generalUtility,
   );
-
-  // // Simulate transaction to get consumed units
-  // const simulation = await transaction.simulateTransaction(connection);
-
-  // // Check if there's error in transaction
-  // if (simulation.err !== null) {
-  //   console.log(`Transaction Error: ${simulation.err}`);
-  //   for (const log of simulation.logs as string[]) {
-  //     console.log(log);
-  //   }
-  //   // throw new Error(simulation.err.toString());
-  // }
-
-  // // Include priority fee instructions generated via Helius (assuming we use Helius as RPC)
-  // transaction.addPriorityFeeIx(connection, priorityLevel, simulation.unitsConsumed, maxPriorityFee);
+  console.log(`createTxMetadata: Elapsed time: ${(new Date().getTime() / 1000) - startTime}`);
 
   // Return transaction metadatauni
   return {
