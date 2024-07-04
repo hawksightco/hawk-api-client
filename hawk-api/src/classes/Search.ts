@@ -9,6 +9,7 @@ export class Search {
   private _loadedFromPersistence = false;
   private previousHash: string = '';
   private latestHash: string = '';
+  disableFetch: boolean = false;
 
   private loadFromPersistenceFn?: LoadFromPersistenceFn;
   private storeToPersistenceFn?: StoreToPersistenceFn;
@@ -88,23 +89,30 @@ export class Search {
       this._loaded = true;
       let firstRun = true;
       const update = async () => {
-        await this.getTokenIndices();
-        setTimeout(update, 60 * 1000);
+        if (this.disableFetch === false) {
+          await this.getTokenIndices();
+          setTimeout(update, 60 * 1000);
+        }
       };
       const updateFromPersistence = async () => {
-        await this.loadFromPersistence();
-        if (firstRun && this.loadFromPersistenceFn !== undefined) {
-          await update();
-          firstRun = false;
-        }
-        if (!!this.tokens && !!this.tokenIndices) {
-          if (!!this.storeToPersistenceFn && this.tokens.length > 0 && this.previousHash !== this.latestHash) {
-            await this.storeToPersistenceFn(this.tokenIndices, this.tokens);
+        if (this.disableFetch === false) {
+          await this.loadFromPersistence();
+          if (firstRun && this.loadFromPersistenceFn !== undefined) {
+            await update();
+            firstRun = false;
           }
-          setTimeout(updateFromPersistence, 60 * 1000);
-          return;
+          if (!!this.tokens && !!this.tokenIndices) {
+            if (!!this.storeToPersistenceFn && this.tokens.length > 0 && this.previousHash !== this.latestHash) {
+              await this.storeToPersistenceFn(this.tokenIndices, this.tokens);
+            }
+            setTimeout(async () => await updateFromPersistence(), 60 * 1000);
+            return;
+          }
+          setTimeout(async () => await updateFromPersistence(), 1 * 1000);
+        } else {
+          await this.loadFromPersistence();
+          setTimeout(async () => await updateFromPersistence(), 10 * 10000);
         }
-        setTimeout(updateFromPersistence, 1 * 1000);
       }
       await updateFromPersistence();
     }
