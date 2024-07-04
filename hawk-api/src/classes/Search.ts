@@ -111,6 +111,10 @@ export class Search {
           setTimeout(async () => await updateFromPersistence(), 1 * 1000);
         } else {
           await this.loadFromPersistence();
+          if (typeof this.tokens === 'undefined' || this.tokens!.length === 0) {
+            setTimeout(async () => await updateFromPersistence(), 1 * 10000);
+            return;
+          }
           setTimeout(async () => await updateFromPersistence(), 10 * 10000);
         }
       }
