@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { PriorityLevel } from './priority-level';
+import { MeteoradlmmtxwithdrawFastGeneration } from './meteoradlmmtxwithdraw-fast-generation';
  /**
  * 
  *
@@ -22,10 +22,12 @@ import { PriorityLevel } from './priority-level';
 export interface TxWithdrawBody {
 
     /**
-     * @type {PriorityLevel}
+     * Priority level for the transaction.
+     *
+     * @type {string}
      * @memberof TxWithdrawBody
      */
-    priority?: PriorityLevel;
+    priority?: TxWithdrawBodyPriorityEnum;
 
     /**
      * Max lamports to consume for priority fee
@@ -74,4 +76,25 @@ export interface TxWithdrawBody {
      * @memberof TxWithdrawBody
      */
     shouldClaimAndClose?: boolean;
+
+    /**
+     * @type {MeteoradlmmtxwithdrawFastGeneration}
+     * @memberof TxWithdrawBody
+     */
+    fastGeneration?: MeteoradlmmtxwithdrawFastGeneration;
 }
+
+/**
+ * @export
+ * @enum {string}
+ */
+export enum TxWithdrawBodyPriorityEnum {
+    Default = 'Default',
+    Low = 'Low',
+    Medium = 'Medium',
+    High = 'High',
+    VeryHigh = 'VeryHigh',
+    UnsafeMax = 'UnsafeMax',
+    None = 'None'
+}
+
