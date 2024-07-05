@@ -1,6 +1,6 @@
 {
   "name": "@hawksightco/swagger-client",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "OpenAPI client for Hawksight v2 Public API",
   "author": "Hawksight",
   "homepage": "https://hawksight.co/",
@@ -15,7 +15,7 @@
   "main": "./dist/index.js",
   "typings": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc --outDir dist/",
+    "build": "npx tsc --outDir dist/",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {

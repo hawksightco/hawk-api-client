@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { PriorityLevel } from './priority-level';
+import { MeteoradlmmtxdepositFastGeneration } from './meteoradlmmtxdeposit-fast-generation';
  /**
  * 
  *
@@ -20,28 +20,6 @@ import { PriorityLevel } from './priority-level';
  * @interface TxDepositBody
  */
 export interface TxDepositBody {
-
-    /**
-     * @type {PriorityLevel}
-     * @memberof TxDepositBody
-     */
-    priority?: PriorityLevel;
-
-    /**
-     * Max lamports to consume for priority fee
-     *
-     * @type {number}
-     * @memberof TxDepositBody
-     */
-    maxPriorityFee?: number;
-
-    /**
-     * Whether to disable computing priority fees. True by default which means it ignores priority parameter
-     *
-     * @type {boolean}
-     * @memberof TxDepositBody
-     */
-    disableFeeCompute?: boolean;
 
     /**
      * User's position from meteora (See GET /meteora/dlmm/util/positions)
@@ -76,6 +54,14 @@ export interface TxDepositBody {
     totalYAmount?: number;
 
     /**
+     * X and Y token distribution. At the moment, we support default meteora distribution functions: SPOT, CURVE, BID-ASK, SPOT-IMBALANCED, CURVE-IMBALANCED, BID-ASK-IMBALANCED
+     *
+     * @type {string}
+     * @memberof TxDepositBody
+     */
+    distribution?: string;
+
+    /**
      * Liquidity slippage (default: 3. 3 means 0.03%)
      *
      * @type {number}
@@ -84,10 +70,16 @@ export interface TxDepositBody {
     slippage?: number;
 
     /**
-     * X and Y token distribution. At the moment, we support default meteora distribution functions: SPOT, CURVE, BID-ASK, SPOT-IMBALANCED, CURVE-IMBALANCED, BID-ASK-IMBALANCED
+     * Whether to skip input token check (improves tx generation)
      *
-     * @type {string}
+     * @type {boolean}
      * @memberof TxDepositBody
      */
-    distribution?: string;
+    skipInputTokenCheck?: boolean;
+
+    /**
+     * @type {MeteoradlmmtxdepositFastGeneration}
+     * @memberof TxDepositBody
+     */
+    fastGeneration?: MeteoradlmmtxdepositFastGeneration;
 }
