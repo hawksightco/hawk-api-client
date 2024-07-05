@@ -60,6 +60,28 @@ export class GeneralUtility {
   }
 
   /**
+   * Overridable jupiter alt function
+   *
+   * @param params
+   * @returns
+   */
+  private findAltWithTxPostFn = async (params: any): Promise<ResponseWithStatus<Array<string>>> => {
+    const result = await this.client.generalUtility.utilFindAltWithTxPost(params).catch(e => e.response);
+    return {
+      status: result.status,
+      data: result.data,
+    };
+  }
+
+    /**
+   * Override get priority fee estimate function
+   * @param getPriorityFeeEstimateFn
+   */
+    overrideFindAltWithTxPostFn(findAltWithTxPostFn: (params: any) => Promise<ResponseWithStatus<Array<string>>>) {
+      this.findAltWithTxPostFn = findAltWithTxPostFn;
+    }
+
+  /**
    * Finds alternative public keys related to a given transaction and returns them along with the response status.
    *
    * This method sends a request to the `utilFindAltWithTxPost` endpoint with the provided parameters, and returns the response
@@ -67,13 +89,9 @@ export class GeneralUtility {
    * data in the returned object.
    *
    * @param {UtilFindAltWithTxBody} params - The parameters for the function, which include the transaction metadata.
-   * @returns {Promise<ResponseWithStatus<Array<string>>>>} A promise that resolves to an object containing the response status and an array of public key strings.
+   * @returns {Promise<ResponseWithStatus<Array<string>>>} A promise that resolves to an object containing the response status and an array of public key strings.
    */
   async findAltWithTxPost(params: UtilFindAltWithTxBody): Promise<ResponseWithStatus<Array<string>>> {
-    const result = await this.client.generalUtility.utilFindAltWithTxPost(params).catch(e => e.response);
-    return {
-      status: result.status,
-      data: result.data,
-    };
+    return await this.findAltWithTxPostFn(params);
   }
 }
