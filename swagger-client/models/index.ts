@@ -18,6 +18,7 @@ export * from './instruction';
 export * from './meteora-config';
 export * from './meteora-position';
 export * from './meteora-position-inner';
+export * from './meteoradlmmtxclaim-fast-generation';
 export * from './meteoradlmmtxdeposit-fast-generation';
 export * from './meteoradlmmtxwithdraw-fast-generation';
 export * from './orca-config';

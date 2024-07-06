@@ -22,30 +22,6 @@ import { MeteoradlmmtxwithdrawFastGeneration } from './meteoradlmmtxwithdraw-fas
 export interface TxWithdrawBody {
 
     /**
-     * Priority level for the transaction.
-     *
-     * @type {string}
-     * @memberof TxWithdrawBody
-     */
-    priority?: TxWithdrawBodyPriorityEnum;
-
-    /**
-     * Max lamports to consume for priority fee
-     *
-     * @type {number}
-     * @memberof TxWithdrawBody
-     */
-    maxPriorityFee?: number;
-
-    /**
-     * Whether to disable computing priority fees. True by default which means it ignores priority parameter
-     *
-     * @type {boolean}
-     * @memberof TxWithdrawBody
-     */
-    disableFeeCompute?: boolean;
-
-    /**
      * User's position from Meteora (See GET /meteora/dlmm/util/positions).
      *
      * @type {string}
@@ -83,18 +59,3 @@ export interface TxWithdrawBody {
      */
     fastGeneration?: MeteoradlmmtxwithdrawFastGeneration;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum TxWithdrawBodyPriorityEnum {
-    Default = 'Default',
-    Low = 'Low',
-    Medium = 'Medium',
-    High = 'High',
-    VeryHigh = 'VeryHigh',
-    UnsafeMax = 'UnsafeMax',
-    None = 'None'
-}
-

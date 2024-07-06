@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { PriorityLevel } from './priority-level';
+import { MeteoradlmmtxclaimFastGeneration } from './meteoradlmmtxclaim-fast-generation';
  /**
  * 
  *
@@ -20,28 +20,6 @@ import { PriorityLevel } from './priority-level';
  * @interface TxClaimBody
  */
 export interface TxClaimBody {
-
-    /**
-     * @type {PriorityLevel}
-     * @memberof TxClaimBody
-     */
-    priority?: PriorityLevel;
-
-    /**
-     * Max lamports to consume for priority fee
-     *
-     * @type {number}
-     * @memberof TxClaimBody
-     */
-    maxPriorityFee?: number;
-
-    /**
-     * Whether to disable computing priority fees. True by default which means it ignores priority parameter
-     *
-     * @type {boolean}
-     * @memberof TxClaimBody
-     */
-    disableFeeCompute?: boolean;
 
     /**
      * User's wallet address who owns the position.
@@ -58,4 +36,10 @@ export interface TxClaimBody {
      * @memberof TxClaimBody
      */
     position?: string;
+
+    /**
+     * @type {MeteoradlmmtxclaimFastGeneration}
+     * @memberof TxClaimBody
+     */
+    fastGeneration?: MeteoradlmmtxclaimFastGeneration;
 }
