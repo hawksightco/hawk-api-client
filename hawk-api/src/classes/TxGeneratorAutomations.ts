@@ -68,14 +68,35 @@ export class TxGeneratorAutomations {
    * @param params Parameters required
    * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
    */
-    async meteoraRebalanceIxs(connection: web3.Connection, payer: string, params: _client.AutomationRebalanceAutomationIxBody): Promise<ResponseWithStatus<TransactionMetadata>> {
-      const result = await this.client.meteoraDLMMAutomationInstructionsApi.meteoraDlmmAutomationRebalanceAutomationIxPost(params).catch(e => e.response);
-      return resultOrError<TransactionMetadataResponse, TransactionMetadata>(
-        {
-          status: result.status,
-          data: result.data,
-        },
-        async (data) => await createTxMetadata(this.generalUtility, connection, payer, data),
-      );
-    }
+  async meteoraRebalanceIxs(connection: web3.Connection, payer: string, params: _client.AutomationRebalanceAutomationIxBody): Promise<ResponseWithStatus<TransactionMetadata>> {
+    const result = await this.client.meteoraDLMMAutomationInstructionsApi.meteoraDlmmAutomationRebalanceAutomationIxPost(params).catch(e => e.response);
+    return resultOrError<TransactionMetadataResponse, TransactionMetadata>(
+      {
+        status: result.status,
+        data: result.data,
+      },
+      async (data) => await createTxMetadata(this.generalUtility, connection, payer, data),
+    );
+  }
+
+  /**
+   * Creates meteora full withdraw and close position instructions
+   *
+   * NOTE: For hawksight devs only.
+   *
+   * @param connection The Solana web3 connection object for blockchain interactions.
+   * @param payer The public key of the payer for transaction fees.
+   * @param params Parameters required
+   * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
+   */
+  async meteoraFullWithdrawAndClosePositionIxs(connection: web3.Connection, payer: string, params: _client.AutomationWithdrawAndCloseAutomationIxBody): Promise<ResponseWithStatus<TransactionMetadata>> {
+    const result = await this.client.meteoraDLMMAutomationInstructionsApi.meteoraDlmmAutomationWithdrawAndCloseAutomationIxPost(params).catch(e => e.response);
+    return resultOrError<TransactionMetadataResponse, TransactionMetadata>(
+      {
+        status: result.status,
+        data: result.data,
+      },
+      async (data) => await createTxMetadata(this.generalUtility, connection, payer, data),
+    );
+  }
 }
