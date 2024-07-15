@@ -53,7 +53,7 @@ export class CreateTxMetadata {
    * Loads the address lookup tables.
    */
   async load() {
-    this.updateAlts();
+    await this.updateAlts();
   }
 
   /**
