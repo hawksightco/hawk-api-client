@@ -4,6 +4,7 @@ export * from './auth-generate-session-message-body';
 export * from './auth-refresh-session-body';
 export * from './automation-compound-automation-ix-body';
 export * from './automation-rebalance-automation-ix-body';
+export * from './automation-withdraw-and-close-automation-ix-body';
 export * from './balance';
 export * from './hawksight-pool';
 export * from './hawksight-pool-metrics';
