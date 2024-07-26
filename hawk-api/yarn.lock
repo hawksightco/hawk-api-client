@@ -312,6 +312,14 @@
   dependencies:
     axios "^1.6.8"
 
+"@hawksightco/swagger-client@^0.0.27":
+  version "0.0.27"
+  resolved "https://registry.yarnpkg.com/@hawksightco/swagger-client/-/swagger-client-0.0.27.tgz#33df62dbd3e0ce9620d6cb99791b528cdc1868c9"
+  integrity sha512-MUrjyW4OyOFreBnRSpfQ1kExE2ar0kfbCzefCIsLft1Ea6peIE3lAZp1BXbvc8Nl3hf5ZM/hr9pziSF8j/JcrQ==
+  dependencies:
+    "@hawksightco/swagger-client" "^0.0.26"
+    axios "^1.6.8"
+
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@istanbuljs/load-nyc-config/-/load-nyc-config-1.1.0.tgz#fd3db1d59ecf7cf121e80650bb86712f9b55eced"

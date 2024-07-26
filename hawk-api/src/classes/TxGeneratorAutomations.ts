@@ -80,7 +80,7 @@ export class TxGeneratorAutomations {
   }
 
   /**
-   * Creates meteora full withdraw and close position instructions
+   * Creates meteora close limit instruction (combination of claim fees/rewards + remove liquidity + close position)
    *
    * NOTE: For hawksight devs only.
    *
@@ -89,8 +89,8 @@ export class TxGeneratorAutomations {
    * @param params Parameters required
    * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
    */
-  async meteoraFullWithdrawAndClosePositionIxs(connection: web3.Connection, payer: string, params: _client.AutomationWithdrawAndCloseAutomationIxBody): Promise<ResponseWithStatus<TransactionMetadata>> {
-    const result = await this.client.meteoraDLMMAutomationInstructionsApi.meteoraDlmmAutomationWithdrawAndCloseAutomationIxPost(params).catch(e => e.response);
+  async meteoraLimitCloseIxs(connection: web3.Connection, payer: string, params: _client.AutomationLimitCloseAutomationIxBody): Promise<ResponseWithStatus<TransactionMetadata>> {
+    const result = await this.client.meteoraDLMMAutomationInstructionsApi.meteoraDlmmAutomationLimitCloseAutomationIxPost(params).catch(e => e.response);
     return resultOrError<TransactionMetadataResponse, TransactionMetadata>(
       {
         status: result.status,
