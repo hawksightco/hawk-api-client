@@ -149,6 +149,48 @@ export const GeneralEndpointsApiAxiosParamCreator = function (configuration?: Co
             };
         },
         /**
+         * Returns all pools integrated by Hawksight.
+         * @param {string} position Position to search
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        positionAnalyticsGet: async (position: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'position' is not null or undefined
+            if (position === null || position === undefined) {
+                throw new RequiredError('position','Required parameter position was null or undefined when calling positionAnalyticsGet.');
+            }
+            const localVarPath = `/positionAnalytics`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions :AxiosRequestConfig = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (position !== undefined) {
+                localVarQueryParameter['position'] = position;
+            }
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.params) {
+                query.set(key, options.params[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Generates a transaction to create a user's program derived address (PDA).
          * @param {RegisterBody} body 
          * @param {*} [options] Override http request option.
@@ -329,6 +371,19 @@ export const GeneralEndpointsApiFp = function(configuration?: Configuration) {
             };
         },
         /**
+         * Returns all pools integrated by Hawksight.
+         * @param {string} position Position to search
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async positionAnalyticsGet(position: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<void>>> {
+            const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).positionAnalyticsGet(position, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Generates a transaction to create a user's program derived address (PDA).
          * @param {RegisterBody} body 
          * @param {*} [options] Override http request option.
@@ -406,6 +461,15 @@ export const GeneralEndpointsApiFactory = function (configuration?: Configuratio
             return GeneralEndpointsApiFp(configuration).portfolioGet(wallet, pool, options).then((request) => request(axios, basePath));
         },
         /**
+         * Returns all pools integrated by Hawksight.
+         * @param {string} position Position to search
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async positionAnalyticsGet(position: string, options?: AxiosRequestConfig): Promise<AxiosResponse<void>> {
+            return GeneralEndpointsApiFp(configuration).positionAnalyticsGet(position, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Generates a transaction to create a user's program derived address (PDA).
          * @param {RegisterBody} body 
          * @param {*} [options] Override http request option.
@@ -473,6 +537,16 @@ export class GeneralEndpointsApi extends BaseAPI {
      */
     public async portfolioGet(wallet: string, pool?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<UserPortfolio>> {
         return GeneralEndpointsApiFp(this.configuration).portfolioGet(wallet, pool, options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
+     * Returns all pools integrated by Hawksight.
+     * @param {string} position Position to search
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof GeneralEndpointsApi
+     */
+    public async positionAnalyticsGet(position: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<void>> {
+        return GeneralEndpointsApiFp(this.configuration).positionAnalyticsGet(position, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * Generates a transaction to create a user's program derived address (PDA).
