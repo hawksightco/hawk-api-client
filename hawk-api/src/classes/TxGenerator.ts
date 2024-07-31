@@ -118,6 +118,25 @@ export class TxGenerator {
   }
 
   /**
+   * Creates meteora instruction that initializes bin arrays
+   *
+   * @param connection The Solana web3 connection object for blockchain interactions.
+   * @param payer The public key of the payer for transaction fees.
+   * @param params Parameters required
+   * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
+   */
+    async meteoraInitializeBinArrays(connection: web3.Connection, payer: string, params: _client.TxInitializeBinArraysBody): Promise<ResponseWithStatus<TransactionMetadata>> {
+      const result = await this.client.meteoraDLMMInstructionsApi.meteoraDlmmTxInitializeBinArraysPost(params).catch(e => e.response);
+      return resultOrError<TransactionMetadataResponse, TransactionMetadata>(
+        {
+          status: result.status,
+          data: result.data,
+        },
+        async (data) => await createTxMetadata(this.generalUtility, connection, payer, data),
+      );
+    }
+
+  /**
    * Creates orca instruction that opens new position
    *
    * @param connection The Solana web3 connection object for blockchain interactions.
