@@ -1,6 +1,6 @@
 {
   "name": "@hawksightco/swagger-client",
-  "version": "0.0.28",
+  "version": "0.0.29",
   "description": "OpenAPI client for Hawksight v2 Public API",
   "author": "Hawksight",
   "homepage": "https://hawksight.co/",
@@ -19,7 +19,6 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@hawksightco/swagger-client": "^0.0.26",
     "axios": "^1.6.8"
   },
   "devDependencies": {
