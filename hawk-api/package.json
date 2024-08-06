@@ -1,6 +1,6 @@
 {
   "name": "@hawksightco/hawk-sdk",
-  "version": "0.0.70",
+  "version": "0.0.71",
   "description": "Hawksight v2 SDK",
   "main": "dist/src/index.js",
   "repository": "https://github.com/ghabxph/hawk-api-client.git",
@@ -20,7 +20,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@hawksightco/swagger-client": "^0.0.28",
+    "@hawksightco/swagger-client": "^0.0.29",
     "@solana/web3.js": "^1.89.1",
     "bn.js": "^5.2.1"
   },

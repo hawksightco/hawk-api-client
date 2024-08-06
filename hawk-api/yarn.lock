@@ -305,19 +305,11 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@hawksightco/swagger-client@^0.0.26":
-  version "0.0.26"
-  resolved "https://registry.yarnpkg.com/@hawksightco/swagger-client/-/swagger-client-0.0.26.tgz#b5464dec5cb72f09872a9563543ae84f1d71f68a"
-  integrity sha512-Xs0qZ79+K88DIXezx/h77OhDAoyjxf5sDS6iVQG7ogJlmzx+wU72d5v1beSJip7dKLygh0exAFbhpa2ZXVbkrg==
+"@hawksightco/swagger-client@^0.0.29":
+  version "0.0.29"
+  resolved "https://registry.yarnpkg.com/@hawksightco/swagger-client/-/swagger-client-0.0.29.tgz#8a34ba4f102eb91af0deede1b09904b83ef040de"
+  integrity sha512-1Mn0CnddmpO8PPDa2OT3hcfU9n4ovDfodiK+pprE8Ke3Q4UO2uXhN6UnWxjrt4WAufbQDTXhrLTWcWpseCV4Ug==
   dependencies:
-    axios "^1.6.8"
-
-"@hawksightco/swagger-client@^0.0.28":
-  version "0.0.28"
-  resolved "https://registry.yarnpkg.com/@hawksightco/swagger-client/-/swagger-client-0.0.28.tgz#a89620178058d919d4507d14af1c3ba825752de4"
-  integrity sha512-VjaDXdOiKEuD3ZuphHNKvfDYTcXQDzUD6yl2oTi/Y+s+GmPw3ZAE+aMObkkn6KIeT8XCRxaPh2qnJ5FZFntpUg==
-  dependencies:
-    "@hawksightco/swagger-client" "^0.0.26"
     axios "^1.6.8"
 
 "@istanbuljs/load-nyc-config@^1.0.0":

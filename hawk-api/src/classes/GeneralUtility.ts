@@ -94,4 +94,21 @@ export class GeneralUtility {
   async findAltWithTxPost(params: UtilFindAltWithTxBody): Promise<ResponseWithStatus<Array<string>>> {
     return await this.findAltWithTxPostFn(params);
   }
+
+  /**
+   * Get candlestick data from Birdeye.
+   *
+   * @param {string} address - The contract address to fetch candlestick data for.
+   * @param {string} frequency - The frequency of the candlestick data (e.g., '15m').
+   * @param {number} startMs - The start time in milliseconds.
+   * @param {number} endMs - The end time in milliseconds.
+   * @returns {Promise<ResponseWithStatus<Array<Object>>>} A promise that resolves to an object containing the response status and an array of candlestick data objects.
+   */
+  async candlestick(address: string, frequency: string, startMs: number, endMs: number): Promise<ResponseWithStatus<Array<string>>> {
+    const result = await this.client.generalUtility.utilCandlestickGet(address, frequency, startMs, endMs).catch(e => e.response);
+    return {
+      status: result.status,
+      data: result.data,
+    };
+  }
 }
