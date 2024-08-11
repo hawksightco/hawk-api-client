@@ -2,6 +2,7 @@ import * as web3 from "@solana/web3.js";
 import BN from "bn.js";
 import { Transaction as TransactionClass } from "./classes/Transaction";
 export { Transaction as TransactionClass } from "./classes/Transaction";
+import { StrategyType } from "@meteora-ag/dlmm";
 
 export type AccountMeta = {
   isSigner: boolean,
@@ -24,26 +25,14 @@ export type BinRange = {
   upperRange: number,
 }
 
-export type Distribution = "SPOT" | "CURVE" | "BID-ASK";
-
-export type MeteoraCreatePositionAndDeposit = {
-  position: web3.PublicKey,
-  pool: string,
-  userWallet: web3.PublicKey,
-  totalXAmount: BN,
-  totalYAmount: BN,
-  binRange: BinRange,
-  distribution: Distribution,
-};
-
-export type MeteoraDeposit = {
-  position: web3.PublicKey,
-  pool: string,
-  userWallet: web3.PublicKey,
-  totalXAmount: BN,
-  totalYAmount: BN,
-  distribution: Distribution,
-};
+export type Distribution =
+  | "SPOT"
+  | "CURVE"
+  | "BID-ASK"
+  | "SPOT-IMBALANCED"
+  | "CURVE-IMBALANCED"
+  | "BID-ASK-IMBALANCED"
+  | "SPOT-ONE-SIDE";
 
 export type MeteoraPoolInfo = {
   address: string,
@@ -302,3 +291,176 @@ export interface SearchTokenStore {
 
 export type LoadFromPersistenceFn = () => Promise<[SearchIndices | undefined, Token[] | undefined]>;
 export type StoreToPersistenceFn = (tokenIndices: SearchIndices, tokens: Token[]) => Promise<void>;
+
+export type TxgenParams<T> = {
+  connection: web3.Connection;
+  params: T;
+};
+
+export type Register = {
+  authority: web3.PublicKey;
+};
+
+export type InitializeStorageTokenAccount = {
+  userWallet: web3.PublicKey;
+  mints: web3.PublicKey[];
+  protocol?: string;
+  pool?: string;
+};
+
+export type MeteoraCreatePositionAndDeposit = {
+  position: web3.PublicKey;
+  pool: web3.PublicKey;
+  userWallet: web3.PublicKey;
+  totalXAmount: BN;
+  totalYAmount: BN;
+  slippage?: number;
+  binRange: BinRange;
+  distribution: Distribution;
+  skipInputTokenCheck: boolean;
+};
+
+export type MeteoraInitializeBinArrays = {
+  pool: web3.PublicKey;
+  userWallet: web3.PublicKey;
+  minBinId: number;
+  maxBinId: number;
+};
+
+export type MeteoraDeposit = {
+  position: web3.PublicKey;
+  userWallet: web3.PublicKey;
+  totalXAmount: BN;
+  totalYAmount: BN;
+  distribution: Distribution;
+  slippage?: number;
+  skipInputTokenCheck: boolean;
+  fastGeneration?: {
+    pool: web3.PublicKey;
+    upperBinId: number;
+    lowerBinId: number;
+  };
+};
+
+export type MeteoraWithdraw = {
+  position: web3.PublicKey;
+  userWallet: web3.PublicKey;
+  amountBps: BN;
+  shouldClaimAndClose: boolean;
+  fastGeneration?: {
+    pool: web3.PublicKey;
+    binIdsToRemove: number[];
+  };
+};
+
+export type MeteoraClaim = {
+  userWallet: web3.PublicKey;
+  position: web3.PublicKey;
+  fastGeneration?: {
+    pool: web3.PublicKey;
+  };
+};
+
+export type MeteoraClose = {
+  userWallet: web3.PublicKey;
+  position: web3.PublicKey;
+};
+
+export type MeteoraCompound = {
+  userWallet: web3.PublicKey;
+  position: web3.PublicKey;
+};
+
+export type MeteoraRebalance = {
+  userWallet: web3.PublicKey;
+  position: web3.PublicKey;
+  currentPosition: web3.PublicKey;
+  newPosition: web3.PublicKey;
+  binRange: BinRange;
+  distribution: Distribution;
+};
+
+export type MeteoraLimitCloseAutomation = {
+  userWallet: web3.PublicKey;
+  position: web3.PublicKey;
+  minBinId: number;
+  maxBinId: number;
+};
+
+export type OrcaOpenPosition = {
+  userWallet: web3.PublicKey,
+  positionMint: web3.PublicKey,
+  whirlpool: web3.PublicKey,
+  tickLowerIndex: number,
+  tickUpperIndex: number,
+}
+
+export type OrcaClosePosition = {
+  userWallet: web3.PublicKey,
+  positionMint: web3.PublicKey,
+}
+
+export type OrcaDeposit = {
+  userWallet: web3.PublicKey,
+  positionMint: web3.PublicKey,
+  totalXAmount: BN,
+  totalYAmount: BN,
+}
+
+export type OrcaWithdraw = {
+  userWallet: web3.PublicKey,
+  positionMint: web3.PublicKey,
+  liquidityAmount: BN,
+}
+
+export type OrcaClaimRewards = {
+  userWallet: web3.PublicKey,
+  positionMint: web3.PublicKey,
+}
+
+export const StrategyTypeMap: Record<Distribution, StrategyType> = {
+  SPOT: StrategyType.SpotBalanced,
+  CURVE: StrategyType.CurveBalanced,
+  "BID-ASK": StrategyType.BidAskBalanced,
+  "SPOT-IMBALANCED": StrategyType.SpotImBalanced,
+  "CURVE-IMBALANCED": StrategyType.CurveImBalanced,
+  "BID-ASK-IMBALANCED": StrategyType.BidAskImBalanced,
+  "SPOT-ONE-SIDE": StrategyType.SpotOneSide,
+};
+
+export interface TokenAccountData {
+  mint: web3.PublicKey;
+  owner: web3.PublicKey;
+  amount: BN;
+}
+
+export interface MeteoraToHawksightParams {
+  ixs: web3.TransactionInstruction[];
+  userPda: web3.PublicKey;
+  authority: web3.PublicKey;
+}
+
+export type MeteoraToHawksightFn = ({
+  ixs,
+  userPda,
+  authority,
+}: MeteoraToHawksightParams) => Promise<web3.TransactionInstruction[]>;
+
+export type CreateAtaIdempotentParams = {
+  accounts: {
+    payer: web3.PublicKey;
+    mint: web3.PublicKey;
+    owner: web3.PublicKey;
+  }[];
+};
+
+export type GetMintsFromInstructionParams = {
+  instructions: web3.TransactionInstruction[];
+  find: Record<
+    string,
+    {
+      programId: string;
+      mintIndices: number[];
+    }
+  >;
+};

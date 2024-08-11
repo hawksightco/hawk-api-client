@@ -4,6 +4,7 @@ import { ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, T
 import { Client } from "./Client";
 import { createTxMetadata, resultOrError } from "../functions";
 import { GeneralUtility } from "./GeneralUtility";
+import { Anchor } from "../anchor";
 
 /**
  * The `TxGeneratorAutomations` class encapsulates methods to generate transactions with various trading operations
@@ -48,6 +49,8 @@ export class TxGeneratorAutomations {
    * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
    */
   async meteoraCompoundIxs(connection: web3.Connection, payer: string, params: _client.AutomationCompoundAutomationIxBody): Promise<ResponseWithStatus<TransactionMetadata>> {
+    // Initialize anchor
+    Anchor.initialize(connection);
     const result = await this.client.meteoraDLMMAutomationInstructionsApi.meteoraDlmmAutomationCompoundAutomationIxPost(params).catch(e => e.response);
     return resultOrError<TransactionMetadataResponse, TransactionMetadata>(
       {
@@ -69,6 +72,8 @@ export class TxGeneratorAutomations {
    * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
    */
   async meteoraRebalanceIxs(connection: web3.Connection, payer: string, params: _client.AutomationRebalanceAutomationIxBody): Promise<ResponseWithStatus<TransactionMetadata>> {
+    // Initialize anchor
+    Anchor.initialize(connection);
     const result = await this.client.meteoraDLMMAutomationInstructionsApi.meteoraDlmmAutomationRebalanceAutomationIxPost(params).catch(e => e.response);
     return resultOrError<TransactionMetadataResponse, TransactionMetadata>(
       {
@@ -90,6 +95,8 @@ export class TxGeneratorAutomations {
    * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
    */
   async meteoraLimitCloseIxs(connection: web3.Connection, payer: string, params: _client.AutomationLimitCloseAutomationIxBody): Promise<ResponseWithStatus<TransactionMetadata>> {
+    // Initialize anchor
+    Anchor.initialize(connection);
     const result = await this.client.meteoraDLMMAutomationInstructionsApi.meteoraDlmmAutomationLimitCloseAutomationIxPost(params).catch(e => e.response);
     return resultOrError<TransactionMetadataResponse, TransactionMetadata>(
       {
