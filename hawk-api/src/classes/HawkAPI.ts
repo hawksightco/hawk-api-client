@@ -7,6 +7,8 @@ import { Client } from "./Client";
 import { GeneralUtility } from "./GeneralUtility";
 import { Search } from "./Search";
 import { CreateTxMetadata } from "./CreateTxMetadata";
+import { Anchor } from "../anchor";
+import { connect } from "http2";
 
 /**
  * HawkAPI is a central gateway class that aggregates access to various functional modules
