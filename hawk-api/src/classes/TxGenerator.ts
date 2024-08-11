@@ -298,209 +298,209 @@ export class TxGenerator {
       }
     }
 
-  // /**
-  //  * Creates orca instruction that opens new position
-  //  *
-  //  * @param connection The Solana web3 connection object for blockchain interactions.
-  //  * @param payer The public key of the payer for transaction fees.
-  //  * @param params Parameters required
-  //  * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
-  //  */
-  // async orcaOpenPosition(connection: web3.Connection, payer: string, params: _client.TxOpenPositionBody): Promise<ResponseWithStatus<TransactionMetadata>> {
-  //   // Initialize anchor
-  //   Anchor.initialize(connection);
-  //   try {
-  //     const result = await txgen.orcaOpenPosition({
-  //       connection,
-  //       params: {
-  //         userWallet: new web3.PublicKey(params.userWallet!),
-  //         positionMint: new web3.PublicKey(params.positionMint!),
-  //         whirlpool: new web3.PublicKey(params.whirlpool!),
-  //         tickLowerIndex: parseInt(params.tickLowerIndex!),
-  //         tickUpperIndex: parseInt(params.tickUpperIndex!),
-  //       }
-  //     });
-  //     return {
-  //       status: 200,
-  //       data: await createTxMetadata(
-  //         this.generalUtility,
-  //         connection,
-  //         payer,
-  //         result,
-  //       ),
-  //     };
-  //   } catch (e) {
-  //     return {
-  //       status: 400,
-  //       data: {
-  //         code: "custom",
-  //         message: e,
-  //         path: [],
-  //       } as any,
-  //     };
-  //   }
-  // }
+  /**
+   * Creates orca instruction that opens new position
+   *
+   * @param connection The Solana web3 connection object for blockchain interactions.
+   * @param payer The public key of the payer for transaction fees.
+   * @param params Parameters required
+   * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
+   */
+  async orcaOpenPosition(connection: web3.Connection, payer: string, params: _client.TxOpenPositionBody): Promise<ResponseWithStatus<TransactionMetadata>> {
+    // Initialize anchor
+    Anchor.initialize(connection);
+    try {
+      const result = await txgen.orcaOpenPosition({
+        connection,
+        params: {
+          userWallet: new web3.PublicKey(params.userWallet!),
+          positionMint: new web3.PublicKey(params.positionMint!),
+          whirlpool: new web3.PublicKey(params.whirlpool!),
+          tickLowerIndex: parseInt(params.tickLowerIndex!),
+          tickUpperIndex: parseInt(params.tickUpperIndex!),
+        }
+      });
+      return {
+        status: 200,
+        data: await createTxMetadata(
+          this.generalUtility,
+          connection,
+          payer,
+          result,
+        ),
+      };
+    } catch (e) {
+      return {
+        status: 400,
+        data: {
+          code: "custom",
+          message: e,
+          path: [],
+        } as any,
+      };
+    }
+  }
 
-  // /**
-  //  * Creates orca instruction that closes position
-  //  *
-  //  * @param connection The Solana web3 connection object for blockchain interactions.
-  //  * @param payer The public key of the payer for transaction fees.
-  //  * @param params Parameters required
-  //  * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
-  //  */
-  // async orcaClosePosition(connection: web3.Connection, payer: string, params: _client.TxClosePositionBody1): Promise<ResponseWithStatus<TransactionMetadata>> {
-  //   // Initialize anchor
-  //   Anchor.initialize(connection);
-  //   try {
-  //     const result = await txgen.orcaClosePosition({
-  //       connection,
-  //       params: {
-  //         userWallet: new web3.PublicKey(params.userWallet!),
-  //         positionMint: new web3.PublicKey(params.positionMint!),
-  //       }
-  //     });
-  //     return {
-  //       status: 200,
-  //       data: await createTxMetadata(
-  //         this.generalUtility,
-  //         connection,
-  //         payer,
-  //         result,
-  //       ),
-  //     };
-  //   } catch (e) {
-  //     return {
-  //       status: 400,
-  //       data: {
-  //         code: "custom",
-  //         message: e,
-  //         path: [],
-  //       } as any,
-  //     };
-  //   }
-  // }
+  /**
+   * Creates orca instruction that closes position
+   *
+   * @param connection The Solana web3 connection object for blockchain interactions.
+   * @param payer The public key of the payer for transaction fees.
+   * @param params Parameters required
+   * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
+   */
+  async orcaClosePosition(connection: web3.Connection, payer: string, params: _client.TxClosePositionBody1): Promise<ResponseWithStatus<TransactionMetadata>> {
+    // Initialize anchor
+    Anchor.initialize(connection);
+    try {
+      const result = await txgen.orcaClosePosition({
+        connection,
+        params: {
+          userWallet: new web3.PublicKey(params.userWallet!),
+          positionMint: new web3.PublicKey(params.positionMint!),
+        }
+      });
+      return {
+        status: 200,
+        data: await createTxMetadata(
+          this.generalUtility,
+          connection,
+          payer,
+          result,
+        ),
+      };
+    } catch (e) {
+      return {
+        status: 400,
+        data: {
+          code: "custom",
+          message: e,
+          path: [],
+        } as any,
+      };
+    }
+  }
 
-  // /**
-  //  * Creates orca instruction that deposits to a position
-  //  *
-  //  * @param connection The Solana web3 connection object for blockchain interactions.
-  //  * @param payer The public key of the payer for transaction fees.
-  //  * @param params Parameters required
-  //  * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
-  //  */
-  // async orcaDeposit(connection: web3.Connection, payer: string, params: _client.TxDepositBody1): Promise<ResponseWithStatus<TransactionMetadata>> {
-  //   // Initialize anchor
-  //   Anchor.initialize(connection);
-  //   try {
-  //     const result = await txgen.orcaDeposit({
-  //       connection,
-  //       params: {
-  //         userWallet: new web3.PublicKey(params.userWallet!),
-  //         positionMint: new web3.PublicKey(params.positionMint!),
-  //         totalXAmount: new BN(params.totalXAmount!),
-  //         totalYAmount: new BN(params.totalYAmount!),
-  //       }
-  //     });
-  //     return {
-  //       status: 200,
-  //       data: await createTxMetadata(
-  //         this.generalUtility,
-  //         connection,
-  //         payer,
-  //         result,
-  //       ),
-  //     };
-  //   } catch (e) {
-  //     return {
-  //       status: 400,
-  //       data: {
-  //         code: "custom",
-  //         message: e,
-  //         path: [],
-  //       } as any,
-  //     };
-  //   }
-  // }
+  /**
+   * Creates orca instruction that deposits to a position
+   *
+   * @param connection The Solana web3 connection object for blockchain interactions.
+   * @param payer The public key of the payer for transaction fees.
+   * @param params Parameters required
+   * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
+   */
+  async orcaDeposit(connection: web3.Connection, payer: string, params: _client.TxDepositBody1): Promise<ResponseWithStatus<TransactionMetadata>> {
+    // Initialize anchor
+    Anchor.initialize(connection);
+    try {
+      const result = await txgen.orcaDeposit({
+        connection,
+        params: {
+          userWallet: new web3.PublicKey(params.userWallet!),
+          positionMint: new web3.PublicKey(params.positionMint!),
+          totalXAmount: new BN(params.totalXAmount!),
+          totalYAmount: new BN(params.totalYAmount!),
+        }
+      });
+      return {
+        status: 200,
+        data: await createTxMetadata(
+          this.generalUtility,
+          connection,
+          payer,
+          result,
+        ),
+      };
+    } catch (e) {
+      return {
+        status: 400,
+        data: {
+          code: "custom",
+          message: e,
+          path: [],
+        } as any,
+      };
+    }
+  }
 
-  // /**
-  //  * Creates orca instruction that withdraws from a position
-  //  *
-  //  * @param connection The Solana web3 connection object for blockchain interactions.
-  //  * @param payer The public key of the payer for transaction fees.
-  //  * @param params Parameters required
-  //  * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
-  //  */
-  // async orcaWithdraw(connection: web3.Connection, payer: string, params: _client.TxWithdrawBody1): Promise<ResponseWithStatus<TransactionMetadata>> {
-  //   // Initialize anchor
-  //   Anchor.initialize(connection);
-  //   try {
-  //     const result = await txgen.orcaWithdraw({
-  //       connection,
-  //       params: {
-  //         userWallet: new web3.PublicKey(params.userWallet!),
-  //         positionMint: new web3.PublicKey(params.positionMint!),
-  //         liquidityAmount: new BN(params.liquidityAmount!),
-  //       }
-  //     });
-  //     return {
-  //       status: 200,
-  //       data: await createTxMetadata(
-  //         this.generalUtility,
-  //         connection,
-  //         payer,
-  //         result,
-  //       ),
-  //     };
-  //   } catch (e) {
-  //     return {
-  //       status: 400,
-  //       data: {
-  //         code: "custom",
-  //         message: e,
-  //         path: [],
-  //       } as any,
-  //     };
-  //   }
-  // }
+  /**
+   * Creates orca instruction that withdraws from a position
+   *
+   * @param connection The Solana web3 connection object for blockchain interactions.
+   * @param payer The public key of the payer for transaction fees.
+   * @param params Parameters required
+   * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
+   */
+  async orcaWithdraw(connection: web3.Connection, payer: string, params: _client.TxWithdrawBody1): Promise<ResponseWithStatus<TransactionMetadata>> {
+    // Initialize anchor
+    Anchor.initialize(connection);
+    try {
+      const result = await txgen.orcaWithdraw({
+        connection,
+        params: {
+          userWallet: new web3.PublicKey(params.userWallet!),
+          positionMint: new web3.PublicKey(params.positionMint!),
+          liquidityAmount: new BN(params.liquidityAmount!),
+        }
+      });
+      return {
+        status: 200,
+        data: await createTxMetadata(
+          this.generalUtility,
+          connection,
+          payer,
+          result,
+        ),
+      };
+    } catch (e) {
+      return {
+        status: 400,
+        data: {
+          code: "custom",
+          message: e,
+          path: [],
+        } as any,
+      };
+    }
+  }
 
-  // /**
-  //  * Creates orca instruction that claims fees and rewards
-  //  *
-  //  * @param connection The Solana web3 connection object for blockchain interactions.
-  //  * @param payer The public key of the payer for transaction fees.
-  //  * @param params Parameters required
-  //  * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
-  //  */
-  // async orcaClaimRewards(connection: web3.Connection, payer: string, params: _client.TxClaimRewardsBody): Promise<ResponseWithStatus<TransactionMetadata>> {
-  //   // Initialize anchor
-  //   Anchor.initialize(connection);
-  //   try {
-  //     const result = await txgen.orcaClaimRewards({
-  //       connection,
-  //       params: {
-  //         userWallet: new web3.PublicKey(params.userWallet!),
-  //         positionMint: new web3.PublicKey(params.positionMint!),
-  //       }
-  //     });
-  //     return {
-  //       status: 200,
-  //       data: await createTxMetadata(
-  //         this.generalUtility,
-  //         connection,
-  //         payer,
-  //         result,
-  //       ),
-  //     };
-  //   } catch (e) {
-  //     return {
-  //       status: 400,
-  //       data: {
-  //         code: "custom",
-  //         message: e,
-  //         path: [],
-  //       } as any,
-  //     };
-  //   }
-  // }
+  /**
+   * Creates orca instruction that claims fees and rewards
+   *
+   * @param connection The Solana web3 connection object for blockchain interactions.
+   * @param payer The public key of the payer for transaction fees.
+   * @param params Parameters required
+   * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
+   */
+  async orcaClaimRewards(connection: web3.Connection, payer: string, params: _client.TxClaimRewardsBody): Promise<ResponseWithStatus<TransactionMetadata>> {
+    // Initialize anchor
+    Anchor.initialize(connection);
+    try {
+      const result = await txgen.orcaClaimRewards({
+        connection,
+        params: {
+          userWallet: new web3.PublicKey(params.userWallet!),
+          positionMint: new web3.PublicKey(params.positionMint!),
+        }
+      });
+      return {
+        status: 200,
+        data: await createTxMetadata(
+          this.generalUtility,
+          connection,
+          payer,
+          result,
+        ),
+      };
+    } catch (e) {
+      return {
+        status: 400,
+        data: {
+          code: "custom",
+          message: e,
+          path: [],
+        } as any,
+      };
+    }
+  }
 }

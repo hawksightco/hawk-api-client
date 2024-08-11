@@ -59,6 +59,7 @@ import axios from "axios";
 // import { PDAUtil } from "@orca-so/whirlpools-sdk";
 import { depositMultipleToken, withdrawMultipleToken } from "../hawksight";
 import { Protocol } from "../types";
+import { PDAUtil } from "@orca-so/whirlpools-sdk";
 
 
 export class Transactions {
@@ -954,331 +955,331 @@ export class Transactions {
     });
   }
 
-  // /**
-  //  * Creates orca instruction that deposits to a position
-  //  *
-  //  * @param connection The Solana web3 connection object for blockchain interactions.
-  //  * @param payer The public key of the payer for transaction fees.
-  //  * @param params Parameters required
-  //  * @returns A ResponseWithStatus containing either TransactionMetadataResponse.
-  //  */
-  // async orcaDeposit({ connection, params }: TxgenParams<OrcaDeposit>): Promise<TransactionMetadataResponse> {
-  //   const farm = USDC_FARM;
-  //   const userPda = generateUserPda(params.userWallet, farm);
-  //   const position = generateOrcaPositionPDA(params.positionMint);
-  //   const positionTokenAccount = generateAta(userPda, params.positionMint);
-  //   const positionData = await WhirlpoolCtx.fetcher.getPosition(position);
-  //   if (positionData === null) {
-  //     throw new Error(`Position: ${position} does not exist or already closed. Position mint: ${params.positionMint}`);
-  //   }
-  //   const whirlpool = positionData.whirlpool;
-  //   const whirlpoolData = await WhirlpoolCtx.fetcher.getPool(whirlpool);
-  //   const mintA = whirlpoolData!.tokenMintA;
-  //   const mintB = whirlpoolData!.tokenMintB;
-  //   const tokenSeeds = [
-  //     { owner: params.userWallet, mint: mintA },
-  //     { owner: params.userWallet, mint: mintB },
-  //   ];
-  //   const resultMap = await tokenAccountExists(connection, tokenSeeds);
-  //   resultMap.map((result, index) => {
-  //     const tokenKey = result.tokenKey;
-  //     const token = tokenSeeds[index];
-  //     if (!result.exists) {
-  //       throw new Error(`Token: ${tokenKey} owned by ${token.owner} does not exist. Mint: ${token.mint}`);
-  //     }
-  //   });
-  //   const tokenOwnerAccountA = generateAta(userPda, mintA);
-  //   const tokenOwnerAccountB = generateAta(userPda, mintB);
-  //   const { publicKey: tickArrayLower } = PDAUtil.getTickArrayFromTickIndex(positionData.tickLowerIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
-  //   const { publicKey: tickArrayUpper } = PDAUtil.getTickArrayFromTickIndex(positionData.tickUpperIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
-  //   const ownerFeeA = generateAta(SITE_FEE_OWNER, mintA);
-  //   const ownerFeeB = generateAta(SITE_FEE_OWNER, mintB);
-  //   const depositIx = await depositMultipleToken({
-  //     payer: params.userWallet,
-  //     deposit: [
-  //       {
-  //         mint: mintA,
-  //         amount: params.totalXAmount,
-  //       },
-  //       {
-  //         mint: mintB,
-  //         amount: params.totalYAmount,
-  //       },
-  //     ]
-  //   });
-  //   const orcaOpenPositionIx = await Anchor.instance().iyfExtension.methods
-  //     .orcaDeposit()
-  //     .accounts({
-  //       farm,
-  //       userPda,
-  //       authority: params.userWallet,
-  //       iyfProgram: IYF_MAIN,
-  //       positionMint: params.positionMint,
-  //       whirlpool,
-  //       position,
-  //       positionTokenAccount,
-  //       tokenOwnerAccountA,
-  //       tokenOwnerAccountB,
-  //       tokenVaultA: whirlpoolData!.tokenVaultA,
-  //       tokenVaultB: whirlpoolData!.tokenVaultB,
-  //       tickArrayLower,
-  //       tickArrayUpper,
-  //       ownerFeeA,
-  //       ownerFeeB,
-  //       orcaWhirlpoolProgram: ORCA_WHIRLPOOL_PROGRAM,
-  //       tokenProgram: TOKEN_PROGRAM_ID,
-  //       associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
-  //     })
-  //     .instruction()
-  //   const orcaOpenPositionIxViaMain = await Anchor.instance().iyfMain.methods
-  //     .iyfExtensionExecute(
-  //       orcaOpenPositionIx.data
-  //     )
-  //     .accounts({
-  //       farm,
-  //       userPda,
-  //       authority: params.userWallet,
-  //       iyfProgram: IYF_MAIN,
-  //       iyfExtensionProgram: IYF_EXTENSION,
-  //     })
-  //     .remainingAccounts([
-  //       orcaOpenPositionIx.keys[4],
-  //       orcaOpenPositionIx.keys[5],
-  //       orcaOpenPositionIx.keys[6],
-  //       orcaOpenPositionIx.keys[7],
-  //       orcaOpenPositionIx.keys[8],
-  //       orcaOpenPositionIx.keys[9],
-  //       orcaOpenPositionIx.keys[10],
-  //       orcaOpenPositionIx.keys[11],
-  //       orcaOpenPositionIx.keys[12],
-  //       orcaOpenPositionIx.keys[13],
-  //       orcaOpenPositionIx.keys[14],
-  //       orcaOpenPositionIx.keys[15],
-  //       orcaOpenPositionIx.keys[16],
-  //       orcaOpenPositionIx.keys[17],
-  //       orcaOpenPositionIx.keys[18],
-  //     ])
-  //     .instruction();
-  //     const clearRemainingTokensIxs = await withdrawMultipleToken({
-  //       payer: params.userWallet,
-  //       withdraw: [
-  //         { mint: mintA },
-  //         { mint: mintB },
-  //       ],
-  //     });
-  //   const mainInstructions = [depositIx, orcaOpenPositionIxViaMain, clearRemainingTokensIxs];
-  //   return createTransactionMeta({
-  //     payer: params.userWallet,
-  //     description: `Deposit to Orca Position: ${position}`,
-  //     addressLookupTableAddresses: GLOBAL_ALT,
-  //     mainInstructions,
-  //   });
-  // }
+  /**
+   * Creates orca instruction that deposits to a position
+   *
+   * @param connection The Solana web3 connection object for blockchain interactions.
+   * @param payer The public key of the payer for transaction fees.
+   * @param params Parameters required
+   * @returns A ResponseWithStatus containing either TransactionMetadataResponse.
+   */
+  async orcaDeposit({ connection, params }: TxgenParams<OrcaDeposit>): Promise<TransactionMetadataResponse> {
+    const farm = USDC_FARM;
+    const userPda = generateUserPda(params.userWallet, farm);
+    const position = generateOrcaPositionPDA(params.positionMint);
+    const positionTokenAccount = generateAta(userPda, params.positionMint);
+    const positionData = await Anchor.instance().whirlpoolCtx.fetcher.getPosition(position);
+    if (positionData === null) {
+      throw new Error(`Position: ${position} does not exist or already closed. Position mint: ${params.positionMint}`);
+    }
+    const whirlpool = positionData.whirlpool;
+    const whirlpoolData = await Anchor.instance().whirlpoolCtx.fetcher.getPool(whirlpool);
+    const mintA = whirlpoolData!.tokenMintA;
+    const mintB = whirlpoolData!.tokenMintB;
+    const tokenSeeds = [
+      { owner: params.userWallet, mint: mintA },
+      { owner: params.userWallet, mint: mintB },
+    ];
+    const resultMap = await tokenAccountExists(connection, tokenSeeds);
+    resultMap.map((result, index) => {
+      const tokenKey = result.tokenKey;
+      const token = tokenSeeds[index];
+      if (!result.exists) {
+        throw new Error(`Token: ${tokenKey} owned by ${token.owner} does not exist. Mint: ${token.mint}`);
+      }
+    });
+    const tokenOwnerAccountA = generateAta(userPda, mintA);
+    const tokenOwnerAccountB = generateAta(userPda, mintB);
+    const { publicKey: tickArrayLower } = PDAUtil.getTickArrayFromTickIndex(positionData.tickLowerIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
+    const { publicKey: tickArrayUpper } = PDAUtil.getTickArrayFromTickIndex(positionData.tickUpperIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
+    const ownerFeeA = generateAta(SITE_FEE_OWNER, mintA);
+    const ownerFeeB = generateAta(SITE_FEE_OWNER, mintB);
+    const depositIx = await depositMultipleToken({
+      payer: params.userWallet,
+      deposit: [
+        {
+          mint: mintA,
+          amount: params.totalXAmount,
+        },
+        {
+          mint: mintB,
+          amount: params.totalYAmount,
+        },
+      ]
+    });
+    const orcaOpenPositionIx = await Anchor.instance().iyfExtension.methods
+      .orcaDeposit()
+      .accounts({
+        farm,
+        userPda,
+        authority: params.userWallet,
+        iyfProgram: IYF_MAIN,
+        positionMint: params.positionMint,
+        whirlpool,
+        position,
+        positionTokenAccount,
+        tokenOwnerAccountA,
+        tokenOwnerAccountB,
+        tokenVaultA: whirlpoolData!.tokenVaultA,
+        tokenVaultB: whirlpoolData!.tokenVaultB,
+        tickArrayLower,
+        tickArrayUpper,
+        ownerFeeA,
+        ownerFeeB,
+        orcaWhirlpoolProgram: ORCA_WHIRLPOOL_PROGRAM,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+      })
+      .instruction()
+    const orcaOpenPositionIxViaMain = await Anchor.instance().iyfMain.methods
+      .iyfExtensionExecute(
+        orcaOpenPositionIx.data
+      )
+      .accounts({
+        farm,
+        userPda,
+        authority: params.userWallet,
+        iyfProgram: IYF_MAIN,
+        iyfExtensionProgram: IYF_EXTENSION,
+      })
+      .remainingAccounts([
+        orcaOpenPositionIx.keys[4],
+        orcaOpenPositionIx.keys[5],
+        orcaOpenPositionIx.keys[6],
+        orcaOpenPositionIx.keys[7],
+        orcaOpenPositionIx.keys[8],
+        orcaOpenPositionIx.keys[9],
+        orcaOpenPositionIx.keys[10],
+        orcaOpenPositionIx.keys[11],
+        orcaOpenPositionIx.keys[12],
+        orcaOpenPositionIx.keys[13],
+        orcaOpenPositionIx.keys[14],
+        orcaOpenPositionIx.keys[15],
+        orcaOpenPositionIx.keys[16],
+        orcaOpenPositionIx.keys[17],
+        orcaOpenPositionIx.keys[18],
+      ])
+      .instruction();
+      const clearRemainingTokensIxs = await withdrawMultipleToken({
+        payer: params.userWallet,
+        withdraw: [
+          { mint: mintA },
+          { mint: mintB },
+        ],
+      });
+    const mainInstructions = [depositIx, orcaOpenPositionIxViaMain, clearRemainingTokensIxs];
+    return createTransactionMeta({
+      payer: params.userWallet,
+      description: `Deposit to Orca Position: ${position}`,
+      addressLookupTableAddresses: GLOBAL_ALT,
+      mainInstructions,
+    });
+  }
 
-  // /**
-  //  * Creates orca instruction that withdraws from a position
-  //  *
-  //  * @param connection The Solana web3 connection object for blockchain interactions.
-  //  * @param payer The public key of the payer for transaction fees.
-  //  * @param params Parameters required
-  //  * @returns A ResponseWithStatus containing either TransactionMetadataResponse.
-  //  */
-  // async orcaWithdraw({ connection, params }: TxgenParams<OrcaWithdraw>): Promise<TransactionMetadataResponse> {
-  //   const farm = USDC_FARM;
-  //   const userPda = generateUserPda(params.userWallet, farm);
-  //   const position = generateOrcaPositionPDA(params.positionMint);
-  //   const positionTokenAccount = generateAta(userPda, params.positionMint);
-  //   const positionData = await WhirlpoolCtx.fetcher.getPosition(position);
-  //   if (positionData === null) {
-  //     throw new Error(`Position: ${position} does not exist or already closed. Position mint: ${params.positionMint}`);
-  //   }
-  //   const whirlpool = positionData.whirlpool;
-  //   const whirlpoolData = await WhirlpoolCtx.fetcher.getPool(whirlpool);
-  //   const mintA = whirlpoolData!.tokenMintA;
-  //   const mintB = whirlpoolData!.tokenMintB;
-  //   const tokenOwnerAccountA = generateAta(userPda, mintA);
-  //   const tokenOwnerAccountB = generateAta(userPda, mintB);
-  //   const { publicKey: tickArrayLower } = PDAUtil.getTickArrayFromTickIndex(positionData.tickLowerIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
-  //   const { publicKey: tickArrayUpper } = PDAUtil.getTickArrayFromTickIndex(positionData.tickUpperIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
-  //   const ownerFeeA = generateAta(SITE_FEE_OWNER, mintA);
-  //   const ownerFeeB = generateAta(SITE_FEE_OWNER, mintB);
-  //   const orcaOpenPositionIx = await Anchor.instance().iyfExtension.methods
-  //     .orcaWithdraw(params.liquidityAmount)
-  //     .accounts({
-  //       farm,
-  //       userPda,
-  //       authority: params.userWallet,
-  //       iyfProgram: IYF_MAIN,
-  //       positionMint: params.positionMint,
-  //       whirlpool,
-  //       position,
-  //       positionTokenAccount,
-  //       tokenOwnerAccountA,
-  //       tokenOwnerAccountB,
-  //       tokenVaultA: whirlpoolData!.tokenVaultA,
-  //       tokenVaultB: whirlpoolData!.tokenVaultB,
-  //       tickArrayLower,
-  //       tickArrayUpper,
-  //       ownerFeeA,
-  //       ownerFeeB,
-  //       orcaWhirlpoolProgram: ORCA_WHIRLPOOL_PROGRAM,
-  //       tokenProgram: TOKEN_PROGRAM_ID,
-  //       associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
-  //     })
-  //     .instruction()
-  //   const orcaOpenPositionIxViaMain = await Anchor.instance().iyfMain.methods
-  //     .iyfExtensionExecute(
-  //       orcaOpenPositionIx.data
-  //     )
-  //     .accounts({
-  //       farm,
-  //       userPda,
-  //       authority: params.userWallet,
-  //       iyfProgram: IYF_MAIN,
-  //       iyfExtensionProgram: IYF_EXTENSION,
-  //     })
-  //     .remainingAccounts([
-  //       orcaOpenPositionIx.keys[4],
-  //       orcaOpenPositionIx.keys[5],
-  //       orcaOpenPositionIx.keys[6],
-  //       orcaOpenPositionIx.keys[7],
-  //       orcaOpenPositionIx.keys[8],
-  //       orcaOpenPositionIx.keys[9],
-  //       orcaOpenPositionIx.keys[10],
-  //       orcaOpenPositionIx.keys[11],
-  //       orcaOpenPositionIx.keys[12],
-  //       orcaOpenPositionIx.keys[13],
-  //       orcaOpenPositionIx.keys[14],
-  //       orcaOpenPositionIx.keys[15],
-  //       orcaOpenPositionIx.keys[16],
-  //       orcaOpenPositionIx.keys[17],
-  //       orcaOpenPositionIx.keys[18],
-  //     ])
-  //     .instruction();
-  //     const withdrawFromPda = await withdrawMultipleToken({
-  //       payer: params.userWallet,
-  //       withdraw: [
-  //         { mint: mintA },
-  //         { mint: mintB },
-  //       ],
-  //     });
-  //   const mainInstructions = [orcaOpenPositionIxViaMain, withdrawFromPda];
-  //   return createTransactionMeta({
-  //     payer: params.userWallet,
-  //     description: `Withdraw deposits from Orca Position: ${position}`,
-  //     addressLookupTableAddresses: GLOBAL_ALT,
-  //     mainInstructions,
-  //   });
-  // }
+  /**
+   * Creates orca instruction that withdraws from a position
+   *
+   * @param connection The Solana web3 connection object for blockchain interactions.
+   * @param payer The public key of the payer for transaction fees.
+   * @param params Parameters required
+   * @returns A ResponseWithStatus containing either TransactionMetadataResponse.
+   */
+  async orcaWithdraw({ connection, params }: TxgenParams<OrcaWithdraw>): Promise<TransactionMetadataResponse> {
+    const farm = USDC_FARM;
+    const userPda = generateUserPda(params.userWallet, farm);
+    const position = generateOrcaPositionPDA(params.positionMint);
+    const positionTokenAccount = generateAta(userPda, params.positionMint);
+    const positionData = await Anchor.instance().whirlpoolCtx.fetcher.getPosition(position);
+    if (positionData === null) {
+      throw new Error(`Position: ${position} does not exist or already closed. Position mint: ${params.positionMint}`);
+    }
+    const whirlpool = positionData.whirlpool;
+    const whirlpoolData = await Anchor.instance().whirlpoolCtx.fetcher.getPool(whirlpool);
+    const mintA = whirlpoolData!.tokenMintA;
+    const mintB = whirlpoolData!.tokenMintB;
+    const tokenOwnerAccountA = generateAta(userPda, mintA);
+    const tokenOwnerAccountB = generateAta(userPda, mintB);
+    const { publicKey: tickArrayLower } = PDAUtil.getTickArrayFromTickIndex(positionData.tickLowerIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
+    const { publicKey: tickArrayUpper } = PDAUtil.getTickArrayFromTickIndex(positionData.tickUpperIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
+    const ownerFeeA = generateAta(SITE_FEE_OWNER, mintA);
+    const ownerFeeB = generateAta(SITE_FEE_OWNER, mintB);
+    const orcaOpenPositionIx = await Anchor.instance().iyfExtension.methods
+      .orcaWithdraw(params.liquidityAmount)
+      .accounts({
+        farm,
+        userPda,
+        authority: params.userWallet,
+        iyfProgram: IYF_MAIN,
+        positionMint: params.positionMint,
+        whirlpool,
+        position,
+        positionTokenAccount,
+        tokenOwnerAccountA,
+        tokenOwnerAccountB,
+        tokenVaultA: whirlpoolData!.tokenVaultA,
+        tokenVaultB: whirlpoolData!.tokenVaultB,
+        tickArrayLower,
+        tickArrayUpper,
+        ownerFeeA,
+        ownerFeeB,
+        orcaWhirlpoolProgram: ORCA_WHIRLPOOL_PROGRAM,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+      })
+      .instruction()
+    const orcaOpenPositionIxViaMain = await Anchor.instance().iyfMain.methods
+      .iyfExtensionExecute(
+        orcaOpenPositionIx.data
+      )
+      .accounts({
+        farm,
+        userPda,
+        authority: params.userWallet,
+        iyfProgram: IYF_MAIN,
+        iyfExtensionProgram: IYF_EXTENSION,
+      })
+      .remainingAccounts([
+        orcaOpenPositionIx.keys[4],
+        orcaOpenPositionIx.keys[5],
+        orcaOpenPositionIx.keys[6],
+        orcaOpenPositionIx.keys[7],
+        orcaOpenPositionIx.keys[8],
+        orcaOpenPositionIx.keys[9],
+        orcaOpenPositionIx.keys[10],
+        orcaOpenPositionIx.keys[11],
+        orcaOpenPositionIx.keys[12],
+        orcaOpenPositionIx.keys[13],
+        orcaOpenPositionIx.keys[14],
+        orcaOpenPositionIx.keys[15],
+        orcaOpenPositionIx.keys[16],
+        orcaOpenPositionIx.keys[17],
+        orcaOpenPositionIx.keys[18],
+      ])
+      .instruction();
+      const withdrawFromPda = await withdrawMultipleToken({
+        payer: params.userWallet,
+        withdraw: [
+          { mint: mintA },
+          { mint: mintB },
+        ],
+      });
+    const mainInstructions = [orcaOpenPositionIxViaMain, withdrawFromPda];
+    return createTransactionMeta({
+      payer: params.userWallet,
+      description: `Withdraw deposits from Orca Position: ${position}`,
+      addressLookupTableAddresses: GLOBAL_ALT,
+      mainInstructions,
+    });
+  }
 
-  // /**
-  //  * Creates orca instruction that claims fees and rewards
-  //  *
-  //  * @param connection The Solana web3 connection object for blockchain interactions.
-  //  * @param payer The public key of the payer for transaction fees.
-  //  * @param params Parameters required
-  //  * @returns A ResponseWithStatus containing either TransactionMetadataResponse.
-  //  */
-  // async orcaClaimRewards({ connection, params }: TxgenParams<OrcaClaimRewards>): Promise<TransactionMetadataResponse> {
-  //   const farm = USDC_FARM;
-  //   const userPda = generateUserPda(params.userWallet, farm);
-  //   const position = generateOrcaPositionPDA(params.positionMint);
-  //   const positionTokenAccount = generateAta(userPda, params.positionMint);
-  //   const positionData = await WhirlpoolCtx.fetcher.getPosition(position);
-  //   if (positionData === null) {
-  //     throw new Error(`Position: ${position} does not exist or already closed. Position mint: ${params.positionMint}`);
-  //   }
-  //   const whirlpool = positionData.whirlpool;
-  //   const whirlpoolData = await WhirlpoolCtx.fetcher.getPool(whirlpool);
-  //   const mintA = whirlpoolData!.tokenMintA;
-  //   const mintB = whirlpoolData!.tokenMintB;
-  //   const tokenOwnerAccountA = generateAta(userPda, mintA);
-  //   const tokenOwnerAccountB = generateAta(userPda, mintB);
-  //   const { publicKey: tickArrayLower } = PDAUtil.getTickArrayFromTickIndex(positionData.tickLowerIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
-  //   const { publicKey: tickArrayUpper } = PDAUtil.getTickArrayFromTickIndex(positionData.tickUpperIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
-  //   const ownerFeeA = generateAta(SITE_FEE_OWNER, mintA);
-  //   const ownerFeeB = generateAta(SITE_FEE_OWNER, mintB);
-  //   const remainingAccounts: web3.AccountMeta[] = [];
-  //   for (const rewardInfo of whirlpoolData!.rewardInfos) {
-  //     if (rewardInfo.mint.toString() !== web3.SystemProgram.programId.toString()) {
-  //       const rewardOwnerAccount = generateAta(userPda, rewardInfo.mint);
-  //       const rewardVault = rewardInfo.vault;
-  //       const rewardFee = generateAta(SITE_FEE_OWNER, rewardInfo.mint);
-  //       remainingAccounts.push({ pubkey: rewardOwnerAccount, isSigner: false, isWritable: true });
-  //       remainingAccounts.push({ pubkey: rewardVault, isSigner: false, isWritable: true });
-  //       remainingAccounts.push({ pubkey: rewardFee, isSigner: false, isWritable: true });
-  //     }
-  //   }
-  //   whirlpoolData!.rewardInfos[0].mint
-  //   const orcaOpenPositionIx = await Anchor.instance().iyfExtension.methods
-  //     .orcaClaimRewards()
-  //     .accounts({
-  //       farm,
-  //       userPda,
-  //       authority: params.userWallet,
-  //       iyfProgram: IYF_MAIN,
-  //       whirlpool,
-  //       positionMint: params.positionMint,
-  //       position,
-  //       tickArrayLower,
-  //       tickArrayUpper,
-  //       positionTokenAccount,
-  //       tokenVaultA: whirlpoolData!.tokenVaultA,
-  //       tokenVaultB: whirlpoolData!.tokenVaultB,
-  //       tokenOwnerAccountA,
-  //       tokenOwnerAccountB,
-  //       ownerFeeA,
-  //       ownerFeeB,
-  //       orcaWhirlpoolProgram: ORCA_WHIRLPOOL_PROGRAM,
-  //       tokenProgram: TOKEN_PROGRAM_ID,
-  //       associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
-  //     })
-  //     .remainingAccounts(remainingAccounts)
-  //     .instruction()
-  //   const orcaOpenPositionIxViaMain = await Anchor.instance().iyfMain.methods
-  //     .iyfExtensionExecute(
-  //       orcaOpenPositionIx.data
-  //     )
-  //     .accounts({
-  //       farm,
-  //       userPda,
-  //       authority: params.userWallet,
-  //       iyfProgram: IYF_MAIN,
-  //       iyfExtensionProgram: IYF_EXTENSION,
-  //     })
-  //     .remainingAccounts([
-  //       orcaOpenPositionIx.keys[4],
-  //       orcaOpenPositionIx.keys[5],
-  //       orcaOpenPositionIx.keys[6],
-  //       orcaOpenPositionIx.keys[7],
-  //       orcaOpenPositionIx.keys[8],
-  //       orcaOpenPositionIx.keys[9],
-  //       orcaOpenPositionIx.keys[10],
-  //       orcaOpenPositionIx.keys[11],
-  //       orcaOpenPositionIx.keys[12],
-  //       orcaOpenPositionIx.keys[13],
-  //       orcaOpenPositionIx.keys[14],
-  //       orcaOpenPositionIx.keys[15],
-  //       orcaOpenPositionIx.keys[16],
-  //       orcaOpenPositionIx.keys[17],
-  //       orcaOpenPositionIx.keys[18],
-  //     ])
-  //     .instruction();
-  //     const withdrawFromPda = await withdrawMultipleToken({
-  //       payer: params.userWallet,
-  //       withdraw: [
-  //         { mint: mintA },
-  //         { mint: mintB },
-  //       ],
-  //     });
-  //   const mainInstructions = [orcaOpenPositionIxViaMain, withdrawFromPda];
-  //   return createTransactionMeta({
-  //     payer: params.userWallet,
-  //     description: `Claim rewards from Orca Position: ${position}`,
-  //     addressLookupTableAddresses: GLOBAL_ALT,
-  //     mainInstructions,
-  //   });
-  // }
+  /**
+   * Creates orca instruction that claims fees and rewards
+   *
+   * @param connection The Solana web3 connection object for blockchain interactions.
+   * @param payer The public key of the payer for transaction fees.
+   * @param params Parameters required
+   * @returns A ResponseWithStatus containing either TransactionMetadataResponse.
+   */
+  async orcaClaimRewards({ connection, params }: TxgenParams<OrcaClaimRewards>): Promise<TransactionMetadataResponse> {
+    const farm = USDC_FARM;
+    const userPda = generateUserPda(params.userWallet, farm);
+    const position = generateOrcaPositionPDA(params.positionMint);
+    const positionTokenAccount = generateAta(userPda, params.positionMint);
+    const positionData = await Anchor.instance().whirlpoolCtx.fetcher.getPosition(position);
+    if (positionData === null) {
+      throw new Error(`Position: ${position} does not exist or already closed. Position mint: ${params.positionMint}`);
+    }
+    const whirlpool = positionData.whirlpool;
+    const whirlpoolData = await Anchor.instance().whirlpoolCtx.fetcher.getPool(whirlpool);
+    const mintA = whirlpoolData!.tokenMintA;
+    const mintB = whirlpoolData!.tokenMintB;
+    const tokenOwnerAccountA = generateAta(userPda, mintA);
+    const tokenOwnerAccountB = generateAta(userPda, mintB);
+    const { publicKey: tickArrayLower } = PDAUtil.getTickArrayFromTickIndex(positionData.tickLowerIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
+    const { publicKey: tickArrayUpper } = PDAUtil.getTickArrayFromTickIndex(positionData.tickUpperIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
+    const ownerFeeA = generateAta(SITE_FEE_OWNER, mintA);
+    const ownerFeeB = generateAta(SITE_FEE_OWNER, mintB);
+    const remainingAccounts: web3.AccountMeta[] = [];
+    for (const rewardInfo of whirlpoolData!.rewardInfos) {
+      if (rewardInfo.mint.toString() !== web3.SystemProgram.programId.toString()) {
+        const rewardOwnerAccount = generateAta(userPda, rewardInfo.mint);
+        const rewardVault = rewardInfo.vault;
+        const rewardFee = generateAta(SITE_FEE_OWNER, rewardInfo.mint);
+        remainingAccounts.push({ pubkey: rewardOwnerAccount, isSigner: false, isWritable: true });
+        remainingAccounts.push({ pubkey: rewardVault, isSigner: false, isWritable: true });
+        remainingAccounts.push({ pubkey: rewardFee, isSigner: false, isWritable: true });
+      }
+    }
+    whirlpoolData!.rewardInfos[0].mint
+    const orcaOpenPositionIx = await Anchor.instance().iyfExtension.methods
+      .orcaClaimRewards()
+      .accounts({
+        farm,
+        userPda,
+        authority: params.userWallet,
+        iyfProgram: IYF_MAIN,
+        whirlpool,
+        positionMint: params.positionMint,
+        position,
+        tickArrayLower,
+        tickArrayUpper,
+        positionTokenAccount,
+        tokenVaultA: whirlpoolData!.tokenVaultA,
+        tokenVaultB: whirlpoolData!.tokenVaultB,
+        tokenOwnerAccountA,
+        tokenOwnerAccountB,
+        ownerFeeA,
+        ownerFeeB,
+        orcaWhirlpoolProgram: ORCA_WHIRLPOOL_PROGRAM,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+      })
+      .remainingAccounts(remainingAccounts)
+      .instruction()
+    const orcaOpenPositionIxViaMain = await Anchor.instance().iyfMain.methods
+      .iyfExtensionExecute(
+        orcaOpenPositionIx.data
+      )
+      .accounts({
+        farm,
+        userPda,
+        authority: params.userWallet,
+        iyfProgram: IYF_MAIN,
+        iyfExtensionProgram: IYF_EXTENSION,
+      })
+      .remainingAccounts([
+        orcaOpenPositionIx.keys[4],
+        orcaOpenPositionIx.keys[5],
+        orcaOpenPositionIx.keys[6],
+        orcaOpenPositionIx.keys[7],
+        orcaOpenPositionIx.keys[8],
+        orcaOpenPositionIx.keys[9],
+        orcaOpenPositionIx.keys[10],
+        orcaOpenPositionIx.keys[11],
+        orcaOpenPositionIx.keys[12],
+        orcaOpenPositionIx.keys[13],
+        orcaOpenPositionIx.keys[14],
+        orcaOpenPositionIx.keys[15],
+        orcaOpenPositionIx.keys[16],
+        orcaOpenPositionIx.keys[17],
+        orcaOpenPositionIx.keys[18],
+      ])
+      .instruction();
+      const withdrawFromPda = await withdrawMultipleToken({
+        payer: params.userWallet,
+        withdraw: [
+          { mint: mintA },
+          { mint: mintB },
+        ],
+      });
+    const mainInstructions = [orcaOpenPositionIxViaMain, withdrawFromPda];
+    return createTransactionMeta({
+      payer: params.userWallet,
+      description: `Claim rewards from Orca Position: ${position}`,
+      addressLookupTableAddresses: GLOBAL_ALT,
+      mainInstructions,
+    });
+  }
 }
 
 export const txgen = new Transactions();
