@@ -8,7 +8,7 @@ import {
   IYF_MAIN,
   ORCA_WHIRLPOOL_PROGRAM
 } from "./addresses";
-// import { WhirlpoolContext } from "@orca-so/whirlpools-sdk";
+import { WhirlpoolContext } from "@orca-so/whirlpools-sdk";
 
 export class Anchor {
 
@@ -16,7 +16,7 @@ export class Anchor {
   provider: anchor.AnchorProvider;
   iyfMain: anchor.Program<IndexYieldFarming>;
   iyfExtension: anchor.Program<IyfExtension>;
-  // whirlpoolCtx: 
+  whirlpoolCtx: WhirlpoolContext
   
   private constructor(
     public connection: web3.Connection,
@@ -24,7 +24,7 @@ export class Anchor {
     this.provider = new anchor.AnchorProvider(connection, new NodeWallet(web3.Keypair.generate()), {});
     this.iyfMain = new anchor.Program(_IyfMain, IYF_MAIN, this.provider);
     this.iyfExtension =  new anchor.Program(_IyfExtension, IYF_EXTENSION, this.provider);
-    // this.whirlpoolCtx = WhirlpoolContext.withProvider(this.provider, ORCA_WHIRLPOOL_PROGRAM);
+    this.whirlpoolCtx = WhirlpoolContext.withProvider(this.provider, ORCA_WHIRLPOOL_PROGRAM);
   }
 
   static initialize(connection: web3.Connection) {
