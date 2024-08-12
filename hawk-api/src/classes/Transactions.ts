@@ -15,7 +15,6 @@ import {
   ASSOCIATED_TOKEN_PROGRAM,
   ORCA_WHIRLPOOL_PROGRAM,
 } from "../addresses";
-import { getMeteoraPool } from "../functions";
 import {
   MeteoraClaim,
   MeteoraClose,
@@ -27,7 +26,6 @@ import {
   MeteoraWithdraw,
   Register,
   StrategyTypeMap,
-  TransactionMetadata,
   TxgenParams,
   InitializeStorageTokenAccount,
   MeteoraLimitCloseAutomation,
@@ -48,7 +46,11 @@ import {
   sighashMatch,
   generateOrcaPositionPDA,
   tokenAccountExists,
+  getMeteoraPool,
 } from "../functions";
+import {
+  getTickArrayFromTickIndex,
+} from "../orca";
 import {
   meteoraToHawksight,
   meteoraToHawksightAutomationIxs,
@@ -56,11 +58,8 @@ import {
 import { MeteoraDLMM } from "../meteora";
 import { Anchor } from "../anchor";
 import axios from "axios";
-// import { PDAUtil } from "@orca-so/whirlpools-sdk";
 import { depositMultipleToken, withdrawMultipleToken } from "../hawksight";
 import { Protocol } from "../types";
-import { PDAUtil } from "@orca-so/whirlpools-sdk";
-
 
 export class Transactions {
   /**
@@ -990,8 +989,8 @@ export class Transactions {
     });
     const tokenOwnerAccountA = generateAta(userPda, mintA);
     const tokenOwnerAccountB = generateAta(userPda, mintB);
-    const { publicKey: tickArrayLower } = PDAUtil.getTickArrayFromTickIndex(positionData.tickLowerIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
-    const { publicKey: tickArrayUpper } = PDAUtil.getTickArrayFromTickIndex(positionData.tickUpperIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
+    const { publicKey: tickArrayLower } = getTickArrayFromTickIndex(positionData.tickLowerIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
+    const { publicKey: tickArrayUpper } = getTickArrayFromTickIndex(positionData.tickUpperIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
     const ownerFeeA = generateAta(SITE_FEE_OWNER, mintA);
     const ownerFeeB = generateAta(SITE_FEE_OWNER, mintB);
     const depositIx = await depositMultipleToken({
@@ -1099,8 +1098,8 @@ export class Transactions {
     const mintB = whirlpoolData!.tokenMintB;
     const tokenOwnerAccountA = generateAta(userPda, mintA);
     const tokenOwnerAccountB = generateAta(userPda, mintB);
-    const { publicKey: tickArrayLower } = PDAUtil.getTickArrayFromTickIndex(positionData.tickLowerIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
-    const { publicKey: tickArrayUpper } = PDAUtil.getTickArrayFromTickIndex(positionData.tickUpperIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
+    const { publicKey: tickArrayLower } = getTickArrayFromTickIndex(positionData.tickLowerIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
+    const { publicKey: tickArrayUpper } = getTickArrayFromTickIndex(positionData.tickUpperIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
     const ownerFeeA = generateAta(SITE_FEE_OWNER, mintA);
     const ownerFeeB = generateAta(SITE_FEE_OWNER, mintB);
     const orcaOpenPositionIx = await Anchor.instance().iyfExtension.methods
@@ -1195,8 +1194,8 @@ export class Transactions {
     const mintB = whirlpoolData!.tokenMintB;
     const tokenOwnerAccountA = generateAta(userPda, mintA);
     const tokenOwnerAccountB = generateAta(userPda, mintB);
-    const { publicKey: tickArrayLower } = PDAUtil.getTickArrayFromTickIndex(positionData.tickLowerIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
-    const { publicKey: tickArrayUpper } = PDAUtil.getTickArrayFromTickIndex(positionData.tickUpperIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
+    const { publicKey: tickArrayLower } = getTickArrayFromTickIndex(positionData.tickLowerIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
+    const { publicKey: tickArrayUpper } = getTickArrayFromTickIndex(positionData.tickUpperIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
     const ownerFeeA = generateAta(SITE_FEE_OWNER, mintA);
     const ownerFeeB = generateAta(SITE_FEE_OWNER, mintB);
     const remainingAccounts: web3.AccountMeta[] = [];
