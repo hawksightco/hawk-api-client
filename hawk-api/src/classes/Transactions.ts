@@ -967,12 +967,12 @@ export class Transactions {
     const userPda = generateUserPda(params.userWallet, farm);
     const position = generateOrcaPositionPDA(params.positionMint);
     const positionTokenAccount = generateAta(userPda, params.positionMint);
-    const positionData = await Anchor.instance().whirlpoolCtx.fetcher.getPosition(position);
+    const positionData = await Anchor.instance().orcaProgram.account.position.fetch(position);
     if (positionData === null) {
       throw new Error(`Position: ${position} does not exist or already closed. Position mint: ${params.positionMint}`);
     }
     const whirlpool = positionData.whirlpool;
-    const whirlpoolData = await Anchor.instance().whirlpoolCtx.fetcher.getPool(whirlpool);
+    const whirlpoolData = await Anchor.instance().orcaProgram.account.whirlpool.fetch(whirlpool);
     const mintA = whirlpoolData!.tokenMintA;
     const mintB = whirlpoolData!.tokenMintB;
     const tokenSeeds = [
@@ -1088,12 +1088,12 @@ export class Transactions {
     const userPda = generateUserPda(params.userWallet, farm);
     const position = generateOrcaPositionPDA(params.positionMint);
     const positionTokenAccount = generateAta(userPda, params.positionMint);
-    const positionData = await Anchor.instance().whirlpoolCtx.fetcher.getPosition(position);
+    const positionData = await Anchor.instance().orcaProgram.account.position.fetch(position);
     if (positionData === null) {
       throw new Error(`Position: ${position} does not exist or already closed. Position mint: ${params.positionMint}`);
     }
     const whirlpool = positionData.whirlpool;
-    const whirlpoolData = await Anchor.instance().whirlpoolCtx.fetcher.getPool(whirlpool);
+    const whirlpoolData = await Anchor.instance().orcaProgram.account.whirlpool.fetch(whirlpool);
     const mintA = whirlpoolData!.tokenMintA;
     const mintB = whirlpoolData!.tokenMintB;
     const tokenOwnerAccountA = generateAta(userPda, mintA);
@@ -1184,12 +1184,12 @@ export class Transactions {
     const userPda = generateUserPda(params.userWallet, farm);
     const position = generateOrcaPositionPDA(params.positionMint);
     const positionTokenAccount = generateAta(userPda, params.positionMint);
-    const positionData = await Anchor.instance().whirlpoolCtx.fetcher.getPosition(position);
+    const positionData = await Anchor.instance().orcaProgram.account.position.fetch(position);
     if (positionData === null) {
       throw new Error(`Position: ${position} does not exist or already closed. Position mint: ${params.positionMint}`);
     }
     const whirlpool = positionData.whirlpool;
-    const whirlpoolData = await Anchor.instance().whirlpoolCtx.fetcher.getPool(whirlpool);
+    const whirlpoolData = await Anchor.instance().orcaProgram.account.whirlpool.fetch(whirlpool);
     const mintA = whirlpoolData!.tokenMintA;
     const mintB = whirlpoolData!.tokenMintB;
     const tokenOwnerAccountA = generateAta(userPda, mintA);

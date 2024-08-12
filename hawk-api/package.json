@@ -1,6 +1,6 @@
 {
   "name": "@hawksightco/hawk-sdk",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Hawksight v2 SDK",
   "main": "dist/src/index.js",
   "repository": "https://github.com/ghabxph/hawk-api-client.git",
@@ -24,7 +24,6 @@
     "@coral-xyz/anchor": "^0.28.0",
     "@hawksightco/swagger-client": "^0.0.29",
     "@meteora-ag/dlmm": "^1.0.51",
-    "@orca-so/whirlpools-sdk": "^0.13.3",
     "@solana/spl-token": "^0.4.6",
     "@solana/web3.js": "^1.89.1",
     "bn.js": "^5.2.1",
