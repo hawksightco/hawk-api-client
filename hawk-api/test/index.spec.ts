@@ -2,13 +2,14 @@ import * as web3 from "@solana/web3.js";
 import { HawkAPI, TransactionMetadata } from "../src";
 import { ResponseWithStatus } from "../src/types";
 
-const client = new HawkAPI('https://stagingapi2.hawksight.co');
+const client = new HawkAPI('https://stagingapi2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
 const TIMEOUT = 60_000;
 const testWallet = 'Ga5jNBh26JHh9zyJcdm7vpyVWRgtKS2cLpNgEc5zBv8G';
 const hawkWallet = 'dche7M2764e8AxNihBdn7uffVzZvTBNeL8x4LZg5E2c';
 const connection = new web3.Connection('https://mainnet-beta.solana.com'); // change this to private rpc
 const testPool = 'ARwi1S4DaiTG5DX7S4M4ZsrXqpMD1MrTmbu9ue2tpmEq';
 const testPosition = '3xbDyEuRKWRtQSoHV2R7fqQpGS1SKacL1gQp1vGzaYgp';
+const SAMPLE_WHIRLPOOL_SOLELON = '99PpNKW9ca26nLPg5GHmJUZizxcjyDZHGefu6eMBW7fa';
 let activeBin: number;
 
 const jestConsole = console;
@@ -31,11 +32,11 @@ describe('Health Endpoints', () => {
   });
 });
 
-describe('Search', () => {
-  it ('Search for token (Partial String)', async () => {
-    console.log(client.search.token("USDC"));
-  }, TIMEOUT);
-});
+// describe('Search', () => {
+//   it ('Search for token (Partial String)', async () => {
+//     console.log(client.search.token("USDC"));
+//   }, TIMEOUT);
+// });
 
 describe('General Endpoints', () => {
   it ('GET /portfolio', async () => {
@@ -191,7 +192,88 @@ describe('Meteora Automation Endpoints', () => {
   }, TIMEOUT);
 });
 
-describe('Orca Endpoints', () => {});
+describe('Orca Transaction Generation', () => {
+  it ('Orca Open Position', async () => {
+    const positionMint = web3.Keypair.generate();
+    const result = await client.txGenerator.orcaOpenPosition(
+      connection,
+      hawkWallet,
+      {
+        userWallet: testWallet,
+        positionMint: positionMint.publicKey.toBase58(),
+        whirlpool: SAMPLE_WHIRLPOOL_SOLELON,
+        tickLowerIndex: '100',
+        tickUpperIndex: '150',
+      }
+    );
+    logIfNot200(result);
+    expect(result.status).toBe(200);
+    await simulateTransaction(result.data);
+  }, TIMEOUT);
+
+  it ('Orca Deposit', async () => {
+    const positionMint = web3.Keypair.generate();
+    const result = await client.txGenerator.orcaDeposit(
+      connection,
+      hawkWallet,
+      {
+        userWallet: testWallet,
+        positionMint: positionMint.publicKey.toBase58(),
+        totalXAmount: '10000',
+        totalYAmount: '10000'
+      }
+    );
+    logIfNot200(result);
+    expect(result.status).toBe(200);
+    await simulateTransaction(result.data);
+  }, TIMEOUT);
+
+  it ('Orca Withdraw', async () => {
+    const positionMint = web3.Keypair.generate();
+    const result = await client.txGenerator.orcaWithdraw(
+      connection,
+      hawkWallet,
+      {
+        userWallet: testWallet,
+        positionMint: positionMint.publicKey.toBase58(),
+        liquidityAmount: 10000,
+      }
+    );
+    logIfNot200(result);
+    expect(result.status).toBe(200);
+    await simulateTransaction(result.data);
+  }, TIMEOUT);
+
+  it ('Orca Claim Rewards', async () => {
+    const positionMint = web3.Keypair.generate();
+    const result = await client.txGenerator.orcaClaimRewards(
+      connection,
+      hawkWallet,
+      {
+        userWallet: testWallet,
+        positionMint: positionMint.publicKey.toBase58(),
+      }
+    );
+    logIfNot200(result);
+    expect(result.status).toBe(200);
+    await simulateTransaction(result.data);
+  }, TIMEOUT);
+
+  it ('Orca Close Position', async () => {
+    const positionMint = web3.Keypair.generate();
+    const result = await client.txGenerator.orcaClosePosition(
+      connection,
+      hawkWallet,
+      {
+        userWallet: testWallet,
+        positionMint: positionMint.publicKey.toBase58(),
+      }
+    );
+    logIfNot200(result);
+    expect(result.status).toBe(200);
+    await simulateTransaction(result.data);
+  }, TIMEOUT);
+});
 
 function logIfNot200(result: ResponseWithStatus<any>) {
   if (result.status !== 200) {

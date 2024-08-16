@@ -9,6 +9,7 @@ import { Search } from "./Search";
 import { CreateTxMetadata } from "./CreateTxMetadata";
 import { Anchor } from "../anchor";
 import { connect } from "http2";
+import { HawkApiOptions } from "../types";
 
 /**
  * HawkAPI is a central gateway class that aggregates access to various functional modules
@@ -51,6 +52,7 @@ export class HawkAPI {
    */
   constructor(
     protected readonly url: string = "https://api2.hawksight.co",
+    protected readonly options?: HawkApiOptions,
   ) {
     const client = new Client(url);
     this.client = client;
@@ -63,10 +65,14 @@ export class HawkAPI {
     this.search = new Search(url);
 
     // Load create tx metadata module
-    CreateTxMetadata.instance().load();
+    if (this.options === undefined || !this.options!.disableTxMetadataLoad) {
+      CreateTxMetadata.instance().load();
+    }
 
     // Load search module
-    this.search.load();
+    if (this.options === undefined || !this.options!.disableTokenLoad) {
+      this.search.load();
+    }
   }
 
   /**

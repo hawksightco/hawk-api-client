@@ -464,3 +464,8 @@ export type GetMintsFromInstructionParams = {
     }
   >;
 };
+
+export type HawkApiOptions = {
+  disableTokenLoad?: boolean,
+  disableTxMetadataLoad?: boolean,
+}
