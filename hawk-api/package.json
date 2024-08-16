@@ -21,7 +21,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@coral-xyz/anchor": "^0.28.0",
+    "@coral-xyz/anchor": "~0.29.0",
     "@hawksightco/swagger-client": "^0.0.29",
     "@meteora-ag/dlmm": "^1.0.51",
     "@solana/spl-token": "^0.4.6",

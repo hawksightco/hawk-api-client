@@ -139,7 +139,7 @@ export class CreateTxMetadata {
       if (!!_alt) {
         alts.push(_alt);
       } else {
-        alts.push(await this.loadSingleAlt(alt));
+        alts.push(await this.loadSingleAlt(alt, connection));
       }
     }
 
@@ -149,7 +149,7 @@ export class CreateTxMetadata {
         if (!!_alt) {
           alts.push(_alt);
         } else {
-          alts.push(await this.loadSingleAlt(alt));
+          alts.push(await this.loadSingleAlt(alt, connection));
         }
       }
     } else {
