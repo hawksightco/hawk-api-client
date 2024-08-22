@@ -447,12 +447,11 @@ export class Transactions {
     const position = await program.account.positionV2.fetch(params.position);
     const dlmmPool = await MeteoraDLMM.create(connection, position.lbPair);
     const userPda = generateUserPda(params.userWallet);
-    const { userPositions } = await dlmmPool.getPositionsByUserAndLbPair(
-      userPda
-    );
-    const index = userPositions.findIndex((v) =>
-      v.publicKey.equals(params.position)
-    );
+    const { userPositions } = await dlmmPool.getPositionsByUserAndLbPair(userPda);
+    const userPosition = userPositions.find(userPosition => userPosition.publicKey.equals(params.position));
+    if (userPosition === undefined) {
+      throw new Error(`Position: ${params.position} does not exist.`);
+    }
 
     // Claim fee and claim reward ixs
     const claimBuilder = await dlmmPool.claimAllRewardsByPosition(
@@ -460,7 +459,7 @@ export class Transactions {
       HS_AUTHORITY,
       {
         owner: userPda,
-        position: userPositions[index],
+        position: userPosition,
       },
       meteoraToHawksightAutomationIxs
     );
@@ -515,10 +514,12 @@ export class Transactions {
     const userPda = generateUserPda(params.userWallet);
 
     // Step 1: Claim all fees/rewards, remove all liquidity and close current position
-    const { userPositions } = await dlmmPool.getPositionsByUserAndLbPair(
-      userPda
-    );
-    const binIdsToRemove = userPositions[0].positionData.positionBinData.map(
+    const { userPositions } = await dlmmPool.getPositionsByUserAndLbPair(userPda);
+    const userPosition = userPositions.find(userPosition => userPosition.publicKey.equals(params.currentPosition));
+    if (userPosition === undefined) {
+      throw new Error(`Position: ${params.currentPosition} does not exist.`);
+    }
+    const binIdsToRemove = userPosition.positionData.positionBinData.map(
       (bin) => bin.binId
     );
     const removeLiquidityBuilder = await dlmmPool.removeLiquidity(
@@ -533,6 +534,9 @@ export class Transactions {
       },
       meteoraToHawksightAutomationIxs
     );
+
+    removeLiquidityBuilder.replaceClaimFeeTokenToSTA();
+    removeLiquidityBuilder.replaceClaimRewardToSTA();
 
     // Re-deposit fees (TODO: How to re-deposit reward tokens that is not X or Y token?)
     const initPositionAndAddLiquidityBuilder =

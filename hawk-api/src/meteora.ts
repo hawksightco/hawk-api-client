@@ -6,7 +6,7 @@ import {
   METEORA_DLMM_PROGRAM,
   SOME_METEORA_DLMM_POOL
 } from './addresses';
-import { createAtaIdempotentIxs, getIxs, getMintsFromInstruction, wrapSolIfMintIsWsol, unwrapSolIfMintIsWsol, inputTokenExists } from './functions';
+import { createAtaIdempotentIxs, getIxs, getMintsFromInstruction, wrapSolIfMintIsWsol, unwrapSolIfMintIsWsol, inputTokenExists, sighashMatch, sighash, generateUserPdaStorageAccount } from './functions';
 import { depositMultipleToken, withdrawMultipleToken } from './hawksight';
 import { MeteoraToHawksightFn } from './types';
 import { Anchor } from './anchor';
@@ -607,7 +607,7 @@ export class AddLiquidityByStrategyBuilder {
 
 /**
  * A builder class for constructing transaction instructions to remove liquidity from a position.
- * 
+ *
  * This class provides a structured way to build the necessary transaction instructions for removing liquidity
  * from a position, handling operations such as creating associated token accounts (ATAs), claiming rewards,
  * withdrawing tokens, and managing wrapped SOL (wSOL) accounts.
@@ -616,7 +616,7 @@ export class RemoveLiquidityBuilder {
 
   /**
    * Constructs an instance of the RemoveLiquidityBuilder class.
-   * 
+   *
    * @param {web3.TransactionInstruction[]} createAtaIxs - Instructions to create associated token accounts (ATAs) prior to withdrawal.
    * @param {web3.TransactionInstruction[]} mainIxs - Main instructions for claiming fees/rewards, removing liquidity, and possibly closing the position.
    * @param {web3.TransactionInstruction} withdrawMultipleTokenIx - Instruction to withdraw multiple tokens to the user wallet.
@@ -631,13 +631,13 @@ export class RemoveLiquidityBuilder {
 
   /**
    * Builds the default sequence of transaction instructions for removing liquidity from a position.
-   * 
+   *
    * This method returns an array of transaction instructions that includes:
    * - Initializing associated token accounts (ATAs) prior to withdrawal
    * - Claiming fees and/or rewards, removing liquidity, and possibly closing the position
    * - Withdrawing tokens to the user wallet
    * - Closing wSOL accounts, if any
-   * 
+   *
    * @returns {web3.TransactionInstruction[]} - An array of transaction instructions in the required order.
    */
   default(): web3.TransactionInstruction[] {
@@ -654,6 +654,45 @@ export class RemoveLiquidityBuilder {
       // Step 4: Close wSOL account (if there's any)
       ...this.unwrapWsolIxs,
     ];
+  }
+
+  /**
+   * Replaces claim fee token ixs into storage token account
+   */
+  replaceClaimFeeTokenToSTA() {
+    const index = this.mainIxs.findIndex(mainIx => {
+      const dataWithoutIyfExtensionExecute = mainIx.data.subarray(12);
+      sighashMatch(dataWithoutIyfExtensionExecute, "MeteoraDlmmClaimFeeAutomation")
+    });
+    if (index === -1) {
+      console.warn(`Warn: claim fee instruction not found! This should not happen if \`shouldClaimAndClose\` is set to true.`);
+      return;
+    }
+    const userPda = this.mainIxs[index].keys[1].pubkey;
+    const tokenXMint = this.mainIxs[index].keys[13].pubkey;
+    const tokenYMint = this.mainIxs[index].keys[14].pubkey;
+    const staTokenX = generateUserPdaStorageAccount(userPda, tokenXMint);
+    const staTokenY = generateUserPdaStorageAccount(userPda, tokenYMint);
+    this.mainIxs[index].keys[11].pubkey = staTokenX;
+    this.mainIxs[index].keys[12].pubkey = staTokenY;
+  }
+
+  /**
+   * Replaces reward token into storage token account
+   */
+  replaceClaimRewardToSTA() {
+    const index = this.mainIxs.findIndex(mainIx => {
+      const dataWithoutIyfExtensionExecute = mainIx.data.subarray(12);
+      sighashMatch(dataWithoutIyfExtensionExecute, "MeteoraDlmmClaimRewardAutomation")
+    })
+    if (index === -1) {
+      console.warn(`Warn: Reward instruction not found! This may happen if pool has no rewards`);
+      return;
+    }
+    const userPda = this.mainIxs[index].keys[1].pubkey;
+    const tokenMint = this.mainIxs[index].keys[10].pubkey;
+    const staToken = generateUserPdaStorageAccount(userPda, tokenMint);
+    this.mainIxs[index].keys[11].pubkey = staToken;
   }
 }
 
