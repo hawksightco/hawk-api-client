@@ -373,7 +373,6 @@ export type MeteoraCompound = {
 
 export type MeteoraRebalance = {
   userWallet: web3.PublicKey;
-  position: web3.PublicKey;
   currentPosition: web3.PublicKey;
   newPosition: web3.PublicKey;
   binRange: BinRange;
