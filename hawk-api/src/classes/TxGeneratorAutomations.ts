@@ -1,10 +1,11 @@
 import * as web3 from "@solana/web3.js";
 import * as _client from "@hawksightco/swagger-client";
-import { ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, TransactionPriority } from "../types";
+import { MeteoraCompound, MeteoraLimitCloseAutomation, MeteoraRebalance, ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, TransactionPriority } from "../types";
 import { Client } from "./Client";
 import { createTxMetadata, resultOrError } from "../functions";
 import { GeneralUtility } from "./GeneralUtility";
 import { Anchor } from "../anchor";
+import { txgen } from "./Transactions";
 
 /**
  * The `TxGeneratorAutomations` class encapsulates methods to generate transactions with various trading operations
@@ -48,17 +49,33 @@ export class TxGeneratorAutomations {
    * @param params Parameters required
    * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
    */
-  async meteoraCompoundIxs(connection: web3.Connection, payer: string, params: _client.AutomationCompoundAutomationIxBody): Promise<ResponseWithStatus<TransactionMetadata>> {
+  async meteoraCompoundIxs(connection: web3.Connection, payer: string, params: MeteoraCompound): Promise<ResponseWithStatus<TransactionMetadata>> {
     // Initialize anchor
     Anchor.initialize(connection);
-    const result = await this.client.meteoraDLMMAutomationInstructionsApi.meteoraDlmmAutomationCompoundAutomationIxPost(params).catch(e => e.response);
-    return resultOrError<TransactionMetadataResponse, TransactionMetadata>(
-      {
-        status: result.status,
-        data: result.data,
-      },
-      async (data) => await createTxMetadata(this.generalUtility, connection, payer, data),
-    );
+    try {
+      const result = await txgen.compoundAutomationIx({
+        connection,
+        params,
+      });
+      return {
+        status: 200,
+        data: await createTxMetadata(
+          this.generalUtility,
+          connection,
+          payer,
+          result
+        ),
+      };
+    } catch (e) {
+      return {
+        status: 400,
+        data: {
+          code: "custom",
+          message: e,
+          path: [],
+        } as any,
+      };
+    }
   }
 
   /**
@@ -71,17 +88,33 @@ export class TxGeneratorAutomations {
    * @param params Parameters required
    * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
    */
-  async meteoraRebalanceIxs(connection: web3.Connection, payer: string, params: _client.AutomationRebalanceAutomationIxBody): Promise<ResponseWithStatus<TransactionMetadata>> {
+  async meteoraRebalanceIxs(connection: web3.Connection, payer: string, params: MeteoraRebalance): Promise<ResponseWithStatus<TransactionMetadata>> {
     // Initialize anchor
     Anchor.initialize(connection);
-    const result = await this.client.meteoraDLMMAutomationInstructionsApi.meteoraDlmmAutomationRebalanceAutomationIxPost(params).catch(e => e.response);
-    return resultOrError<TransactionMetadataResponse, TransactionMetadata>(
-      {
-        status: result.status,
-        data: result.data,
-      },
-      async (data) => await createTxMetadata(this.generalUtility, connection, payer, data),
-    );
+    try {
+      const result = await txgen.rebalanceAutomationIx({
+        connection,
+        params,
+      });
+      return {
+        status: 200,
+        data: await createTxMetadata(
+          this.generalUtility,
+          connection,
+          payer,
+          result
+        ),
+      };
+    } catch (e) {
+      return {
+        status: 400,
+        data: {
+          code: "custom",
+          message: e,
+          path: [],
+        } as any,
+      };
+    }
   }
 
   /**
@@ -94,16 +127,32 @@ export class TxGeneratorAutomations {
    * @param params Parameters required
    * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
    */
-  async meteoraLimitCloseIxs(connection: web3.Connection, payer: string, params: _client.AutomationLimitCloseAutomationIxBody): Promise<ResponseWithStatus<TransactionMetadata>> {
+  async meteoraLimitCloseIxs(connection: web3.Connection, payer: string, params: MeteoraLimitCloseAutomation): Promise<ResponseWithStatus<TransactionMetadata>> {
     // Initialize anchor
     Anchor.initialize(connection);
-    const result = await this.client.meteoraDLMMAutomationInstructionsApi.meteoraDlmmAutomationLimitCloseAutomationIxPost(params).catch(e => e.response);
-    return resultOrError<TransactionMetadataResponse, TransactionMetadata>(
-      {
-        status: result.status,
-        data: result.data,
-      },
-      async (data) => await createTxMetadata(this.generalUtility, connection, payer, data),
-    );
+    try {
+      const result = await txgen.limitCloseAutomationIx({
+        connection,
+        params,
+      });
+      return {
+        status: 200,
+        data: await createTxMetadata(
+          this.generalUtility,
+          connection,
+          payer,
+          result
+        ),
+      };
+    } catch (e) {
+      return {
+        status: 400,
+        data: {
+          code: "custom",
+          message: e,
+          path: [],
+        } as any,
+      };
+    }
   }
 }
