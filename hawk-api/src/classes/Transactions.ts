@@ -47,6 +47,7 @@ import {
   generateOrcaPositionPDA,
   tokenAccountExists,
   getMeteoraPool,
+  wrapSolIfMintIsWsol,
 } from "../functions";
 import {
   getTickArrayFromTickIndex,
@@ -983,7 +984,7 @@ export class Transactions {
     resultMap.map((result, index) => {
       const tokenKey = result.tokenKey;
       const token = tokenSeeds[index];
-      if (!result.exists) {
+      if (!result.exists && `${token.mint}` !== 'So11111111111111111111111111111111111111112') {
         throw new Error(`Token: ${tokenKey} owned by ${token.owner} does not exist. Mint: ${token.mint}`);
       }
     });
@@ -993,6 +994,11 @@ export class Transactions {
     const { publicKey: tickArrayUpper } = getTickArrayFromTickIndex(positionData.tickUpperIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
     const ownerFeeA = generateAta(SITE_FEE_OWNER, mintA);
     const ownerFeeB = generateAta(SITE_FEE_OWNER, mintB);
+    // Step 1: Init wSOL token account for user wallet (if X or Y token is wSOL)
+    const wrapSolIx = wrapSolIfMintIsWsol(params.userWallet, params.userWallet, [
+      { mint: mintA, amount: params.totalXAmount },
+      { mint: mintB, amount: params.totalYAmount },
+    ]);
     const depositIx = await depositMultipleToken({
       payer: params.userWallet,
       deposit: [
@@ -1066,7 +1072,7 @@ export class Transactions {
           { mint: mintB },
         ],
       });
-    const mainInstructions = [depositIx, orcaOpenPositionIxViaMain, clearRemainingTokensIxs];
+    const mainInstructions = [...wrapSolIx, depositIx, orcaOpenPositionIxViaMain, clearRemainingTokensIxs];
     return createTransactionMeta({
       payer: params.userWallet,
       description: `Deposit to Orca Position: ${position}`,
