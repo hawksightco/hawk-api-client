@@ -301,13 +301,13 @@ async function simulateTransaction(txMetadata: TransactionMetadata, signers: web
   console.log(txMetadata.description);
   console.log(`-----------------------------------------`);
   const simulation = await txMetadata.transaction.simulateTransaction(connection, signers);
-  for (const log of simulation.logs as string[]) {
-    console.log(log);
-  }
-  console.log(``)
-  console.log(``)
-  console.log(``)
   if (simulation.err) {
+    for (const log of simulation.logs as string[]) {
+      console.log(log);
+    }
+    console.log(``)
+    console.log(``)
+    console.log(``)
     throw new Error(`Simulation has error`);
   }
   return simulation;
