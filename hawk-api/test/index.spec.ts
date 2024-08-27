@@ -228,13 +228,12 @@ describe('Orca Transaction Generation', () => {
   }, TIMEOUT);
 
   it ('Orca Deposit', async () => {
-    const positionMint = web3.Keypair.generate();
     const result = await client.txGenerator.orcaDeposit(
       connection,
       testWallet,
       {
         userWallet: testWallet,
-        positionMint: positionMint.publicKey.toBase58(),
+        positionMint: testPositionMint,
         totalXAmount: '10000',
         totalYAmount: '10000'
       }
