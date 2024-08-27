@@ -21,6 +21,7 @@ const hawkWallet = 'dche7M2764e8AxNihBdn7uffVzZvTBNeL8x4LZg5E2c';
 const connection = new web3.Connection(process.env.RPC_URL as string); // change this to private rpc
 const testPool = process.env.TEST_METEORA_POOL as string;
 const testPosition = process.env.TEST_METEORA_POSITION as string;
+const testPositionMint = process.env.TEST_ORCA_POSITION_MINT as string;
 const testOrcaPool = process.env.TEST_ORCA_POOL as string;
 let activeBin: number;
 
@@ -244,13 +245,12 @@ describe('Orca Transaction Generation', () => {
   }, TIMEOUT);
 
   it ('Orca Withdraw', async () => {
-    const positionMint = web3.Keypair.generate();
     const result = await client.txGenerator.orcaWithdraw(
       connection,
       testWallet,
       {
         userWallet: testWallet,
-        positionMint: positionMint.publicKey.toBase58(),
+        positionMint: testPositionMint,
         liquidityAmount: 10000,
       }
     );
@@ -260,13 +260,12 @@ describe('Orca Transaction Generation', () => {
   }, TIMEOUT);
 
   it ('Orca Claim Rewards', async () => {
-    const positionMint = web3.Keypair.generate();
     const result = await client.txGenerator.orcaClaimRewards(
       connection,
       testWallet,
       {
         userWallet: testWallet,
-        positionMint: positionMint.publicKey.toBase58(),
+        positionMint: testPositionMint,
       }
     );
     logIfNot200(result);
@@ -275,13 +274,12 @@ describe('Orca Transaction Generation', () => {
   }, TIMEOUT);
 
   it ('Orca Close Position', async () => {
-    const positionMint = web3.Keypair.generate();
     const result = await client.txGenerator.orcaClosePosition(
       connection,
       testWallet,
       {
         userWallet: testWallet,
-        positionMint: positionMint.publicKey.toBase58(),
+        positionMint: testPositionMint,
       }
     );
     logIfNot200(result);
