@@ -1,15 +1,27 @@
 import * as web3 from "@solana/web3.js";
 import { HawkAPI, TransactionMetadata } from "../src";
 import { ResponseWithStatus } from "../src/types";
+import bs58 from "bs58";
+import dotenv from "dotenv";
+import path from "path";
+import { Anchor } from "../src/anchor";
+
+dotenv.config({
+  path: path.join(process.cwd(), 'test', '.env')
+});
+
 
 const client = new HawkAPI('https://stagingapi2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
 const TIMEOUT = 60_000;
-const testWallet = 'Ga5jNBh26JHh9zyJcdm7vpyVWRgtKS2cLpNgEc5zBv8G';
+const testWalletSecret = process.env.TEST_WALLET as string;
+const testWalletKpBuffer = bs58.decode(testWalletSecret);
+const testWalletKp = web3.Keypair.fromSecretKey(testWalletKpBuffer);
+const testWallet = testWalletKp.publicKey.toString();
 const hawkWallet = 'dche7M2764e8AxNihBdn7uffVzZvTBNeL8x4LZg5E2c';
-const connection = new web3.Connection('https://mainnet-beta.solana.com'); // change this to private rpc
-const testPool = 'ARwi1S4DaiTG5DX7S4M4ZsrXqpMD1MrTmbu9ue2tpmEq';
-const testPosition = '3xbDyEuRKWRtQSoHV2R7fqQpGS1SKacL1gQp1vGzaYgp';
-const SAMPLE_WHIRLPOOL_SOLELON = '99PpNKW9ca26nLPg5GHmJUZizxcjyDZHGefu6eMBW7fa';
+const connection = new web3.Connection(process.env.RPC_URL as string); // change this to private rpc
+const testPool = process.env.TEST_METEORA_POOL as string;
+const testPosition = process.env.TEST_METEORA_POSITION as string;
+const testOrcaPool = process.env.TEST_ORCA_POOL as string;
 let activeBin: number;
 
 const jestConsole = console;
@@ -32,11 +44,11 @@ describe('Health Endpoints', () => {
   });
 });
 
-// describe('Search', () => {
-//   it ('Search for token (Partial String)', async () => {
-//     console.log(client.search.token("USDC"));
-//   }, TIMEOUT);
-// });
+describe('Search', () => {
+  it ('Search for token (Partial String)', async () => {
+    console.log(client.search.token("USDC"));
+  }, TIMEOUT);
+});
 
 describe('General Endpoints', () => {
   it ('GET /portfolio', async () => {
@@ -195,15 +207,20 @@ describe('Meteora Automation Endpoints', () => {
 describe('Orca Transaction Generation', () => {
   it ('Orca Open Position', async () => {
     const positionMint = web3.Keypair.generate();
+    Anchor.initialize(connection);
+    const pool = await Anchor.instance().orcaProgram.account.whirlpool.fetch(testOrcaPool);
+    console.log(`pool.tickCurrentIndex: ${pool.tickCurrentIndex}`);
     const result = await client.txGenerator.orcaOpenPosition(
       connection,
-      hawkWallet,
+      testWallet,
       {
         userWallet: testWallet,
         positionMint: positionMint.publicKey.toBase58(),
-        whirlpool: SAMPLE_WHIRLPOOL_SOLELON,
-        tickLowerIndex: '100',
-        tickUpperIndex: '150',
+        whirlpool: testOrcaPool,
+        // tickLowerIndex: `${pool.tickCurrentIndex - 500}`,
+        // tickUpperIndex: `${pool.tickCurrentIndex + 500}`,
+        tickLowerIndex: `-443636`,
+        tickUpperIndex: `443636`,
       }
     );
     logIfNot200(result);
@@ -215,7 +232,7 @@ describe('Orca Transaction Generation', () => {
     const positionMint = web3.Keypair.generate();
     const result = await client.txGenerator.orcaDeposit(
       connection,
-      hawkWallet,
+      testWallet,
       {
         userWallet: testWallet,
         positionMint: positionMint.publicKey.toBase58(),
@@ -232,7 +249,7 @@ describe('Orca Transaction Generation', () => {
     const positionMint = web3.Keypair.generate();
     const result = await client.txGenerator.orcaWithdraw(
       connection,
-      hawkWallet,
+      testWallet,
       {
         userWallet: testWallet,
         positionMint: positionMint.publicKey.toBase58(),
@@ -248,7 +265,7 @@ describe('Orca Transaction Generation', () => {
     const positionMint = web3.Keypair.generate();
     const result = await client.txGenerator.orcaClaimRewards(
       connection,
-      hawkWallet,
+      testWallet,
       {
         userWallet: testWallet,
         positionMint: positionMint.publicKey.toBase58(),
@@ -263,7 +280,7 @@ describe('Orca Transaction Generation', () => {
     const positionMint = web3.Keypair.generate();
     const result = await client.txGenerator.orcaClosePosition(
       connection,
-      hawkWallet,
+      testWallet,
       {
         userWallet: testWallet,
         positionMint: positionMint.publicKey.toBase58(),
@@ -281,15 +298,18 @@ function logIfNot200(result: ResponseWithStatus<any>) {
   }
 }
 
-async function simulateTransaction(txMetadata: TransactionMetadata) {
+async function simulateTransaction(txMetadata: TransactionMetadata, signers: web3.Keypair[] = []) {
   console.log(txMetadata.description);
   console.log(`-----------------------------------------`);
-  const simulation = await txMetadata.transaction.simulateTransaction(connection);
+  const simulation = await txMetadata.transaction.simulateTransaction(connection, signers);
   for (const log of simulation.logs as string[]) {
     console.log(log);
   }
   console.log(``)
   console.log(``)
   console.log(``)
+  if (simulation.err) {
+    throw new Error(`Simulation has error`);
+  }
   return simulation;
 }

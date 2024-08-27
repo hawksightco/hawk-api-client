@@ -314,7 +314,8 @@ export class Transaction {
    * @returns
    */
   async simulateTransaction(
-    connection: web3.Connection
+    connection: web3.Connection,
+    signers: web3.Keypair[] = [],
   ): Promise<SimulatedTransactionResponse> {
     const testInstructions = [
       ...this.instructions,
@@ -337,6 +338,9 @@ export class Transaction {
         recentBlockhash: web3.PublicKey.default.toString(),
       }).compileToV0Message(this.alts)
     );
+    if (signers.length > 0) {
+      testVersionedTxn.sign(signers);
+    }
     const simulation = await connection.simulateTransaction(testVersionedTxn, {
       replaceRecentBlockhash: true,
       sigVerify: false,
