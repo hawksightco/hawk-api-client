@@ -209,7 +209,8 @@ describe('Orca Transaction Generation', () => {
     const positionMint = web3.Keypair.generate();
     Anchor.initialize(connection);
     const pool = await Anchor.instance().orcaProgram.account.whirlpool.fetch(testOrcaPool);
-    console.log(`pool.tickCurrentIndex: ${pool.tickCurrentIndex}`);
+    const tickLowerIndex = `${Math.floor((pool.tickCurrentIndex - 50 * pool.tickSpacing) / pool.tickSpacing) * pool.tickSpacing}`;
+    const tickUpperIndex = `${Math.floor((pool.tickCurrentIndex + 50 * pool.tickSpacing) / pool.tickSpacing) * pool.tickSpacing}`;
     const result = await client.txGenerator.orcaOpenPosition(
       connection,
       testWallet,
@@ -217,10 +218,8 @@ describe('Orca Transaction Generation', () => {
         userWallet: testWallet,
         positionMint: positionMint.publicKey.toBase58(),
         whirlpool: testOrcaPool,
-        // tickLowerIndex: `${pool.tickCurrentIndex - 500}`,
-        // tickUpperIndex: `${pool.tickCurrentIndex + 500}`,
-        tickLowerIndex: `-443636`,
-        tickUpperIndex: `443636`,
+        tickLowerIndex,
+        tickUpperIndex,
       }
     );
     logIfNot200(result);
