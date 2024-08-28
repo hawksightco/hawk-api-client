@@ -67,7 +67,7 @@ describe('General Endpoints', () => {
     const result = await client.general.register(connection, hawkWallet, { userWallet: hawkWallet });
     logIfNot200(result);
     expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
+    await simulateOrExecuteTransaction(result.data);
   }, TIMEOUT);
 });
 
@@ -100,7 +100,7 @@ describe('Meteora Endpoints', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
+    await simulateOrExecuteTransaction(result.data);
   }, TIMEOUT);
   it ('POST /meteora/dlmm/tx/deposit', async () => {
     const result = await client.txGenerator.meteoraDeposit(
@@ -116,7 +116,7 @@ describe('Meteora Endpoints', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
+    await simulateOrExecuteTransaction(result.data);
   }, TIMEOUT);
   it ('POST /meteora/dlmm/tx/claim', async () => {
     const result = await client.txGenerator.meteoraClaim(
@@ -129,7 +129,7 @@ describe('Meteora Endpoints', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
+    await simulateOrExecuteTransaction(result.data);
   }, TIMEOUT);
   it ('POST /meteora/dlmm/tx/withdraw', async () => {
     const result = await client.txGenerator.meteoraWithdraw(
@@ -144,7 +144,7 @@ describe('Meteora Endpoints', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
+    await simulateOrExecuteTransaction(result.data);
   }, TIMEOUT);
   it ('POST /meteora/dlmm/tx/closePosition', async () => { // will not work because position is not empty.
     const result = await client.txGenerator.meteoraClosePosition(
@@ -157,7 +157,7 @@ describe('Meteora Endpoints', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
+    await simulateOrExecuteTransaction(result.data);
   }, TIMEOUT);
 });
 
@@ -184,7 +184,7 @@ describe('Meteora Automation Endpoints', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
+    await simulateOrExecuteTransaction(result.data);
   }, TIMEOUT);
   it ('POST /meteora/dlmm/automation/rebalanceAutomationIxs', async () => {
     const result = await client.txGeneratorAutomation.meteoraRebalanceIxs(
@@ -201,7 +201,7 @@ describe('Meteora Automation Endpoints', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
+    await simulateOrExecuteTransaction(result.data);
   }, TIMEOUT);
 });
 
@@ -225,7 +225,7 @@ describe('Orca Transaction Generation', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
+    await simulateOrExecuteTransaction(result.data);
   }, TIMEOUT);
 
   it ('Orca Deposit', async () => {
@@ -241,7 +241,7 @@ describe('Orca Transaction Generation', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
+    await simulateOrExecuteTransaction(result.data);
   }, TIMEOUT);
 
   it ('Orca Withdraw', async () => {
@@ -256,7 +256,7 @@ describe('Orca Transaction Generation', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
+    await simulateOrExecuteTransaction(result.data);
   }, TIMEOUT);
 
   it ('Orca Claim Rewards', async () => {
@@ -270,7 +270,7 @@ describe('Orca Transaction Generation', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
+    await simulateOrExecuteTransaction(result.data);
   }, TIMEOUT);
 
   it ('Orca Close Position', async () => {
@@ -284,7 +284,7 @@ describe('Orca Transaction Generation', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
-    await simulateTransaction(result.data);
+    await simulateOrExecuteTransaction(result.data);
   }, TIMEOUT);
 });
 
@@ -294,7 +294,15 @@ function logIfNot200(result: ResponseWithStatus<any>) {
   }
 }
 
-async function simulateTransaction(txMetadata: TransactionMetadata, signers: web3.Keypair[] = []) {
+/**
+ * Simulate and execute transaction
+ *
+ * TODO: Be able to truly execute transaction
+ * @param txMetadata
+ * @param signers
+ * @returns
+ */
+async function simulateOrExecuteTransaction(txMetadata: TransactionMetadata, signers: web3.Keypair[] = []) {
   console.log(txMetadata.description);
   console.log(`-----------------------------------------`);
   const simulation = await txMetadata.transaction.simulateTransaction(connection, signers);
@@ -306,6 +314,10 @@ async function simulateTransaction(txMetadata: TransactionMetadata, signers: web
     console.log(``)
     console.log(``)
     throw new Error(`Simulation has error`);
+  }
+  const executeTransaction = (process.env.EXECUTE_TRANSACTION as string).toLowerCase() === 'true';
+  if (executeTransaction) {
+    // TODO: Execute transaction
   }
   return simulation;
 }
