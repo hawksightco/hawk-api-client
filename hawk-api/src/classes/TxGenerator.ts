@@ -1,6 +1,6 @@
 import * as web3 from "@solana/web3.js";
 import * as _client from "@hawksightco/swagger-client";
-import { ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, TransactionPriority, Distribution } from "../types";
+import { ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, TransactionPriority, Distribution, OrcaWithdraw, OrcaDeposit, OrcaClosePosition, OrcaOpenPosition, OrcaClaimRewards } from "../types";
 import { Client } from "./Client";
 import { createTxMetadata, resultOrError } from "../functions";
 import { GeneralUtility } from "./GeneralUtility";
@@ -306,18 +306,18 @@ export class TxGenerator {
    * @param params Parameters required
    * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
    */
-  async orcaOpenPosition(connection: web3.Connection, payer: string, params: _client.TxOpenPositionBody): Promise<ResponseWithStatus<TransactionMetadata>> {
+  async orcaOpenPosition(connection: web3.Connection, payer: string, params: OrcaOpenPosition): Promise<ResponseWithStatus<TransactionMetadata>> {
     // Initialize anchor
     Anchor.initialize(connection);
     try {
       const result = await txgen.orcaOpenPosition({
         connection,
         params: {
-          userWallet: new web3.PublicKey(params.userWallet!),
-          positionMint: new web3.PublicKey(params.positionMint!),
-          whirlpool: new web3.PublicKey(params.whirlpool!),
-          tickLowerIndex: parseInt(params.tickLowerIndex!),
-          tickUpperIndex: parseInt(params.tickUpperIndex!),
+          userWallet: params.userWallet,
+          positionMint: params.positionMint,
+          whirlpool: params.whirlpool,
+          tickLowerIndex: params.tickLowerIndex,
+          tickUpperIndex: params.tickUpperIndex,
         }
       });
       return {
@@ -349,15 +349,15 @@ export class TxGenerator {
    * @param params Parameters required
    * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
    */
-  async orcaClosePosition(connection: web3.Connection, payer: string, params: _client.TxClosePositionBody1): Promise<ResponseWithStatus<TransactionMetadata>> {
+  async orcaClosePosition(connection: web3.Connection, payer: string, params: OrcaClosePosition): Promise<ResponseWithStatus<TransactionMetadata>> {
     // Initialize anchor
     Anchor.initialize(connection);
     try {
       const result = await txgen.orcaClosePosition({
         connection,
         params: {
-          userWallet: new web3.PublicKey(params.userWallet!),
-          positionMint: new web3.PublicKey(params.positionMint!),
+          userWallet: params.userWallet,
+          positionMint: params.positionMint,
         }
       });
       return {
@@ -389,17 +389,17 @@ export class TxGenerator {
    * @param params Parameters required
    * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
    */
-  async orcaDeposit(connection: web3.Connection, payer: string, params: _client.TxDepositBody1): Promise<ResponseWithStatus<TransactionMetadata>> {
+  async orcaDeposit(connection: web3.Connection, payer: string, params: OrcaDeposit): Promise<ResponseWithStatus<TransactionMetadata>> {
     // Initialize anchor
     Anchor.initialize(connection);
     try {
       const result = await txgen.orcaDeposit({
         connection,
         params: {
-          userWallet: new web3.PublicKey(params.userWallet!),
-          positionMint: new web3.PublicKey(params.positionMint!),
-          totalXAmount: new BN(params.totalXAmount!),
-          totalYAmount: new BN(params.totalYAmount!),
+          userWallet: params.userWallet,
+          positionMint: params.positionMint,
+          totalXAmount: params.totalXAmount,
+          totalYAmount: params.totalYAmount,
         }
       });
       return {
@@ -431,16 +431,16 @@ export class TxGenerator {
    * @param params Parameters required
    * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
    */
-  async orcaWithdraw(connection: web3.Connection, payer: string, params: _client.TxWithdrawBody1): Promise<ResponseWithStatus<TransactionMetadata>> {
+  async orcaWithdraw(connection: web3.Connection, payer: string, params: OrcaWithdraw): Promise<ResponseWithStatus<TransactionMetadata>> {
     // Initialize anchor
     Anchor.initialize(connection);
     try {
       const result = await txgen.orcaWithdraw({
         connection,
         params: {
-          userWallet: new web3.PublicKey(params.userWallet!),
-          positionMint: new web3.PublicKey(params.positionMint!),
-          liquidityAmount: new BN(params.liquidityAmount!),
+          userWallet: params.userWallet,
+          positionMint: params.positionMint,
+          liquidityAmount: params.liquidityAmount,
         }
       });
       return {
@@ -472,15 +472,15 @@ export class TxGenerator {
    * @param params Parameters required
    * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
    */
-  async orcaClaimRewards(connection: web3.Connection, payer: string, params: _client.TxClaimRewardsBody): Promise<ResponseWithStatus<TransactionMetadata>> {
+  async orcaClaimRewards(connection: web3.Connection, payer: string, params: OrcaClaimRewards): Promise<ResponseWithStatus<TransactionMetadata>> {
     // Initialize anchor
     Anchor.initialize(connection);
     try {
       const result = await txgen.orcaClaimRewards({
         connection,
         params: {
-          userWallet: new web3.PublicKey(params.userWallet!),
-          positionMint: new web3.PublicKey(params.positionMint!),
+          userWallet: params.userWallet,
+          positionMint: params.positionMint,
         }
       });
       return {

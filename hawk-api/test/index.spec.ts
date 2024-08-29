@@ -5,6 +5,9 @@ import bs58 from "bs58";
 import dotenv from "dotenv";
 import path from "path";
 import { Anchor } from "../src/anchor";
+import { PriorityLevel } from "@hawksightco/swagger-client";
+import { generateOrcaPositionPDA } from "../src/functions";
+import { BN } from "bn.js";
 
 dotenv.config({
   path: path.join(process.cwd(), 'test', '.env')
@@ -16,14 +19,18 @@ const TIMEOUT = 60_000;
 const testWalletSecret = process.env.TEST_WALLET as string;
 const testWalletKpBuffer = bs58.decode(testWalletSecret);
 const testWalletKp = web3.Keypair.fromSecretKey(testWalletKpBuffer);
-const testWallet = testWalletKp.publicKey.toString();
+const testWallet = testWalletKp.publicKey;
 const hawkWallet = 'dche7M2764e8AxNihBdn7uffVzZvTBNeL8x4LZg5E2c';
 const connection = new web3.Connection(process.env.RPC_URL as string); // change this to private rpc
 const testPool = process.env.TEST_METEORA_POOL as string;
 const testPosition = process.env.TEST_METEORA_POSITION as string;
-const testPositionMint = process.env.TEST_ORCA_POSITION_MINT as string;
-const testOrcaPool = process.env.TEST_ORCA_POOL as string;
+const testPositionMint = new web3.PublicKey(process.env.TEST_ORCA_POSITION_MINT as string);
+const testOrcaPool = new web3.PublicKey(process.env.TEST_ORCA_POOL as string);
+const positionMintKp = web3.Keypair.generate();
+const positionMint = positionMintKp.publicKey;
+let liquidityDelta = new BN(0);
 let activeBin: number;
+Anchor.initialize(connection);
 
 const jestConsole = console;
 
@@ -86,11 +93,11 @@ describe('Meteora Endpoints', () => {
   it ('POST /meteora/dlmm/tx/createPositionAndDeposit', async () => {
     const result = await client.txGenerator.meteoraCreatePositionAndDeposit(
       connection,
-      testWallet,
+      testWallet.toString(),
       {
         position: web3.Keypair.generate().publicKey.toString(),
         pool: testPool,
-        userWallet: testWallet,
+        userWallet: testWallet.toString(),
         totalXAmount: 10_000,
         totalYAmount: 10_000,
         lowerBinRange: activeBin - 34,
@@ -105,10 +112,10 @@ describe('Meteora Endpoints', () => {
   it ('POST /meteora/dlmm/tx/deposit', async () => {
     const result = await client.txGenerator.meteoraDeposit(
       connection,
-      testWallet,
+      testWallet.toString(),
       {
         position: testPosition,
-        userWallet: testWallet,
+        userWallet: testWallet.toString(),
         totalXAmount: 10_000,
         totalYAmount: 10_000,
         distribution: 'CURVE',
@@ -121,10 +128,10 @@ describe('Meteora Endpoints', () => {
   it ('POST /meteora/dlmm/tx/claim', async () => {
     const result = await client.txGenerator.meteoraClaim(
       connection,
-      testWallet,
+      testWallet.toString(),
       {
         position: testPosition,
-        userWallet: testWallet,
+        userWallet: testWallet.toString(),
       }
     );
     logIfNot200(result);
@@ -134,10 +141,10 @@ describe('Meteora Endpoints', () => {
   it ('POST /meteora/dlmm/tx/withdraw', async () => {
     const result = await client.txGenerator.meteoraWithdraw(
       connection,
-      testWallet,
+      testWallet.toString(),
       {
         position: testPosition,
-        userWallet: testWallet,
+        userWallet: testWallet.toString(),
         amountBps: 10_000,
         shouldClaimAndClose: true,
       }
@@ -149,10 +156,10 @@ describe('Meteora Endpoints', () => {
   it ('POST /meteora/dlmm/tx/closePosition', async () => { // will not work because position is not empty.
     const result = await client.txGenerator.meteoraClosePosition(
       connection,
-      testWallet,
+      testWallet.toString(),
       {
         position: testPosition,
-        userWallet: testWallet,
+        userWallet: testWallet.toString(),
       }
     );
     logIfNot200(result);
@@ -178,7 +185,7 @@ describe('Meteora Automation Endpoints', () => {
       connection,
       hawkWallet,
       {
-        userWallet: testWallet,
+        userWallet: testWallet.toString(),
         position: testPosition,
       }
     );
@@ -191,7 +198,7 @@ describe('Meteora Automation Endpoints', () => {
       connection,
       hawkWallet,
       {
-        userWallet: testWallet,
+        userWallet: testWallet.toString(),
         currentPosition: testPosition,
         newPosition: web3.Keypair.generate().publicKey.toString(),
         lowerBinRange: activeBin - 34,
@@ -207,17 +214,16 @@ describe('Meteora Automation Endpoints', () => {
 
 describe('Orca Transaction Generation', () => {
   it ('Orca Open Position', async () => {
-    const positionMint = web3.Keypair.generate();
     Anchor.initialize(connection);
     const pool = await Anchor.instance().orcaProgram.account.whirlpool.fetch(testOrcaPool);
-    const tickLowerIndex = `${Math.floor((pool.tickCurrentIndex - 50 * pool.tickSpacing) / pool.tickSpacing) * pool.tickSpacing}`;
-    const tickUpperIndex = `${Math.floor((pool.tickCurrentIndex + 50 * pool.tickSpacing) / pool.tickSpacing) * pool.tickSpacing}`;
+    const tickLowerIndex = Math.floor((pool.tickCurrentIndex - 50 * pool.tickSpacing) / pool.tickSpacing) * pool.tickSpacing;
+    const tickUpperIndex = Math.floor((pool.tickCurrentIndex + 50 * pool.tickSpacing) / pool.tickSpacing) * pool.tickSpacing;
     const result = await client.txGenerator.orcaOpenPosition(
       connection,
-      testWallet,
+      testWallet.toString(),
       {
         userWallet: testWallet,
-        positionMint: positionMint.publicKey.toBase58(),
+        positionMint: positionMint,
         whirlpool: testOrcaPool,
         tickLowerIndex,
         tickUpperIndex,
@@ -225,58 +231,49 @@ describe('Orca Transaction Generation', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
-    await simulateOrExecuteTransaction(result.data);
-  }, TIMEOUT);
-
-  it ('Orca Deposit', async () => {
-    const result = await client.txGenerator.orcaDeposit(
-      connection,
-      testWallet,
-      {
-        userWallet: testWallet,
-        positionMint: testPositionMint,
-        totalXAmount: '10000',
-        totalYAmount: '10000'
-      }
-    );
-    logIfNot200(result);
-    expect(result.status).toBe(200);
-    await simulateOrExecuteTransaction(result.data);
-  }, TIMEOUT);
-
-  it ('Orca Withdraw', async () => {
-    const result = await client.txGenerator.orcaWithdraw(
-      connection,
-      testWallet,
-      {
-        userWallet: testWallet,
-        positionMint: testPositionMint,
-        liquidityAmount: 10000,
-      }
-    );
-    logIfNot200(result);
-    expect(result.status).toBe(200);
-    await simulateOrExecuteTransaction(result.data);
-  }, TIMEOUT);
-
-  it ('Orca Claim Rewards', async () => {
-    const result = await client.txGenerator.orcaClaimRewards(
-      connection,
-      testWallet,
-      {
-        userWallet: testWallet,
-        positionMint: testPositionMint,
-      }
-    );
-    logIfNot200(result);
-    expect(result.status).toBe(200);
-    await simulateOrExecuteTransaction(result.data);
+    await simulateOrExecuteTransaction(result.data, [testWalletKp, positionMintKp]);
   }, TIMEOUT);
 
   it ('Orca Close Position', async () => {
     const result = await client.txGenerator.orcaClosePosition(
       connection,
-      testWallet,
+      testWallet.toString(),
+      {
+        userWallet: testWallet,
+        positionMint,
+      }
+    );
+    logIfNot200(result);
+    expect(result.status).toBe(200);
+    await simulateOrExecuteTransaction(result.data, [testWalletKp]);
+  }, TIMEOUT);
+
+  it ('Orca Deposit', async () => {
+    const position = generateOrcaPositionPDA(testPositionMint);
+    let positionInfo = await Anchor.instance().orcaProgram.account.position.fetch(position);
+    const currentLiquidity = positionInfo.liquidity;
+    console.log(`position: ${position}`);
+    const result = await client.txGenerator.orcaDeposit(
+      connection,
+      testWallet.toString(),
+      {
+        userWallet: testWallet,
+        positionMint: testPositionMint,
+        totalXAmount: new BN('10000'),
+        totalYAmount: new BN('10000')
+      }
+    );
+    logIfNot200(result);
+    expect(result.status).toBe(200);
+    await simulateOrExecuteTransaction(result.data, [testWalletKp]);
+    positionInfo = await Anchor.instance().orcaProgram.account.position.fetch(position);
+    liquidityDelta = positionInfo.liquidity.sub(currentLiquidity);
+  }, TIMEOUT);
+
+  it ('Orca Claim Rewards', async () => {
+    const result = await client.txGenerator.orcaClaimRewards(
+      connection,
+      testWallet.toString(),
       {
         userWallet: testWallet,
         positionMint: testPositionMint,
@@ -284,7 +281,23 @@ describe('Orca Transaction Generation', () => {
     );
     logIfNot200(result);
     expect(result.status).toBe(200);
-    await simulateOrExecuteTransaction(result.data);
+    await simulateOrExecuteTransaction(result.data, [testWalletKp]);
+  }, TIMEOUT);
+
+  it ('Orca Withdraw', async () => {
+    console.log(`liquidityDelta: ${liquidityDelta}`);
+    const result = await client.txGenerator.orcaWithdraw(
+      connection,
+      testWallet.toString(),
+      {
+        userWallet: testWallet,
+        positionMint: testPositionMint,
+        liquidityAmount: liquidityDelta,
+      }
+    );
+    logIfNot200(result);
+    expect(result.status).toBe(200);
+    await simulateOrExecuteTransaction(result.data, [testWalletKp]);
   }, TIMEOUT);
 });
 
@@ -316,8 +329,19 @@ async function simulateOrExecuteTransaction(txMetadata: TransactionMetadata, sig
     throw new Error(`Simulation has error`);
   }
   const executeTransaction = (process.env.EXECUTE_TRANSACTION as string).toLowerCase() === 'true';
-  if (executeTransaction) {
-    // TODO: Execute transaction
+  if (executeTransaction && signers.length > 0) {
+    // txMetadata.transaction.addPriorityFeeIx(connection, Math.ceil(simulation.unitsConsumed * 1.1), false, PriorityLevel.High);
+    txMetadata.transaction.sign(signers);
+    const rawTx = txMetadata.transaction.versionedTransaction.serialize();
+    const signature = await connection.sendRawTransaction(rawTx);
+    console.log(`Transaction signature: ${signature}`);
+    const result = await connection.confirmTransaction({
+      signature,
+      blockhash: txMetadata.transaction.recentBlockhash,
+      lastValidBlockHeight: txMetadata.transaction.lastValidBlockHeight
+    }, 'finalized');
+    console.log(`Transaction result`, result);
+    console.log(`\n\n`);
   }
   return simulation;
 }

@@ -845,7 +845,7 @@ export class Transactions {
     const userPda = generateUserPda(params.userWallet, farm);
     const position = generateOrcaPositionPDA(params.positionMint);
     const positionTokenAccount = generateAta(userPda, params.positionMint);
-    const orcaOpenPositionIx = await Anchor.instance().iyfExtension.methods
+    const extensionIx = await Anchor.instance().iyfExtension.methods
       .orcaOpenPosition(
         params.tickLowerIndex,
         params.tickUpperIndex,
@@ -866,9 +866,9 @@ export class Transactions {
         systemProgram: web3.SystemProgram.programId,
       })
       .instruction()
-    const orcaOpenPositionIxViaMain = await Anchor.instance().iyfMain.methods
+    const orcaIx = await Anchor.instance().iyfMain.methods
       .iyfExtensionExecute(
-        orcaOpenPositionIx.data
+        extensionIx.data
       )
       .accounts({
         farm,
@@ -878,18 +878,19 @@ export class Transactions {
         iyfExtensionProgram: IYF_EXTENSION,
       })
       .remainingAccounts([
-        orcaOpenPositionIx.keys[4],
-        orcaOpenPositionIx.keys[5],
-        orcaOpenPositionIx.keys[6],
-        orcaOpenPositionIx.keys[7],
-        orcaOpenPositionIx.keys[8],
-        orcaOpenPositionIx.keys[9],
-        orcaOpenPositionIx.keys[10],
-        orcaOpenPositionIx.keys[11],
-        orcaOpenPositionIx.keys[12],
+        extensionIx.keys[4],
+        extensionIx.keys[5],
+        extensionIx.keys[6],
+        extensionIx.keys[7],
+        extensionIx.keys[8],
+        extensionIx.keys[9],
+        extensionIx.keys[10],
+        extensionIx.keys[11],
+        extensionIx.keys[12],
       ])
       .instruction();
-    const mainInstructions = [orcaOpenPositionIxViaMain];
+    orcaIx.keys[2].isSigner = true; // authority must be signer.
+    const mainInstructions = [orcaIx];
     return createTransactionMeta({
       payer: params.userWallet,
       description: "Create new Orca Position",
@@ -911,7 +912,7 @@ export class Transactions {
     const userPda = generateUserPda(params.userWallet, farm);
     const position = generateOrcaPositionPDA(params.positionMint);
     const positionTokenAccount = generateAta(userPda, params.positionMint);
-    const orcaOpenPositionIx = await Anchor.instance().iyfExtension.methods
+    const extensionIx = await Anchor.instance().iyfExtension.methods
       .orcaClosePosition()
       .accounts({
         farm,
@@ -926,9 +927,9 @@ export class Transactions {
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
       })
       .instruction()
-    const orcaOpenPositionIxViaMain = await Anchor.instance().iyfMain.methods
+    const orcaIx = await Anchor.instance().iyfMain.methods
       .iyfExtensionExecute(
-        orcaOpenPositionIx.data
+        extensionIx.data
       )
       .accounts({
         farm,
@@ -938,15 +939,16 @@ export class Transactions {
         iyfExtensionProgram: IYF_EXTENSION,
       })
       .remainingAccounts([
-        orcaOpenPositionIx.keys[4],
-        orcaOpenPositionIx.keys[5],
-        orcaOpenPositionIx.keys[6],
-        orcaOpenPositionIx.keys[7],
-        orcaOpenPositionIx.keys[8],
-        orcaOpenPositionIx.keys[9],
+        extensionIx.keys[4],
+        extensionIx.keys[5],
+        extensionIx.keys[6],
+        extensionIx.keys[7],
+        extensionIx.keys[8],
+        extensionIx.keys[9],
       ])
       .instruction();
-    const mainInstructions = [orcaOpenPositionIxViaMain];
+    orcaIx.keys[2].isSigner = true; // authority must be signer.
+    const mainInstructions = [orcaIx];
     return createTransactionMeta({
       payer: params.userWallet,
       description: "Close Orca Position",
@@ -1012,7 +1014,7 @@ export class Transactions {
         },
       ]
     });
-    const orcaOpenPositionIx = await Anchor.instance().iyfExtension.methods
+    const extensionIx = await Anchor.instance().iyfExtension.methods
       .orcaDeposit()
       .accounts({
         farm,
@@ -1036,9 +1038,9 @@ export class Transactions {
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
       })
       .instruction()
-    const orcaOpenPositionIxViaMain = await Anchor.instance().iyfMain.methods
+    const orcaIx = await Anchor.instance().iyfMain.methods
       .iyfExtensionExecute(
-        orcaOpenPositionIx.data
+        extensionIx.data
       )
       .accounts({
         farm,
@@ -1048,21 +1050,21 @@ export class Transactions {
         iyfExtensionProgram: IYF_EXTENSION,
       })
       .remainingAccounts([
-        orcaOpenPositionIx.keys[4],
-        orcaOpenPositionIx.keys[5],
-        orcaOpenPositionIx.keys[6],
-        orcaOpenPositionIx.keys[7],
-        orcaOpenPositionIx.keys[8],
-        orcaOpenPositionIx.keys[9],
-        orcaOpenPositionIx.keys[10],
-        orcaOpenPositionIx.keys[11],
-        orcaOpenPositionIx.keys[12],
-        orcaOpenPositionIx.keys[13],
-        orcaOpenPositionIx.keys[14],
-        orcaOpenPositionIx.keys[15],
-        orcaOpenPositionIx.keys[16],
-        orcaOpenPositionIx.keys[17],
-        orcaOpenPositionIx.keys[18],
+        extensionIx.keys[4],
+        extensionIx.keys[5],
+        extensionIx.keys[6],
+        extensionIx.keys[7],
+        extensionIx.keys[8],
+        extensionIx.keys[9],
+        extensionIx.keys[10],
+        extensionIx.keys[11],
+        extensionIx.keys[12],
+        extensionIx.keys[13],
+        extensionIx.keys[14],
+        extensionIx.keys[15],
+        extensionIx.keys[16],
+        extensionIx.keys[17],
+        extensionIx.keys[18],
       ])
       .instruction();
       const clearRemainingTokensIxs = await withdrawMultipleToken({
@@ -1072,7 +1074,8 @@ export class Transactions {
           { mint: mintB },
         ],
       });
-    const mainInstructions = [...wrapSolIx, depositIx, orcaOpenPositionIxViaMain, clearRemainingTokensIxs];
+    orcaIx.keys[2].isSigner = true; // authority must be signer.
+    const mainInstructions = [...wrapSolIx, depositIx, orcaIx, clearRemainingTokensIxs];
     return createTransactionMeta({
       payer: params.userWallet,
       description: `Deposit to Orca Position: ${position}`,
@@ -1108,7 +1111,7 @@ export class Transactions {
     const { publicKey: tickArrayUpper } = getTickArrayFromTickIndex(positionData.tickUpperIndex, whirlpoolData!.tickSpacing, whirlpool, ORCA_WHIRLPOOL_PROGRAM);
     const ownerFeeA = generateAta(SITE_FEE_OWNER, mintA);
     const ownerFeeB = generateAta(SITE_FEE_OWNER, mintB);
-    const orcaOpenPositionIx = await Anchor.instance().iyfExtension.methods
+    const extensionIx = await Anchor.instance().iyfExtension.methods
       .orcaWithdraw(params.liquidityAmount)
       .accounts({
         farm,
@@ -1132,9 +1135,9 @@ export class Transactions {
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
       })
       .instruction()
-    const orcaOpenPositionIxViaMain = await Anchor.instance().iyfMain.methods
+    const orcaIx = await Anchor.instance().iyfMain.methods
       .iyfExtensionExecute(
-        orcaOpenPositionIx.data
+        extensionIx.data
       )
       .accounts({
         farm,
@@ -1144,21 +1147,21 @@ export class Transactions {
         iyfExtensionProgram: IYF_EXTENSION,
       })
       .remainingAccounts([
-        orcaOpenPositionIx.keys[4],
-        orcaOpenPositionIx.keys[5],
-        orcaOpenPositionIx.keys[6],
-        orcaOpenPositionIx.keys[7],
-        orcaOpenPositionIx.keys[8],
-        orcaOpenPositionIx.keys[9],
-        orcaOpenPositionIx.keys[10],
-        orcaOpenPositionIx.keys[11],
-        orcaOpenPositionIx.keys[12],
-        orcaOpenPositionIx.keys[13],
-        orcaOpenPositionIx.keys[14],
-        orcaOpenPositionIx.keys[15],
-        orcaOpenPositionIx.keys[16],
-        orcaOpenPositionIx.keys[17],
-        orcaOpenPositionIx.keys[18],
+        extensionIx.keys[4],
+        extensionIx.keys[5],
+        extensionIx.keys[6],
+        extensionIx.keys[7],
+        extensionIx.keys[8],
+        extensionIx.keys[9],
+        extensionIx.keys[10],
+        extensionIx.keys[11],
+        extensionIx.keys[12],
+        extensionIx.keys[13],
+        extensionIx.keys[14],
+        extensionIx.keys[15],
+        extensionIx.keys[16],
+        extensionIx.keys[17],
+        extensionIx.keys[18],
       ])
       .instruction();
       const withdrawFromPda = await withdrawMultipleToken({
@@ -1168,7 +1171,8 @@ export class Transactions {
           { mint: mintB },
         ],
       });
-    const mainInstructions = [orcaOpenPositionIxViaMain, withdrawFromPda];
+    orcaIx.keys[2].isSigner = true; // authority must be signer.
+    const mainInstructions = [orcaIx, withdrawFromPda];
     return createTransactionMeta({
       payer: params.userWallet,
       description: `Withdraw deposits from Orca Position: ${position}`,
@@ -1216,7 +1220,7 @@ export class Transactions {
       }
     }
     whirlpoolData!.rewardInfos[0].mint
-    const orcaOpenPositionIx = await Anchor.instance().iyfExtension.methods
+    const extensionIx = await Anchor.instance().iyfExtension.methods
       .orcaClaimRewards()
       .accounts({
         farm,
@@ -1241,9 +1245,9 @@ export class Transactions {
       })
       .remainingAccounts(remainingAccounts)
       .instruction()
-    const orcaOpenPositionIxViaMain = await Anchor.instance().iyfMain.methods
+    const orcaIx = await Anchor.instance().iyfMain.methods
       .iyfExtensionExecute(
-        orcaOpenPositionIx.data
+        extensionIx.data
       )
       .accounts({
         farm,
@@ -1253,21 +1257,21 @@ export class Transactions {
         iyfExtensionProgram: IYF_EXTENSION,
       })
       .remainingAccounts([
-        orcaOpenPositionIx.keys[4],
-        orcaOpenPositionIx.keys[5],
-        orcaOpenPositionIx.keys[6],
-        orcaOpenPositionIx.keys[7],
-        orcaOpenPositionIx.keys[8],
-        orcaOpenPositionIx.keys[9],
-        orcaOpenPositionIx.keys[10],
-        orcaOpenPositionIx.keys[11],
-        orcaOpenPositionIx.keys[12],
-        orcaOpenPositionIx.keys[13],
-        orcaOpenPositionIx.keys[14],
-        orcaOpenPositionIx.keys[15],
-        orcaOpenPositionIx.keys[16],
-        orcaOpenPositionIx.keys[17],
-        orcaOpenPositionIx.keys[18],
+        extensionIx.keys[4],
+        extensionIx.keys[5],
+        extensionIx.keys[6],
+        extensionIx.keys[7],
+        extensionIx.keys[8],
+        extensionIx.keys[9],
+        extensionIx.keys[10],
+        extensionIx.keys[11],
+        extensionIx.keys[12],
+        extensionIx.keys[13],
+        extensionIx.keys[14],
+        extensionIx.keys[15],
+        extensionIx.keys[16],
+        extensionIx.keys[17],
+        extensionIx.keys[18],
       ])
       .instruction();
       const withdrawFromPda = await withdrawMultipleToken({
@@ -1277,7 +1281,8 @@ export class Transactions {
           { mint: mintB },
         ],
       });
-    const mainInstructions = [orcaOpenPositionIxViaMain, withdrawFromPda];
+    orcaIx.keys[2].isSigner = true; // authority must be signer.
+    const mainInstructions = [orcaIx, withdrawFromPda];
     return createTransactionMeta({
       payer: params.userWallet,
       description: `Claim rewards from Orca Position: ${position}`,
