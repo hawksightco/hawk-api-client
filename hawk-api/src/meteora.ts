@@ -662,7 +662,7 @@ export class RemoveLiquidityBuilder {
   replaceClaimFeeTokenToSTA() {
     const index = this.mainIxs.findIndex(mainIx => {
       const dataWithoutIyfExtensionExecute = mainIx.data.subarray(12);
-      sighashMatch(dataWithoutIyfExtensionExecute, "MeteoraDlmmClaimFeeAutomation")
+      return sighashMatch(dataWithoutIyfExtensionExecute, "MeteoraDlmmClaimFeeAutomation");
     });
     if (index === -1) {
       console.warn(`Warn: claim fee instruction not found! This should not happen if \`shouldClaimAndClose\` is set to true.`);
@@ -683,7 +683,7 @@ export class RemoveLiquidityBuilder {
   replaceClaimRewardToSTA() {
     const index = this.mainIxs.findIndex(mainIx => {
       const dataWithoutIyfExtensionExecute = mainIx.data.subarray(12);
-      sighashMatch(dataWithoutIyfExtensionExecute, "MeteoraDlmmClaimRewardAutomation")
+      return sighashMatch(dataWithoutIyfExtensionExecute, "MeteoraDlmmClaimRewardAutomation");
     })
     if (index === -1) {
       console.warn(`Warn: Reward instruction not found! This may happen if pool has no rewards`);
