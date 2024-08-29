@@ -185,8 +185,8 @@ describe('Meteora Automation Endpoints', () => {
       connection,
       hawkWallet,
       {
-        userWallet: testWallet.toString(),
-        position: testPosition,
+        userWallet: testWallet,
+        position: new web3.PublicKey(testPosition),
       }
     );
     logIfNot200(result);
@@ -198,11 +198,13 @@ describe('Meteora Automation Endpoints', () => {
       connection,
       hawkWallet,
       {
-        userWallet: testWallet.toString(),
-        currentPosition: testPosition,
-        newPosition: web3.Keypair.generate().publicKey.toString(),
-        lowerBinRange: activeBin - 34,
-        upperBinRange: activeBin + 35,
+        userWallet: testWallet,
+        currentPosition: new web3.PublicKey(testPosition),
+        newPosition: web3.Keypair.generate().publicKey,
+        binRange: {
+          lowerRange: activeBin - 34,
+          upperRange: activeBin + 35,
+        },
         distribution: 'CURVE',
       }
     );
