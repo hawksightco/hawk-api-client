@@ -669,12 +669,12 @@ export class RemoveLiquidityBuilder {
       return;
     }
     const userPda = this.mainIxs[index].keys[1].pubkey;
-    const tokenXMint = this.mainIxs[index].keys[13].pubkey;
-    const tokenYMint = this.mainIxs[index].keys[14].pubkey;
+    const tokenXMint = this.mainIxs[index].keys[14].pubkey;
+    const tokenYMint = this.mainIxs[index].keys[15].pubkey;
     const staTokenX = generateUserPdaStorageAccount(userPda, tokenXMint);
     const staTokenY = generateUserPdaStorageAccount(userPda, tokenYMint);
-    this.mainIxs[index].keys[11].pubkey = staTokenX;
-    this.mainIxs[index].keys[12].pubkey = staTokenY;
+    this.mainIxs[index].keys[12].pubkey = staTokenX;
+    this.mainIxs[index].keys[13].pubkey = staTokenY;
   }
 
   /**
