@@ -577,8 +577,8 @@ export class Transactions {
     );
 
     const mainInstructions = [
-      // // Initialize required ATA
-      // ...removeLiquidityBuilder.createAtaIxs,
+      // Initialize required ATA
+      ...removeLiquidityBuilder.createAtaIxs,
 
       // Remove liquidity
       ...removeLiquidityBuilder.mainIxs,
@@ -586,8 +586,8 @@ export class Transactions {
       // Re-deposit liquidity
       ...initPositionAndAddLiquidityBuilder.mainIxs,
 
-      // // Sweep dust
-      // ...sweepLiquidityBuilder.mainIxs,
+      // Sweep dust
+      ...sweepLiquidityBuilder.mainIxs,
     ];
 
     return createTransactionMeta({
