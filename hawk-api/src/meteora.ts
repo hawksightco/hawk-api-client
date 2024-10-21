@@ -744,11 +744,11 @@ export class InitializePositionAndAddLiquidityByStrategyBuilder {
       // Step 3: Add liquidity by strategy
       ...this.mainIxs,
 
-      // Step 4: Refund dust to user wallet
-      this.refundDustIxs,
+      // // Step 4: Refund dust to user wallet
+      // this.refundDustIxs,
 
-      // Step 5: Close wSOL account (if there's any)
-      ...this.unwrapWsolIxs,
+      // // Step 5: Close wSOL account (if there's any)
+      // ...this.unwrapWsolIxs,
     ];
   }
 }
