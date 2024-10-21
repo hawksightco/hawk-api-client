@@ -362,10 +362,10 @@
     bn.js "^5.1.2"
     buffer-layout "^1.2.0"
 
-"@ghabxph/solana-localnet@^0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@ghabxph/solana-localnet/-/solana-localnet-0.0.5.tgz#4909aa25d46d5781d4525ab5a74a77a5089e727a"
-  integrity sha512-xHOS80mCtnmJxrftMeBE5YZpc7P4tahUp25kSM662Ks1hwAVeNlWwp1afmLEMJTw+P9zlW4AoUdXt5ygu5FmtQ==
+"@ghabxph/solana-localnet@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@ghabxph/solana-localnet/-/solana-localnet-0.0.6.tgz#4ff71efda538edeeaf0fa2e240e5434f75416c8a"
+  integrity sha512-f8LEAl8SqFjn9sq9BNXjUVwtQda03rasCXHJgQhio8SrwuENzWUD/3u1f4wwkK05RlFiejZde4SzG4OY1GHQ3A==
   dependencies:
     "@solana/web3.js" "^1.95.3"
 
