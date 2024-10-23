@@ -648,7 +648,7 @@ export class Transactions {
         console.log(`initializing STA: ${filteredMints[i].toBase58()}`);
         mainInstructions.push(
           await Anchor.instance().iyfMain.methods
-            .initializeStorageTokenAccountAutomation()
+            .initializeStorageTokenAccount()
             .accounts({
               userPda: userPda,
               payer: params.userWallet,
