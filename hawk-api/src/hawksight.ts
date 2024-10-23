@@ -104,3 +104,33 @@ export async function withdrawMultipleToken(params: {
     .instruction();
   return ix;
 }
+
+export type AtomicityContextParams = {
+  userWallet: web3.PublicKey,
+};
+export async function setTransactionSlot({ userWallet }: AtomicityContextParams): Promise<web3.TransactionInstruction> {
+  const ix = await Anchor
+    .instance().iyfMain.methods
+    .setTransactionSlot()
+    .accounts({
+      userPda: util.generateUserPda(userWallet),
+      clock: web3.SYSVAR_CLOCK_PUBKEY,
+    })
+    .instruction()
+  return ix;
+}
+
+export type VerifyTransactionSlotParams = {
+  userWallet: web3.PublicKey,
+};
+export async function verifyTransactionSlot({ userWallet }: AtomicityContextParams): Promise<web3.TransactionInstruction> {
+  const ix = await Anchor
+    .instance().iyfMain.methods
+    .verifyTransactionSlot()
+    .accounts({
+      userPda: util.generateUserPda(userWallet),
+      clock: web3.SYSVAR_CLOCK_PUBKEY,
+    })
+    .instruction()
+  return ix;
+}
