@@ -67,7 +67,7 @@ export class HawkAPI {
     this._txGenerator = new TxGenerator(client, this.generalUtility);
     this.txGeneratorAutomation = new TxGeneratorAutomations(client, this.generalUtility);
     this.search = new Search(url);
-    this.simpleIxGenerator = new SimpleIxGenerator(this.generalUtility);
+    this.simpleIxGenerator = new SimpleIxGenerator();
 
     // Load create tx metadata module
     if (this.options === undefined || !this.options!.disableTxMetadataLoad) {

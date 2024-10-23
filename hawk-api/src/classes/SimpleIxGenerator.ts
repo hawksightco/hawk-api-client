@@ -12,15 +12,6 @@ import { setTransactionSlot, verifyTransactionSlot, AtomicityContextParams } fro
 export class SimpleIxGenerator {
 
   /**
-   * Initializes an instance of the SimpleIxGenerator class.
-   *
-   * @param generalUtility - An instance of GeneralUtility that provides general utility functions.
-   */
-  constructor(
-    protected readonly generalUtility: GeneralUtility,
-  ) { }
-
-  /**
    * Generates a transaction instruction that sets the current blockchain clock
    * to the user's PDA (Program Derived Address) account.
    *

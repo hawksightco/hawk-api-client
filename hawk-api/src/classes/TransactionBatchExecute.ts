@@ -27,12 +27,12 @@ export type TransactionBatchExecuteParams = {
  */
 export class TransactionBatchExecute {
 
-  private readonly MAX_SIZE = 1232;
+  protected readonly MAX_SIZE = 1232;
 
   /**
    * Downloaded address lookup table accounts
    */
-  private alts: web3.AddressLookupTableAccount[] = [];
+  protected alts: web3.AddressLookupTableAccount[] = [];
 
   /**
    * Creates an instance of TransactionExecute class
@@ -44,11 +44,11 @@ export class TransactionBatchExecute {
    * @param signers Required signers to fulfill the transactions
    */
   constructor(
-    private lookupTableAddresses: web3.PublicKey[],
-    private instructions: web3.TransactionInstruction[],
-    private payer: web3.Keypair,
-    private connection: web3.Connection,
-    private signers: web3.Keypair[] = [],
+    protected lookupTableAddresses: web3.PublicKey[],
+    protected instructions: web3.TransactionInstruction[],
+    protected payer: web3.Keypair,
+    protected connection: web3.Connection,
+    protected signers: web3.Keypair[] = [],
   ) {};
 
   /**
@@ -169,7 +169,7 @@ export class TransactionBatchExecute {
    * @param dummySigners
    * @returns
    */
-  private async splitToTransactions(simulationIxs: web3.TransactionInstruction[], dummySigners: DummySigners): Promise<web3.TransactionInstruction[][]> {
+  protected async splitToTransactions(simulationIxs: web3.TransactionInstruction[], dummySigners: DummySigners): Promise<web3.TransactionInstruction[][]> {
 
     // Fetch latest blockhash required to calculate transaction size
     const latestBlockhash = await this.connection.getLatestBlockhash();
@@ -192,7 +192,7 @@ export class TransactionBatchExecute {
       }
     }
 
-    if (batch.length > 0) {
+    if (batch.length > 0 && simulationIxs.length !== 0) {
       result.push(batch);
     }
 
@@ -204,7 +204,7 @@ export class TransactionBatchExecute {
    *
    * @param batch
    */
-  private calculateTransactionSize(latestBlockhash: web3.BlockhashWithExpiryBlockHeight, batch: web3.TransactionInstruction[], dummySigners: DummySigners): number {
+  protected calculateTransactionSize(latestBlockhash: web3.BlockhashWithExpiryBlockHeight, batch: web3.TransactionInstruction[], dummySigners: DummySigners): number {
     const alts = this.findRequiredAltsForBatch(batch);
     const messageV0 = new web3.TransactionMessage({
       payerKey: this.payer.publicKey,
