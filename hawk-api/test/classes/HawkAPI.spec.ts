@@ -16,4 +16,15 @@ describe('HawkAPI Unit Test', () => {
       signers: [web3.Keypair.generate()],
     });
   });
+
+  it('Be able to call atomicity method without any error', async () => {
+    const connection = new web3.Connection('https://api.mainnet-beta.solana.com');
+    new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true }).atomicity({
+      lookupTableAddresses: [],
+      instructions: [],
+      payer: web3.Keypair.generate(),
+      connection,
+      signers: [web3.Keypair.generate()],
+    });
+  });
 });

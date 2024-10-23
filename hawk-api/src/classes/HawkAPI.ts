@@ -11,6 +11,7 @@ import { CreateTxMetadata } from "./CreateTxMetadata";
 import { HawkApiOptions } from "../types";
 import { SimpleIxGenerator } from "./SimpleIxGenerator";
 import { TransactionBatchExecute, TransactionBatchExecuteParams } from "./TransactionBatchExecute";
+import { Atomicity } from "./Atomicity";
 
 /**
  * HawkAPI is a central gateway class that aggregates access to various functional modules
@@ -90,7 +91,7 @@ export class HawkAPI {
   }
 
   /**
-   * Create instance of TransactionBatchExecute
+   * Create instance of TransactionBatchExecute class
    *
    * @param param
    */
@@ -101,6 +102,22 @@ export class HawkAPI {
       payer,
       connection,
       signers,
+    );
+  }
+
+  /**
+   * Create instance of Atomicity class
+   *
+   * @param param
+   */
+  atomicity({lookupTableAddresses, instructions, payer, connection, signers}: TransactionBatchExecuteParams) {
+    return new Atomicity(
+      lookupTableAddresses,
+      instructions,
+      payer,
+      connection,
+      signers,
+      this.simpleIxGenerator,
     );
   }
 }
