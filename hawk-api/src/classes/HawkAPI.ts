@@ -1,3 +1,4 @@
+import * as web3 from "@solana/web3.js";
 import { General } from "./General";
 import { Health } from "./Health";
 import { TxGenerator } from "./TxGenerator";
@@ -9,6 +10,7 @@ import { Search } from "./Search";
 import { CreateTxMetadata } from "./CreateTxMetadata";
 import { HawkApiOptions } from "../types";
 import { SimpleIxGenerator } from "./SimpleIxGenerator";
+import { TransactionBatchExecute, TransactionBatchExecuteParams } from "./TransactionBatchExecute";
 
 /**
  * HawkAPI is a central gateway class that aggregates access to various functional modules
@@ -85,5 +87,20 @@ export class HawkAPI {
    */
   overrideTxGenerator(builderFn: (client: Client, generalUtility: GeneralUtility) => TxGenerator) {
     this._txGenerator = builderFn(this.client, this.generalUtility);
+  }
+
+  /**
+   * Create instance of TransactionBatchExecute
+   *
+   * @param param
+   */
+  batchExecute({lookupTableAddresses, instructions, payer, connection, signers}: TransactionBatchExecuteParams) {
+    return new TransactionBatchExecute(
+      lookupTableAddresses,
+      instructions,
+      payer,
+      connection,
+      signers,
+    );
   }
 }
