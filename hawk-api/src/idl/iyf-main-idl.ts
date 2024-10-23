@@ -6497,7 +6497,10 @@ export type IndexYieldFarming = {
           {
             "name": "padding",
             "type": {
-              "defined": "UserAccountMultiPadding"
+              "array": [
+                "u8",
+                285
+              ]
             }
           }
         ]
@@ -13431,7 +13434,10 @@ export const IDL: IndexYieldFarming = {
           {
             "name": "padding",
             "type": {
-              "defined": "UserAccountMultiPadding"
+              "array": [
+                "u8",
+                285
+              ]
             }
           }
         ]
