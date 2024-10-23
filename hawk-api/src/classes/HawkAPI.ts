@@ -7,9 +7,8 @@ import { Client } from "./Client";
 import { GeneralUtility } from "./GeneralUtility";
 import { Search } from "./Search";
 import { CreateTxMetadata } from "./CreateTxMetadata";
-import { Anchor } from "../anchor";
-import { connect } from "http2";
 import { HawkApiOptions } from "../types";
+import { SimpleIxGenerator } from "./SimpleIxGenerator";
 
 /**
  * HawkAPI is a central gateway class that aggregates access to various functional modules
@@ -46,6 +45,9 @@ export class HawkAPI {
   /** Search module (token search only for now...) */
   public readonly search: Search;
 
+  /** Simple instruction generator */
+  public readonly simpleIxGenerator: SimpleIxGenerator;
+
   /**
    * Initializes a new instance of the HawkAPI class with a specified API URL.
    * @param url The base URL for the HawkSight API services, defaulted to "https://api2.hawksight.co" if not specified.
@@ -63,6 +65,7 @@ export class HawkAPI {
     this._txGenerator = new TxGenerator(client, this.generalUtility);
     this.txGeneratorAutomation = new TxGeneratorAutomations(client, this.generalUtility);
     this.search = new Search(url);
+    this.simpleIxGenerator = new SimpleIxGenerator(this.generalUtility);
 
     // Load create tx metadata module
     if (this.options === undefined || !this.options!.disableTxMetadataLoad) {
