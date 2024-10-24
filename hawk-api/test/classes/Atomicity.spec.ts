@@ -1,6 +1,5 @@
 import * as web3 from "@solana/web3.js";
 import { Atomicity } from "../../src/classes/Atomicity";
-import { TransactionInstruction } from "@solana/web3.js";
 import { SimpleIxGenerator } from "../../src/classes/SimpleIxGenerator";
 import { sighashMatch } from "../../src/functions";
 
@@ -20,7 +19,7 @@ describe('Atomicity', () => {
   it('Be able to chunk transactions into set of 6 transactions without any error', async () => {
     const connection = new web3.Connection('https://api.mainnet-beta.solana.com');
     const signers: web3.Keypair[] = new Array(5).fill(web3.Keypair.generate());
-    const dummyIx = new TransactionInstruction({
+    const dummyIx = new web3.TransactionInstruction({
       programId: web3.SystemProgram.programId,
       keys: [
         ...signers.map(signer => {
