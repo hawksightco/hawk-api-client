@@ -5,6 +5,7 @@ import { sighashMatch } from "../../src/functions";
 import dotenv from "dotenv";
 import path from "path";
 import { HawkAPI } from "../../src";
+import { JupiterAlts } from "../../src/classes/JupiterAlts";
 
 dotenv.config({
   path: path.join(process.cwd(), 'test', '.env')
@@ -19,6 +20,7 @@ describe('Atomicity', () => {
       web3.Keypair.generate(),
       connection,
       [web3.Keypair.generate()],
+      new JupiterAlts(),
       new SimpleIxGenerator(),
     );
   });

@@ -1,4 +1,5 @@
 import * as web3 from '@solana/web3.js';
+import { JupiterAlts } from './JupiterAlts';
 
 /**
  * Dummy signers
@@ -49,6 +50,7 @@ export class TransactionBatchExecute {
     protected payer: web3.Keypair,
     protected connection: web3.Connection,
     protected signers: web3.Keypair[] = [],
+    protected jupiterAlts: JupiterAlts,
   ) {};
 
   /**

@@ -107,6 +107,7 @@ export class HawkAPI {
       payer,
       connection,
       signers,
+      this.jupAlts,
     );
   }
 
@@ -122,6 +123,7 @@ export class HawkAPI {
       payer,
       connection,
       signers,
+      this.jupAlts,
       this.simpleIxGenerator,
     );
   }

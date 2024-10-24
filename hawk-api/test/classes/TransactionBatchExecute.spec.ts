@@ -4,6 +4,7 @@ import { TransactionInstruction } from "@solana/web3.js";
 import dotenv from "dotenv";
 import path from "path";
 import { HawkAPI } from "../../src";
+import { JupiterAlts } from "../../src/classes/JupiterAlts";
 
 dotenv.config({
   path: path.join(process.cwd(), 'test', '.env')
@@ -18,6 +19,7 @@ describe('TransactionBatchExecute', () => {
       web3.Keypair.generate(),
       connection,
       [web3.Keypair.generate()],
+      new JupiterAlts(),
     );
   });
 

@@ -2,6 +2,7 @@ import * as web3 from '@solana/web3.js';
 import { DummySigners, TransactionBatchExecute } from "./TransactionBatchExecute";
 import { SimpleIxGenerator } from './SimpleIxGenerator';
 import { sighashMatch } from '../functions';
+import { JupiterAlts } from './JupiterAlts';
 
 export class Atomicity extends TransactionBatchExecute {
 
@@ -16,6 +17,7 @@ export class Atomicity extends TransactionBatchExecute {
     payer: web3.Keypair,
     connection: web3.Connection,
     signers: web3.Keypair[] = [],
+    jupiterAlts: JupiterAlts,
     private ixGenerator: SimpleIxGenerator,
   ) {
     super(
@@ -24,6 +26,7 @@ export class Atomicity extends TransactionBatchExecute {
       payer,
       connection,
       signers,
+      jupiterAlts,
     );
   }
 
