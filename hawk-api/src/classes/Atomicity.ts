@@ -97,10 +97,10 @@ export class Atomicity extends TransactionBatchExecute {
     }
 
     // Generate set transaction slot instruction
-    const setTransactionSlotIx = await this.ixGenerator.setTransactionSlot(this.connection, { userWallet: this.userWallet });
+    const setTransactionSlotIx = await this.ixGenerator.iyfMain.setTransactionSlot(this.connection, { userWallet: this.userWallet });
 
     // Generate verify transaction slot instruction
-    const verifyTransactionSlotIx = await this.ixGenerator.verifyTransactionSlot(this.connection, { userWallet: this.userWallet });
+    const verifyTransactionSlotIx = await this.ixGenerator.iyfMain.verifyTransactionSlot(this.connection, { userWallet: this.userWallet });
 
     // Run simulation
     let batch: web3.TransactionInstruction[] = [];

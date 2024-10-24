@@ -17,7 +17,7 @@ export class Anchor {
   iyfMain: anchor.Program<IndexYieldFarming>;
   iyfExtension: anchor.Program<IyfExtension>;
   orcaProgram: anchor.Program<Whirlpool>;
-  
+
   private constructor(
     public connection: web3.Connection,
   ) {

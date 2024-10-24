@@ -50,7 +50,7 @@ export class HawkAPI {
   public readonly search: Search;
 
   /** Simple instruction generator */
-  public readonly simpleIxGenerator: SimpleIxGenerator;
+  public readonly ix: SimpleIxGenerator;
 
   /** Jupiter alts */
   public readonly jupAlts: JupiterAlts;
@@ -72,7 +72,7 @@ export class HawkAPI {
     this._txGenerator = new TxGenerator(client, this.generalUtility);
     this.txGeneratorAutomation = new TxGeneratorAutomations(client, this.generalUtility);
     this.search = new Search(url);
-    this.simpleIxGenerator = new SimpleIxGenerator();
+    this.ix = new SimpleIxGenerator();
     this.jupAlts = new JupiterAlts();
 
     // Load create tx metadata module
@@ -124,7 +124,7 @@ export class HawkAPI {
       connection,
       signers,
       this.jupAlts,
-      this.simpleIxGenerator,
+      this.ix,
     );
   }
 }

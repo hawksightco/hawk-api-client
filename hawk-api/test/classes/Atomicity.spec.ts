@@ -11,6 +11,8 @@ dotenv.config({
   path: path.join(process.cwd(), 'test', '.env')
 });
 
+const TEST_TIMEOUT = 10_000;
+
 describe('Atomicity', () => {
   it('Be able to create new instance of Atomicity without error', async () => {
     const connection = new web3.Connection(process.env.RPC_URL as string);
@@ -135,5 +137,5 @@ describe('Atomicity', () => {
 
     // Expect 6 batch of transaction from given 100 instruction
     expect(txs.length).toBe(6);
-  });
+  }, TEST_TIMEOUT);
 });

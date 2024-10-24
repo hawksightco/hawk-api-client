@@ -8,6 +8,8 @@ dotenv.config({
   path: path.join(process.cwd(), 'test', '.env')
 });
 
+const TEST_TIMEOUT = 30_000;
+
 describe('JupiterAlts', () => {
   it('Be able to create new instance of JupiterAlts without error', async () => {
     new JupiterAlts();
@@ -49,5 +51,5 @@ describe('JupiterAlts', () => {
       new web3.PublicKey(key);
       new web3.PublicKey(hawkApi.jupAlts.alts[key]);
     }
-  });
+  }, TEST_TIMEOUT);
 });
