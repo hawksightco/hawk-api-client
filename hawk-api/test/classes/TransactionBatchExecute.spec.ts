@@ -3,6 +3,7 @@ import { TransactionBatchExecute } from "../../src/classes/TransactionBatchExecu
 import { TransactionInstruction } from "@solana/web3.js";
 import dotenv from "dotenv";
 import path from "path";
+import { HawkAPI } from "../../src";
 
 dotenv.config({
   path: path.join(process.cwd(), 'test', '.env')
@@ -22,6 +23,7 @@ describe('TransactionBatchExecute', () => {
 
   it('Be able to chunk transactions into set of 5 transactions without any error', async () => {
     const connection = new web3.Connection(process.env.RPC_URL as string);
+    const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
     const signers = new Array(5).fill(web3.Keypair.generate());
     const dummyIx = new TransactionInstruction({
       programId: web3.SystemProgram.programId,
@@ -33,13 +35,13 @@ describe('TransactionBatchExecute', () => {
       ],
       data: Buffer.from([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
     })
-    const txBatch = new TransactionBatchExecute(
-      [],
-      new Array(100).fill(dummyIx, 0, 100),
-      signers[0],
+    const txBatch = hawkAPI.batchExecute({
+      lookupTableAddresses: [],
+      instructions: new Array(100).fill(dummyIx, 0, 100),
+      payer: signers[0],
       connection,
       signers,
-    );
+    });
 
     // Build batch
     const batch = await txBatch.buildBatch();
@@ -55,6 +57,7 @@ describe('TransactionBatchExecute', () => {
 
   it('Be able to create batch of versioned transactions without any error', async () => {
     const connection = new web3.Connection(process.env.RPC_URL as string);
+    const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
     const signers: web3.Keypair[] = new Array(5).fill(web3.Keypair.generate());
     const dummyIx = new web3.TransactionInstruction({
       programId: web3.SystemProgram.programId,
@@ -66,13 +69,13 @@ describe('TransactionBatchExecute', () => {
       ],
       data: Buffer.from([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
     })
-    const txBatch = new TransactionBatchExecute(
-      [],
-      new Array(100).fill(dummyIx, 0, 100),
-      signers[0],
+    const txBatch = hawkAPI.batchExecute({
+      lookupTableAddresses: [],
+      instructions: new Array(100).fill(dummyIx, 0, 100),
+      payer: signers[0],
       connection,
       signers,
-    );
+    });
 
     // Build batch
     const batch = await txBatch.buildBatch();
