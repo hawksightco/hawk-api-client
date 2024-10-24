@@ -13,6 +13,29 @@ describe('JupiterAlts', () => {
     new JupiterAlts();
   });
 
+  it('Should throw an error if URL is not set', async () => {
+    const hawkApi = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
+    let thrownError = false;
+    try {
+      await hawkApi.jupAlts.downloadAlts();
+    } catch {
+      thrownError = true;
+    }
+    expect(thrownError).toBe(true);
+  });
+
+  it('Should throw an error if credential is not set', async () => {
+    const hawkApi = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
+    hawkApi.jupAlts.setApiUrl(`${process.env.WORKER_URL}/jupiterAlts`);
+    let thrownError = false;
+    try {
+      await hawkApi.jupAlts.downloadAlts();
+    } catch {
+      thrownError = true;
+    }
+    expect(thrownError).toBe(true);
+  });
+
   it('Be able to download alts from Jupiter', async () => {
     const hawkApi = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
     hawkApi.jupAlts.setApiUrl(`${process.env.WORKER_URL}/jupiterAlts`);

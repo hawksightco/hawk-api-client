@@ -28,7 +28,6 @@ describe('Atomicity', () => {
   it('Be able to chunk transactions into set of 6 transactions without any error using atomicity', async () => {
     const connection = new web3.Connection(process.env.RPC_URL as string);
     const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
-
     const signers: web3.Keypair[] = new Array(5).fill(web3.Keypair.generate());
     const dummyIx = new web3.TransactionInstruction({
       programId: web3.SystemProgram.programId,
@@ -39,7 +38,12 @@ describe('Atomicity', () => {
         ...new Array(25).fill({ pubkey: web3.SystemProgram.programId, isSigner: false, isWritable: false }, 0, 25)
       ],
       data: Buffer.from([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-    })
+    });
+    hawkAPI.jupAlts.setApiUrl(`${process.env.WORKER_URL}/jupiterAlts`);
+    hawkAPI.jupAlts.setCredentials(
+      process.env.WORKER_USERNAME as string,
+      process.env.WORKER_PASSWORD as string,
+    );
     const atomicity = hawkAPI.atomicity({
       lookupTableAddresses: [],
       instructions: new Array(100).fill(dummyIx, 0, 100),
@@ -96,7 +100,6 @@ describe('Atomicity', () => {
   it('Be able to create batch of versioned transactions without any error', async () => {
     const connection = new web3.Connection(process.env.RPC_URL as string);
     const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
-
     const signers: web3.Keypair[] = new Array(5).fill(web3.Keypair.generate());
     const dummyIx = new web3.TransactionInstruction({
       programId: web3.SystemProgram.programId,
@@ -107,7 +110,12 @@ describe('Atomicity', () => {
         ...new Array(25).fill({ pubkey: web3.SystemProgram.programId, isSigner: false, isWritable: false }, 0, 25)
       ],
       data: Buffer.from([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-    })
+    });
+    hawkAPI.jupAlts.setApiUrl(`${process.env.WORKER_URL}/jupiterAlts`);
+    hawkAPI.jupAlts.setCredentials(
+      process.env.WORKER_USERNAME as string,
+      process.env.WORKER_PASSWORD as string,
+    );
     const atomicity = hawkAPI.atomicity({
       lookupTableAddresses: [],
       instructions: new Array(100).fill(dummyIx, 0, 100),

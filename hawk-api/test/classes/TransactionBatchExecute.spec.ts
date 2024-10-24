@@ -36,7 +36,12 @@ describe('TransactionBatchExecute', () => {
         ...new Array(25).fill({ pubkey: web3.SystemProgram.programId, isSigner: false, isWritable: false }, 0, 25)
       ],
       data: Buffer.from([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-    })
+    });
+    hawkAPI.jupAlts.setApiUrl(`${process.env.WORKER_URL}/jupiterAlts`);
+    hawkAPI.jupAlts.setCredentials(
+      process.env.WORKER_USERNAME as string,
+      process.env.WORKER_PASSWORD as string,
+    );
     const txBatch = hawkAPI.batchExecute({
       lookupTableAddresses: [],
       instructions: new Array(100).fill(dummyIx, 0, 100),
@@ -70,7 +75,12 @@ describe('TransactionBatchExecute', () => {
         ...new Array(25).fill({ pubkey: web3.SystemProgram.programId, isSigner: false, isWritable: false }, 0, 25)
       ],
       data: Buffer.from([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-    })
+    });
+    hawkAPI.jupAlts.setApiUrl(`${process.env.WORKER_URL}/jupiterAlts`);
+    hawkAPI.jupAlts.setCredentials(
+      process.env.WORKER_USERNAME as string,
+      process.env.WORKER_PASSWORD as string,
+    );
     const txBatch = hawkAPI.batchExecute({
       lookupTableAddresses: [],
       instructions: new Array(100).fill(dummyIx, 0, 100),

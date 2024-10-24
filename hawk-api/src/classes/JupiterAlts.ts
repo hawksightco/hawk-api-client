@@ -56,6 +56,15 @@ export class JupiterAlts {
    * @returns
    */
   async downloadAlts() {
+
+    if (this.url === undefined) {
+      throw new Error('Please set endpoint URL via hawkAPI.jupAlts.setApiUrl first!');
+    }
+
+    if (this.username === undefined || this.password === undefined) {
+      throw new Error('Please set credentials via hawkAPI.jupAlts.setCredentials() first!');
+    }
+
     const base64Credentials = btoa(`${this.username!}:${this.password!}`);
     const hash = await (await fetch(this.url!, { headers: { Authorization: `Basic ${base64Credentials}`, Range: 'bytes=9-72'} })).text();
 

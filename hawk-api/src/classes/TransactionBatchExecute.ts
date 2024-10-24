@@ -57,17 +57,74 @@ export class TransactionBatchExecute {
    * Downoad address lookup table from given cluster
    */
   async downloadAlts() {
-    // Skip if we already downloaded alts from the cluster
-    if (this.alts.length > 0 && this.alts.length === this.lookupTableAddresses.length) return;
+
+    // Public keys across all instructions
+    const pubkeys = this.getPubkeyFromInstruction();
+
+    // Download jupiter alts first
+    await this.jupiterAlts.downloadAlts();
+
+    // Then find alts from pubkeys
+    const jupAlts = this.jupiterAlts.findAltByPubkeys(pubkeys);
+
+    // Then append jupiter alts in the lookup table address
+    this.lookupTableAddresses.push(...jupAlts);
+
+    // Then make sure lookup table addresses are unique
+    this.filterLookupTables();
+
+    // Get list of lookup tables to download
+    const lookupTableAddresses = this.getListOfAltsToDownload();
 
     // Download if address lookup table does not match with downloaded alts
-    for (const lookupTable of this.lookupTableAddresses) {
+    for (const lookupTable of lookupTableAddresses) {
       const alt = await this.connection.getAddressLookupTable(lookupTable);
       if (alt.value === null) {
         throw new Error(`Address lookup table: ${lookupTable} does not exist on the blockchain.`);
       }
       this.alts.push(alt.value);
     }
+  }
+
+  /**
+   * Get list of lookup tables to download
+   */
+  private getListOfAltsToDownload(): web3.PublicKey[] {
+    const alts = this.alts.map(alt => alt.key.toBase58());
+    const toDownload: web3.PublicKey[] = [];
+    for (const alt of this.lookupTableAddresses) {
+      if (!alts.includes(alt.toBase58())) {
+        toDownload.push(alt);
+      }
+    }
+    return toDownload;
+  }
+
+  /**
+   * Filter lookup tables
+   */
+  private filterLookupTables() {
+    const map: Record<string, 1> = {};
+    for (const alt of this.lookupTableAddresses) {
+      map[alt.toBase58()] = 1;
+    }
+    const filtered: web3.PublicKey[] = [];
+    for (const alt in map) {
+      filtered.push(new web3.PublicKey(alt));
+    }
+    this.lookupTableAddresses = filtered;
+  }
+
+  /**
+   * Get public keys from instruction
+   * @returns
+   */
+  private getPubkeyFromInstruction(): web3.PublicKey[] {
+    const pubkeys: web3.PublicKey[] = [];
+    this.instructions.map(ix => {
+      pubkeys.push(...ix.keys.map(meta => meta.pubkey));
+    });
+    return pubkeys;
   }
 
   /**
