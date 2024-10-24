@@ -102,4 +102,40 @@ describe('HawkAPI Unit Test', () => {
     expect(sixthIxData.length).toBeGreaterThanOrEqual(8);
     expect(sighashMatch(sixthIxData, "verifyTransactionSlot")).toBe(true);
   });
+
+  it('Be able to create batch of versioned transactions without any error', async () => {
+    const connection = new web3.Connection(process.env.RPC_URL as string);
+    const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
+
+    const signers: web3.Keypair[] = new Array(5).fill(web3.Keypair.generate());
+    const dummyIx = new web3.TransactionInstruction({
+      programId: web3.SystemProgram.programId,
+      keys: [
+        ...signers.map(signer => {
+          return { pubkey: signer.publicKey, isSigner: true, isWritable: true };
+        }),
+        ...new Array(25).fill({ pubkey: web3.SystemProgram.programId, isSigner: false, isWritable: false }, 0, 25)
+      ],
+      data: Buffer.from([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+    })
+    const atomicity = hawkAPI.atomicity({
+      lookupTableAddresses: [],
+      instructions: new Array(100).fill(dummyIx, 0, 100),
+      payer: signers[0],
+      connection: connection,
+      signers,
+    });
+
+    // Set dummy user wallet
+    atomicity.setUserWallet(signers[0].publicKey);
+
+    // Build batch
+    const batch = await atomicity.buildBatch();
+
+    // Build versioned transactions
+    const txs = await atomicity.buildV0Transactions(batch);
+
+    // Expect 6 batch of transaction from given 100 instruction
+    expect(txs.length).toBe(6);
+  });
 });
