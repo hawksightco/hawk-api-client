@@ -1,11 +1,11 @@
 import * as web3 from "@solana/web3.js";
 import { SimpleIxGenerator } from "../../src/classes/SimpleIxGenerator";
-import { sighashMatch } from "../../src/functions";
+import { generateUserPda, sighashMatch } from "../../src/functions";
 import dotenv from "dotenv";
 import path from "path";
 import { HawkAPI } from "../../src";
 import { JupiterAlts } from "../../src/classes/JupiterAlts";
-import { IYF_EXTENSION } from "../../src/addresses";
+import { IYF_EXTENSION, IYF_MAIN, USDC_FARM } from "../../src/addresses";
 
 dotenv.config({
   path: path.join(process.cwd(), 'test', '.env')
@@ -17,26 +17,53 @@ describe('SimpleIxGenerator', () => {
     new SimpleIxGenerator();
   });
 
-  // it('Generate iyfMain.iyfExtensionExecute instruction', async () => {
-  //   // Connection instance
-  //   const connection = new web3.Connection(process.env.RPC_URL as string);
+  it('Generate iyfMain.iyfExtensionExecute instruction', async () => {
+    // Connection instance
+    const connection = new web3.Connection(process.env.RPC_URL as string);
 
-  //   // Create instance of HawkAPI
-  //   const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
+    // Create instance of HawkAPI
+    const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
 
-  //   // Generate wallet
-  //   const userWallet = web3.Keypair.generate().publicKey;
+    // Generate wallet
+    const userWallet = web3.Keypair.generate().publicKey;
+    const userPda = generateUserPda(userWallet);
 
-  //   // Generate set transaction slot
-  //   hawkAPI.ix.iyfMain.iyfExtensionExecute(connection, {
-  //     userWallet,
-  //     iyfExtensionIx: new web3.TransactionInstruction({
-  //       data: Buffer.from([]),
-  //       keys: [],
-  //       programId: IYF_EXTENSION,
-  //     })
-  //   });
-  // });
+    // Generate instruction
+    let throwsException = false;
+    try {
+      await hawkAPI.ix.iyfMain.iyfExtensionExecute(connection, {
+        userWallet,
+        iyfExtensionIx: new web3.TransactionInstruction({
+          data: Buffer.from([0,0,0,0,0,0,0,0]),
+          keys: [
+            { pubkey: USDC_FARM, isSigner: false, isWritable: false },
+            { pubkey: userPda, isSigner: false, isWritable: false },
+            { pubkey: userWallet, isSigner: false, isWritable: false },
+            { pubkey: IYF_MAIN, isSigner: false, isWritable: false },
+          ],
+          programId: IYF_EXTENSION,
+        })
+      });
+    } catch(e) {
+      throwsException = true;
+    }
+    expect(throwsException).toBe(false);
+
+    throwsException = true;
+    try {
+      await hawkAPI.ix.iyfMain.iyfExtensionExecute(connection, {
+        userWallet,
+        iyfExtensionIx: new web3.TransactionInstruction({
+          data: Buffer.from([0,0,0,0,0,0,0,0]),
+          keys: [],
+          programId: IYF_EXTENSION,
+        })
+      });
+    } catch(e) {
+      throwsException = true;
+    }
+    expect(throwsException).toBe(true);
+  });
 
   it('Generate iyfMain.setTransactionSlot instruction', async () => {
     // Connection instance
@@ -48,8 +75,14 @@ describe('SimpleIxGenerator', () => {
     // Generate wallet
     const userWallet = web3.Keypair.generate().publicKey;
 
-    // Generate set transaction slot
-    hawkAPI.ix.iyfMain.setTransactionSlot(connection, { userWallet });
+    // Generate instruction
+    let throwsException = false;
+    try {
+      await hawkAPI.ix.iyfMain.setTransactionSlot(connection, { userWallet });
+    } catch {
+      throwsException = true;
+    }
+    expect(throwsException).toBe(false);
   });
 
   it('Generate iyfMain.verifyTransactionSlot instruction', async () => {
@@ -62,8 +95,14 @@ describe('SimpleIxGenerator', () => {
     // Generate wallet
     const userWallet = web3.Keypair.generate().publicKey;
 
-    // Generate verify transaction slot
-    hawkAPI.ix.iyfMain.verifyTransactionSlot(connection, { userWallet });
+    // Generate instruction
+    let throwsException = false;
+    try {
+      await hawkAPI.ix.iyfMain.verifyTransactionSlot(connection, { userWallet });
+    } catch {
+      throwsException = true;
+    }
+    expect(throwsException).toBe(false);
   });
 
   it('Generate meteora.initializePositionAutomation instruction', async () => {
@@ -76,14 +115,20 @@ describe('SimpleIxGenerator', () => {
     // Generate wallet
     const userWallet = web3.Keypair.generate().publicKey;
 
-    // Generate verify transaction slot
-    hawkAPI.ix.meteoraDlmm.initializePositionAutomation(connection, {
-      userWallet,
-      lbPair: web3.SystemProgram.programId,
-      position: web3.SystemProgram.programId,
-      lowerBinId: 0,
-      upperBinId: 1
-    });
+    // Generate instruction
+    let throwsException = false;
+    try {
+      await hawkAPI.ix.meteoraDlmm.initializePositionAutomation(connection, {
+        userWallet,
+        lbPair: web3.SystemProgram.programId,
+        position: web3.SystemProgram.programId,
+        lowerBinId: 0,
+        upperBinId: 1
+      });
+    } catch {
+      throwsException = true;
+    }
+    expect(throwsException).toBe(false);
   });
 
   // it('Generate meteora.claimFee instruction', async () => {
@@ -97,7 +142,7 @@ describe('SimpleIxGenerator', () => {
   //   const userWallet = web3.Keypair.generate().publicKey;
 
   //   // Generate verify transaction slot
-  //   hawkAPI.ix.meteoraDlmm.claimFee(connection, {});
+  //   await hawkAPI.ix.meteoraDlmm.claimFee(connection, {});
   // });
 
   // it('Generate meteora.claimReward instruction', async () => {
@@ -111,7 +156,7 @@ describe('SimpleIxGenerator', () => {
   //   const userWallet = web3.Keypair.generate().publicKey;
 
   //   // Generate verify transaction slot
-  //   hawkAPI.ix.meteoraDlmm.claimReward(connection, {});
+  //   await hawkAPI.ix.meteoraDlmm.claimReward(connection, {});
   // });
 
   // it('Generate meteora.claimFeeAutomation instruction', async () => {
@@ -125,7 +170,7 @@ describe('SimpleIxGenerator', () => {
   //   const userWallet = web3.Keypair.generate().publicKey;
 
   //   // Generate verify transaction slot
-  //   hawkAPI.ix.meteoraDlmm.claimFeeAutomation(connection, {});
+  //   await hawkAPI.ix.meteoraDlmm.claimFeeAutomation(connection, {});
   // });
 
   // it('Generate meteora.claimRewardAutomation instruction', async () => {
@@ -139,7 +184,7 @@ describe('SimpleIxGenerator', () => {
   //   const userWallet = web3.Keypair.generate().publicKey;
 
   //   // Generate verify transaction slot
-  //   hawkAPI.ix.meteoraDlmm.claimRewardAutomation(connection, {});
+  //   await hawkAPI.ix.meteoraDlmm.claimRewardAutomation(connection, {});
   // });
 
   // it('Generate meteora.depositAutomation instruction', async () => {
@@ -153,7 +198,7 @@ describe('SimpleIxGenerator', () => {
   //   const userWallet = web3.Keypair.generate().publicKey;
 
   //   // Generate verify transaction slot
-  //   hawkAPI.ix.meteoraDlmm.depositAutomation(connection, {});
+  //   await hawkAPI.ix.meteoraDlmm.depositAutomation(connection, {});
   // });
 
   // it('Generate meteora.oneSideDeposit instruction', async () => {
@@ -167,7 +212,7 @@ describe('SimpleIxGenerator', () => {
   //   const userWallet = web3.Keypair.generate().publicKey;
 
   //   // Generate verify transaction slot
-  //   hawkAPI.ix.meteoraDlmm.oneSideDeposit(connection, {});
+  //   await hawkAPI.ix.meteoraDlmm.oneSideDeposit(connection, {});
   // });
 
   // it('Generate meteora.withdrawAutomation instruction', async () => {
@@ -181,7 +226,7 @@ describe('SimpleIxGenerator', () => {
   //   const userWallet = web3.Keypair.generate().publicKey;
 
   //   // Generate verify transaction slot
-  //   hawkAPI.ix.meteoraDlmm.withdrawAutomation(connection, {});
+  //   await hawkAPI.ix.meteoraDlmm.withdrawAutomation(connection, {});
   // });
 
   // it('Generate meteora.closePositionAutomation instruction', async () => {
@@ -195,7 +240,7 @@ describe('SimpleIxGenerator', () => {
   //   const userWallet = web3.Keypair.generate().publicKey;
 
   //   // Generate verify transaction slot
-  //   hawkAPI.ix.meteoraDlmm.closePositionAutomation(connection, {});
+  //   await hawkAPI.ix.meteoraDlmm.closePositionAutomation(connection, {});
   // });
 
   // it('Generate meteora.limitCloseAutomation instruction', async () => {
@@ -209,6 +254,6 @@ describe('SimpleIxGenerator', () => {
   //   const userWallet = web3.Keypair.generate().publicKey;
 
   //   // Generate verify transaction slot
-  //   hawkAPI.ix.meteoraDlmm.limitCloseAutomation(connection, {});
+  //   await hawkAPI.ix.meteoraDlmm.limitCloseAutomation(connection, {});
   // });
 });

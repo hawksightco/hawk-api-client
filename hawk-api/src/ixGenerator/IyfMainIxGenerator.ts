@@ -3,6 +3,8 @@ import { Anchor } from "../anchor";
 import { setTransactionSlot, verifyTransactionSlot, AtomicityContextParams } from "../hawksight";
 import { generateUserPda } from "../functions";
 import { IYF_EXTENSION, IYF_MAIN, USDC_FARM } from "../addresses";
+import { Transactions } from "../classes/Transactions";
+import { InitializeStorageTokenAccount } from "../types";
 
 type IyfExtensionExecute = {
   userWallet: web3.PublicKey,
@@ -68,6 +70,7 @@ export class IyfMainIxGenerator {
     const invalidInstruction =
       !iyfExtensionIx.programId.equals(IYF_EXTENSION) ||
       iyfExtensionIx.keys.length < 4 ||
+      iyfExtensionIx.data.length < 8 ||
       !iyfExtensionIx.keys[0].pubkey.equals(USDC_FARM) ||
       !iyfExtensionIx.keys[1].pubkey.equals(userPda) ||
       !iyfExtensionIx.keys[2].pubkey.equals(userWallet) ||

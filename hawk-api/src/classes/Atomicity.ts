@@ -42,10 +42,7 @@ export class Atomicity extends TransactionBatchExecute {
    * @param ix
    */
   private isAtomicityIx(ix: web3.TransactionInstruction): boolean {
-    if (ix.data.length >= 8) {
-      return sighashMatch(ix.data, "setTransactionSlot") || sighashMatch(ix.data, "verifyTransactionSlot")
-    }
-    return false;
+    return ix.data.length >= 8 && sighashMatch(ix.data, "setTransactionSlot") || sighashMatch(ix.data, "verifyTransactionSlot")
   }
 
   /**

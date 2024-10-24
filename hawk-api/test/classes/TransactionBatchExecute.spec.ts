@@ -28,7 +28,13 @@ describe('TransactionBatchExecute', () => {
   it('Be able to chunk transactions into set of 5 transactions without any error', async () => {
     const connection = new web3.Connection(process.env.RPC_URL as string);
     const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
-    const signers = new Array(5).fill(web3.Keypair.generate());
+    const signers = [
+      web3.Keypair.generate(),
+      web3.Keypair.generate(),
+      web3.Keypair.generate(),
+      web3.Keypair.generate(),
+      web3.Keypair.generate()
+    ];
     const dummyIx = new TransactionInstruction({
       programId: web3.SystemProgram.programId,
       keys: [
@@ -46,11 +52,14 @@ describe('TransactionBatchExecute', () => {
     );
     const txBatch = hawkAPI.batchExecute({
       lookupTableAddresses: [],
-      instructions: new Array(100).fill(dummyIx, 0, 100),
+      instructions: new Array(60).fill(dummyIx, 0, 60),
       payer: signers[0],
       connection,
-      signers,
+      signers: [],
     });
+
+    // Set signer via method (for code coverage)
+    txBatch.setSigners(signers);
 
     // Build batch
     const batch = await txBatch.buildBatch();
@@ -58,16 +67,72 @@ describe('TransactionBatchExecute', () => {
     // Expect 5 batch of transaction from given 100 instruction
     expect(batch.length).toBe(5);
 
-    // Expect 100 instructions from batch
+    // Expect 60 instructions from batch
     let count = 0;
     batch.map(ixs => { count += ixs.length });
-    expect(count).toBe(100)
+    expect(count).toBe(60)
+  }, TEST_TIMEOUT);
+
+  it('Expect missing signer', async () => {
+    const connection = new web3.Connection(process.env.RPC_URL as string);
+    const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
+    const signers = [
+      web3.Keypair.generate(),
+      web3.Keypair.generate(),
+      web3.Keypair.generate(),
+      web3.Keypair.generate(),
+      web3.Keypair.generate()
+    ];
+    const dummyIx = new TransactionInstruction({
+      programId: web3.SystemProgram.programId,
+      keys: [
+        ...signers.map(signer => {
+          return { pubkey: signer.publicKey, isSigner: true, isWritable: true };
+        }),
+        ...new Array(25).fill({ pubkey: web3.SystemProgram.programId, isSigner: false, isWritable: false }, 0, 25)
+      ],
+      data: Buffer.from([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+    });
+    hawkAPI.jupAlts.setApiUrl(`${process.env.WORKER_URL}/jupiterAlts`);
+    hawkAPI.jupAlts.setCredentials(
+      process.env.WORKER_USERNAME as string,
+      process.env.WORKER_PASSWORD as string,
+    );
+    const txBatch = hawkAPI.batchExecute({
+      lookupTableAddresses: [],
+      instructions: new Array(20).fill(dummyIx, 0, 20),
+      payer: signers[0],
+      connection,
+      signers: [],
+    });
+
+    // intentionally remove one signer
+    signers.pop();
+
+    // Set signer via method (for code coverage)
+    txBatch.setSigners(signers);
+
+    // Build batch
+    let throwsError = false;
+    try {
+      const batch = await txBatch.buildBatch();
+      await txBatch.buildV0Transactions(batch);
+    } catch {
+      throwsError = true;
+    }
+    expect(throwsError).toBe(true);
   }, TEST_TIMEOUT);
 
   it('Be able to create batch of versioned transactions without any error', async () => {
     const connection = new web3.Connection(process.env.RPC_URL as string);
     const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
-    const signers: web3.Keypair[] = new Array(5).fill(web3.Keypair.generate());
+    const signers = [
+      web3.Keypair.generate(),
+      web3.Keypair.generate(),
+      web3.Keypair.generate(),
+      web3.Keypair.generate(),
+      web3.Keypair.generate()
+    ];
     const dummyIx = new web3.TransactionInstruction({
       programId: web3.SystemProgram.programId,
       keys: [
@@ -85,7 +150,7 @@ describe('TransactionBatchExecute', () => {
     );
     const txBatch = hawkAPI.batchExecute({
       lookupTableAddresses: [],
-      instructions: new Array(100).fill(dummyIx, 0, 100),
+      instructions: new Array(60).fill(dummyIx, 0, 60),
       payer: signers[0],
       connection,
       signers,

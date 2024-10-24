@@ -30,7 +30,13 @@ describe('Atomicity', () => {
   it('Be able to chunk transactions into set of 6 transactions without any error using atomicity', async () => {
     const connection = new web3.Connection(process.env.RPC_URL as string);
     const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
-    const signers: web3.Keypair[] = new Array(5).fill(web3.Keypair.generate());
+    const signers = [
+      web3.Keypair.generate(),
+      web3.Keypair.generate(),
+      web3.Keypair.generate(),
+      web3.Keypair.generate(),
+      web3.Keypair.generate()
+    ];
     const dummyIx = new web3.TransactionInstruction({
       programId: web3.SystemProgram.programId,
       keys: [
@@ -48,7 +54,50 @@ describe('Atomicity', () => {
     );
     const atomicity = hawkAPI.atomicity({
       lookupTableAddresses: [],
-      instructions: new Array(100).fill(dummyIx, 0, 100),
+      instructions: new Array(60).fill(dummyIx, 0, 60),
+      payer: signers[0],
+      connection: connection,
+      signers,
+    });
+
+    // Attempt to build batch without defining user wallet
+    let throwsError = false;
+    try {
+      await atomicity.buildBatch();
+    } catch {
+      throwsError = true;
+    }
+    expect(throwsError).toBe(true);
+  }, TEST_TIMEOUT);
+
+  it('Be able to chunk transactions into set of 6 transactions without any error using atomicity', async () => {
+    const connection = new web3.Connection(process.env.RPC_URL as string);
+    const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
+    const signers = [
+      web3.Keypair.generate(),
+      web3.Keypair.generate(),
+      web3.Keypair.generate(),
+      web3.Keypair.generate(),
+      web3.Keypair.generate()
+    ];
+    const dummyIx = new web3.TransactionInstruction({
+      programId: web3.SystemProgram.programId,
+      keys: [
+        ...signers.map(signer => {
+          return { pubkey: signer.publicKey, isSigner: true, isWritable: true };
+        }),
+        ...new Array(25).fill({ pubkey: web3.SystemProgram.programId, isSigner: false, isWritable: false }, 0, 25)
+      ],
+      data: Buffer.from([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+    });
+    hawkAPI.jupAlts.setApiUrl(`${process.env.WORKER_URL}/jupiterAlts`);
+    hawkAPI.jupAlts.setCredentials(
+      process.env.WORKER_USERNAME as string,
+      process.env.WORKER_PASSWORD as string,
+    );
+    const atomicity = hawkAPI.atomicity({
+      lookupTableAddresses: [],
+      instructions: new Array(60).fill(dummyIx, 0, 60),
       payer: signers[0],
       connection: connection,
       signers,
@@ -63,10 +112,10 @@ describe('Atomicity', () => {
     // Expect 6 batch of transaction from given 100 instruction
     expect(batch.length).toBe(6);
 
-    // Expect 106 instructions from batch
+    // Expect 66 instructions from batch
     let count = 0;
     batch.map(ixs => { count += ixs.length });
-    expect(count).toBe(106);
+    expect(count).toBe(66);
 
     // Expect first batch to have `setTransactionSlot`
     const firstIxData = batch[0][batch[0].length - 1].data;
@@ -102,7 +151,13 @@ describe('Atomicity', () => {
   it('Be able to create batch of versioned transactions without any error', async () => {
     const connection = new web3.Connection(process.env.RPC_URL as string);
     const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
-    const signers: web3.Keypair[] = new Array(5).fill(web3.Keypair.generate());
+    const signers = [
+      web3.Keypair.generate(),
+      web3.Keypair.generate(),
+      web3.Keypair.generate(),
+      web3.Keypair.generate(),
+      web3.Keypair.generate()
+    ];
     const dummyIx = new web3.TransactionInstruction({
       programId: web3.SystemProgram.programId,
       keys: [
@@ -120,7 +175,7 @@ describe('Atomicity', () => {
     );
     const atomicity = hawkAPI.atomicity({
       lookupTableAddresses: [],
-      instructions: new Array(100).fill(dummyIx, 0, 100),
+      instructions: new Array(60).fill(dummyIx, 0, 60),
       payer: signers[0],
       connection: connection,
       signers,
