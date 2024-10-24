@@ -10,6 +10,8 @@ dotenv.config({
   path: path.join(process.cwd(), 'test', '.env')
 });
 
+const TEST_TIMEOUT = 15_000;
+
 describe('TransactionBatchExecute', () => {
   it('Be able to create new instance of TransactionBatchExecute without error', async () => {
     const connection = new web3.Connection(process.env.RPC_URL as string);
@@ -60,7 +62,7 @@ describe('TransactionBatchExecute', () => {
     let count = 0;
     batch.map(ixs => { count += ixs.length });
     expect(count).toBe(100)
-  });
+  }, TEST_TIMEOUT);
 
   it('Be able to create batch of versioned transactions without any error', async () => {
     const connection = new web3.Connection(process.env.RPC_URL as string);
@@ -97,5 +99,5 @@ describe('TransactionBatchExecute', () => {
 
     // Expect 5 batch of transaction from given 100 instruction
     expect(txs.length).toBe(5);
-  });
+  }, TEST_TIMEOUT);
 });

@@ -11,7 +11,7 @@ dotenv.config({
   path: path.join(process.cwd(), 'test', '.env')
 });
 
-const TEST_TIMEOUT = 10_000;
+const TEST_TIMEOUT = 15_000;
 
 describe('Atomicity', () => {
   it('Be able to create new instance of Atomicity without error', async () => {
@@ -97,7 +97,7 @@ describe('Atomicity', () => {
     const sixthIxData = batch[5][batch[5].length - 1].data;
     expect(sixthIxData.length).toBeGreaterThanOrEqual(8);
     expect(sighashMatch(sixthIxData, "verifyTransactionSlot")).toBe(true);
-  });
+  }, TEST_TIMEOUT);
 
   it('Be able to create batch of versioned transactions without any error', async () => {
     const connection = new web3.Connection(process.env.RPC_URL as string);
