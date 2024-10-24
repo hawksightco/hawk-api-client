@@ -1,6 +1,12 @@
 import * as web3 from "@solana/web3.js";
 import { HawkAPI } from "../../src";
 import { sighashMatch } from "../../src/functions";
+import dotenv from "dotenv";
+import path from "path";
+
+dotenv.config({
+  path: path.join(process.cwd(), 'test', '.env')
+});
 
 describe('HawkAPI Unit Test', () => {
   it('Be able to create new instance of hawk api without error', async () => {
@@ -8,7 +14,7 @@ describe('HawkAPI Unit Test', () => {
   });
 
   it('Be able to call batchExecute method without any error', async () => {
-    const connection = new web3.Connection('https://api.mainnet-beta.solana.com');
+    const connection = new web3.Connection(process.env.RPC_URL as string);
     new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true }).batchExecute({
       lookupTableAddresses: [],
       instructions: [],
@@ -19,7 +25,7 @@ describe('HawkAPI Unit Test', () => {
   });
 
   it('Be able to call atomicity method without any error', async () => {
-    const connection = new web3.Connection('https://api.mainnet-beta.solana.com');
+    const connection = new web3.Connection(process.env.RPC_URL as string);
     new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true }).atomicity({
       lookupTableAddresses: [],
       instructions: [],
@@ -30,7 +36,7 @@ describe('HawkAPI Unit Test', () => {
   });
 
   it('Be able to chunk transactions into set of 6 transactions without any error using atomicity', async () => {
-    const connection = new web3.Connection('https://api.mainnet-beta.solana.com');
+    const connection = new web3.Connection(process.env.RPC_URL as string);
     const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
 
     const signers: web3.Keypair[] = new Array(5).fill(web3.Keypair.generate());

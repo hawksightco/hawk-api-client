@@ -2,10 +2,16 @@ import * as web3 from "@solana/web3.js";
 import { Atomicity } from "../../src/classes/Atomicity";
 import { SimpleIxGenerator } from "../../src/classes/SimpleIxGenerator";
 import { sighashMatch } from "../../src/functions";
+import dotenv from "dotenv";
+import path from "path";
+
+dotenv.config({
+  path: path.join(process.cwd(), 'test', '.env')
+});
 
 describe('Atomicity', () => {
   it('Be able to create new instance of Atomicity without error', async () => {
-    const connection = new web3.Connection('https://api.mainnet-beta.solana.com');
+    const connection = new web3.Connection(process.env.RPC_URL as string);
     new Atomicity(
       [],
       [],
@@ -17,7 +23,7 @@ describe('Atomicity', () => {
   });
 
   it('Be able to chunk transactions into set of 6 transactions without any error', async () => {
-    const connection = new web3.Connection('https://api.mainnet-beta.solana.com');
+    const connection = new web3.Connection(process.env.RPC_URL as string);
     const signers: web3.Keypair[] = new Array(5).fill(web3.Keypair.generate());
     const dummyIx = new web3.TransactionInstruction({
       programId: web3.SystemProgram.programId,
@@ -81,5 +87,40 @@ describe('Atomicity', () => {
     const sixthIxData = batch[5][batch[5].length - 1].data;
     expect(sixthIxData.length).toBeGreaterThanOrEqual(8);
     expect(sighashMatch(sixthIxData, "verifyTransactionSlot")).toBe(true);
+  });
+
+  it('Be able to create batch of versioned transactions without any error', async () => {
+    const connection = new web3.Connection(process.env.RPC_URL as string);
+    const signers: web3.Keypair[] = new Array(5).fill(web3.Keypair.generate());
+    const dummyIx = new web3.TransactionInstruction({
+      programId: web3.SystemProgram.programId,
+      keys: [
+        ...signers.map(signer => {
+          return { pubkey: signer.publicKey, isSigner: true, isWritable: true };
+        }),
+        ...new Array(25).fill({ pubkey: web3.SystemProgram.programId, isSigner: false, isWritable: false }, 0, 25)
+      ],
+      data: Buffer.from([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+    })
+    const atomicity = new Atomicity(
+      [],
+      new Array(100).fill(dummyIx, 0, 100),
+      signers[0],
+      connection,
+      signers,
+      new SimpleIxGenerator(),
+    );
+
+    // Set dummy user wallet
+    atomicity.setUserWallet(signers[0].publicKey);
+
+    // Build batch
+    const batch = await atomicity.buildBatch();
+
+    // Build versioned transactions
+    const txs = await atomicity.buildV0Transactions(batch);
+
+    // Expect 6 batch of transaction from given 100 instruction
+    expect(txs.length).toBe(6);
   });
 });

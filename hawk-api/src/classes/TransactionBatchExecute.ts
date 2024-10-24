@@ -163,6 +163,30 @@ export class TransactionBatchExecute {
   }
 
   /**
+   * Build versioned transactions from given batches of transactions
+   *
+   * @param batches
+   * @returns
+   */
+  async buildV0Transactions(batches: web3.TransactionInstruction[][]): Promise<web3.VersionedTransaction[]> {
+    const latestBlockhash = await this.connection.getLatestBlockhash();
+    const signedVersionedTxs: web3.VersionedTransaction[] = [];
+    for (const batch of batches) {
+      const alts = this.findRequiredAltsForBatch(batch);
+      const messageV0 = new web3.TransactionMessage({
+        payerKey: this.payer.publicKey,
+        instructions: batch,
+        recentBlockhash: latestBlockhash.blockhash,
+      }).compileToV0Message(alts);
+      const versionedTx = new web3.VersionedTransaction(messageV0);
+      const signers = this.findSigningKeypairFromIxs(batch);
+      versionedTx.sign(signers);
+      signedVersionedTxs.push(versionedTx)
+    }
+    return signedVersionedTxs;
+  }
+
+  /**
    * Split transactions
    *
    * @param simulationIxs
@@ -233,6 +257,25 @@ export class TransactionBatchExecute {
         throw new Error('Unexpected error: Dummy signer not found (it should never happen)');
       }
       result.push(dummySigners[key]);
+    }
+    return result;
+  }
+
+  /**
+   * Find signing keypairs from signers defined in instruction
+   *
+   * @param batch
+   * @returns
+   */
+  private findSigningKeypairFromIxs(batch: web3.TransactionInstruction[]): web3.Keypair[] {
+    const signers = this.findRequiredSignersFromIxs(batch);
+    const result: web3.Keypair[] = [];
+    for (const signer of signers) {
+      const keypair = this.signers.find(keypair => keypair.publicKey.toBase58() === signer.toBase58());
+      if (keypair === undefined) {
+        throw new Error(`Keypair ${signer} cannot be found in $this.signers array. Perhaps you forgot to add it?`);
+      }
+      result.push(keypair);
     }
     return result;
   }
