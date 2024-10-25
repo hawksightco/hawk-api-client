@@ -1,8 +1,13 @@
-import * as web3 from "@solana/web3.js";
 import * as _client from "@hawksightco/swagger-client";
-import { ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, TransactionPriority, UserPortfolioOut } from "../types";
-import { Client } from "./Client";
+import * as web3 from "@solana/web3.js";
 import { createTxMetadata, resultOrError } from "../functions";
+import {
+  ResponseWithStatus,
+  TransactionMetadata,
+  TransactionMetadataResponse,
+  UserPortfolioOut,
+} from "../types";
+import { Client } from "./Client";
 import { GeneralUtility } from "./GeneralUtility";
 
 /**
@@ -12,7 +17,6 @@ import { GeneralUtility } from "./GeneralUtility";
  * such as registering new entities, retrieving portfolio information, and more.
  */
 export class General {
-
   /** The priority level for transactions, influencing transaction fee calculation and processing priority. */
   protected priorityLevel: _client.PriorityLevel;
 
@@ -25,8 +29,8 @@ export class General {
    */
   constructor(
     private readonly client: Client,
-    private readonly generalUtility: GeneralUtility,
-    ) {
+    private readonly generalUtility: GeneralUtility
+  ) {
     // Initialize with default values for transaction priority and fees.
     this.priorityLevel = _client.PriorityLevel.Default;
     this.maxPriorityFee = 500_000;
@@ -56,17 +60,17 @@ export class General {
    * @param params Object containing wallet address and optional pool identifier.
    * @returns A Promise resolving to the portfolio information including assets and balances.
    */
-  async portfolio(
-    params: {
-      wallet: string,
-      pool?: string,
-    }
-  ): Promise<ResponseWithStatus<UserPortfolioOut>> {
-    const result = await this.client.generalEndpoints.portfolioGet(params.wallet, params.pool).catch(e => e.response);
+  async portfolio(params: {
+    wallet: string;
+    pool?: string;
+  }): Promise<ResponseWithStatus<UserPortfolioOut>> {
+    const result = await this.client.generalEndpoints
+      .portfolioGet(params.wallet, params.pool)
+      .catch((e) => e.response);
     return {
       status: result.status,
       data: result.data,
-    }
+    };
   }
 
   /**
@@ -75,12 +79,14 @@ export class General {
    * @param params Object containing hash of the pools
    * @returns A Promise resolving to an array of pools, including metadata such as pool addresses and statistics.
    */
-  async pools(
-    params: {
-      hash?: string,
-    }
-  ): Promise<ResponseWithStatus<_client.HawksightPool[]>> {
-    const result = await this.client.generalEndpoints.poolsGet(params.hash).catch(e => e.response);
+  async pools(params: {
+    hash?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<ResponseWithStatus<_client.HawksightPool[]>> {
+    const result = await this.client.generalEndpoints
+      .poolsGet(params.hash, params.page, params.limit)
+      .catch((e) => e.response);
     return {
       status: result.status,
       data: result.data,
@@ -93,7 +99,9 @@ export class General {
    * @returns A Promise resolving to an array of token details, including names, symbols, and other token-specific information.
    */
   async tokens(): Promise<ResponseWithStatus<_client.InlineResponse200[]>> {
-    const result = await this.client.generalEndpoints.tokensGet().catch(e => e.response);
+    const result = await this.client.generalEndpoints
+      .tokensGet()
+      .catch((e) => e.response);
     return {
       status: result.status,
       data: result.data,
@@ -108,14 +116,21 @@ export class General {
    * @param params Registration parameters required by the API.
    * @returns A Promise resolving to the transaction metadata or an error response, depending on the outcome of the registration.
    */
-  async register(connection: web3.Connection, payer: string, params: _client.RegisterBody): Promise<ResponseWithStatus<TransactionMetadata>> {
-    const result = await this.client.generalEndpoints.registerPost(params).catch(e => e.response);
+  async register(
+    connection: web3.Connection,
+    payer: string,
+    params: _client.RegisterBody
+  ): Promise<ResponseWithStatus<TransactionMetadata>> {
+    const result = await this.client.generalEndpoints
+      .registerPost(params)
+      .catch((e) => e.response);
     return resultOrError<TransactionMetadataResponse, TransactionMetadata>(
       {
         status: result.status,
         data: result.data,
       },
-      async (data) => await createTxMetadata(this.generalUtility, connection, payer, data),
+      async (data) =>
+        await createTxMetadata(this.generalUtility, connection, payer, data)
     );
   }
 }
