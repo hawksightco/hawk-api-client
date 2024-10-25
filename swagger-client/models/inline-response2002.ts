@@ -12,6 +12,7 @@
  * Do not edit the class manually.
  */
 
+import { InlineResponse2002Data } from './inline-response2002-data';
  /**
  * 
  *
@@ -21,24 +22,22 @@
 export interface InlineResponse2002 {
 
     /**
-     * The wallet address of the user.
-     *
-     * @type {string}
+     * @type {InlineResponse2002Data}
      * @memberof InlineResponse2002
      */
-    wallet?: string;
+    data?: InlineResponse2002Data;
 
     /**
-     * The associated Program Derived Address (PDA) of the user.
+     * Indicates if the request was successful.
      *
-     * @type {string}
+     * @type {boolean}
      * @memberof InlineResponse2002
      */
-    userPda?: string;
+    success?: boolean;
 
     /**
-     * @type {{ [key: string]: Array<any>; }}
+     * @type {any}
      * @memberof InlineResponse2002
      */
-    pools?: { [key: string]: Array<any>; };
+    example?: any;
 }

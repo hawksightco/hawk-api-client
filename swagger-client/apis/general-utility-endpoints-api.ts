@@ -17,6 +17,7 @@ import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
+import { InlineResponse2002 } from '../models';
 import { InlineResponse400 } from '../models';
 import { PriorityFeeEstimate } from '../models';
 import { UtilFindAltWithTxBody } from '../models';
@@ -27,6 +28,75 @@ import { UtilGetPriorityFeeEstimateBody } from '../models';
  */
 export const GeneralUtilityEndpointsApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * Returns OLHCV data of a given contract address from Birdeye
+         * @param {string} address The contract address.
+         * @param {string} timeframe Candlestick timeframe
+         * @param {number} timeFrom the start time in seconds.
+         * @param {number} timeTo The end time in seconds.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        utilCandlestickGet: async (address: string, timeframe: string, timeFrom: number, timeTo: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'address' is not null or undefined
+            if (address === null || address === undefined) {
+                throw new RequiredError('address','Required parameter address was null or undefined when calling utilCandlestickGet.');
+            }
+            // verify required parameter 'timeframe' is not null or undefined
+            if (timeframe === null || timeframe === undefined) {
+                throw new RequiredError('timeframe','Required parameter timeframe was null or undefined when calling utilCandlestickGet.');
+            }
+            // verify required parameter 'timeFrom' is not null or undefined
+            if (timeFrom === null || timeFrom === undefined) {
+                throw new RequiredError('timeFrom','Required parameter timeFrom was null or undefined when calling utilCandlestickGet.');
+            }
+            // verify required parameter 'timeTo' is not null or undefined
+            if (timeTo === null || timeTo === undefined) {
+                throw new RequiredError('timeTo','Required parameter timeTo was null or undefined when calling utilCandlestickGet.');
+            }
+            const localVarPath = `/util/candlestick`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions :AxiosRequestConfig = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (address !== undefined) {
+                localVarQueryParameter['address'] = address;
+            }
+
+            if (timeframe !== undefined) {
+                localVarQueryParameter['timeframe'] = timeframe;
+            }
+
+            if (timeFrom !== undefined) {
+                localVarQueryParameter['time_from'] = timeFrom;
+            }
+
+            if (timeTo !== undefined) {
+                localVarQueryParameter['time_to'] = timeTo;
+            }
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.params) {
+                query.set(key, options.params[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * Find address lookup tables from Jupiter from given transaction metadata.
          * @param {UtilFindAltWithTxBody} body 
@@ -121,6 +191,22 @@ export const GeneralUtilityEndpointsApiAxiosParamCreator = function (configurati
 export const GeneralUtilityEndpointsApiFp = function(configuration?: Configuration) {
     return {
         /**
+         * Returns OLHCV data of a given contract address from Birdeye
+         * @param {string} address The contract address.
+         * @param {string} timeframe Candlestick timeframe
+         * @param {number} timeFrom the start time in seconds.
+         * @param {number} timeTo The end time in seconds.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async utilCandlestickGet(address: string, timeframe: string, timeFrom: number, timeTo: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<InlineResponse2002>>> {
+            const localVarAxiosArgs = await GeneralUtilityEndpointsApiAxiosParamCreator(configuration).utilCandlestickGet(address, timeframe, timeFrom, timeTo, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Find address lookup tables from Jupiter from given transaction metadata.
          * @param {UtilFindAltWithTxBody} body 
          * @param {*} [options] Override http request option.
@@ -156,6 +242,18 @@ export const GeneralUtilityEndpointsApiFp = function(configuration?: Configurati
 export const GeneralUtilityEndpointsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     return {
         /**
+         * Returns OLHCV data of a given contract address from Birdeye
+         * @param {string} address The contract address.
+         * @param {string} timeframe Candlestick timeframe
+         * @param {number} timeFrom the start time in seconds.
+         * @param {number} timeTo The end time in seconds.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async utilCandlestickGet(address: string, timeframe: string, timeFrom: number, timeTo: number, options?: AxiosRequestConfig): Promise<AxiosResponse<InlineResponse2002>> {
+            return GeneralUtilityEndpointsApiFp(configuration).utilCandlestickGet(address, timeframe, timeFrom, timeTo, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Find address lookup tables from Jupiter from given transaction metadata.
          * @param {UtilFindAltWithTxBody} body 
          * @param {*} [options] Override http request option.
@@ -183,6 +281,19 @@ export const GeneralUtilityEndpointsApiFactory = function (configuration?: Confi
  * @extends {BaseAPI}
  */
 export class GeneralUtilityEndpointsApi extends BaseAPI {
+    /**
+     * Returns OLHCV data of a given contract address from Birdeye
+     * @param {string} address The contract address.
+     * @param {string} timeframe Candlestick timeframe
+     * @param {number} timeFrom the start time in seconds.
+     * @param {number} timeTo The end time in seconds.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof GeneralUtilityEndpointsApi
+     */
+    public async utilCandlestickGet(address: string, timeframe: string, timeFrom: number, timeTo: number, options?: AxiosRequestConfig) : Promise<AxiosResponse<InlineResponse2002>> {
+        return GeneralUtilityEndpointsApiFp(this.configuration).utilCandlestickGet(address, timeframe, timeFrom, timeTo, options).then((request) => request(this.axios, this.basePath));
+    }
     /**
      * Find address lookup tables from Jupiter from given transaction metadata.
      * @param {UtilFindAltWithTxBody} body 

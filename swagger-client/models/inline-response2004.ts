@@ -12,17 +12,6 @@
  * Do not edit the class manually.
  */
 
-import { OrcautilpoolsFeeApr } from './orcautilpools-fee-apr';
-import { OrcautilpoolsPriceRange } from './orcautilpools-price-range';
-import { OrcautilpoolsReward0Apr } from './orcautilpools-reward0-apr';
-import { OrcautilpoolsReward1Apr } from './orcautilpools-reward1-apr';
-import { OrcautilpoolsReward2Apr } from './orcautilpools-reward2-apr';
-import { OrcautilpoolsTokenA } from './orcautilpools-token-a';
-import { OrcautilpoolsTokenB } from './orcautilpools-token-b';
-import { OrcautilpoolsTotalApr } from './orcautilpools-total-apr';
-import { OrcautilpoolsVolume } from './orcautilpools-volume';
-import { OrcautilpoolsVolumeDenominatedA } from './orcautilpools-volume-denominated-a';
-import { OrcautilpoolsVolumeDenominatedB } from './orcautilpools-volume-denominated-b';
  /**
  * 
  *
@@ -32,140 +21,24 @@ import { OrcautilpoolsVolumeDenominatedB } from './orcautilpools-volume-denomina
 export interface InlineResponse2004 {
 
     /**
-     * The unique address identifier for the whirlpool.
+     * The wallet address of the user.
      *
      * @type {string}
      * @memberof InlineResponse2004
      */
-    address?: string;
+    wallet?: string;
 
     /**
-     * @type {OrcautilpoolsTokenA}
-     * @memberof InlineResponse2004
-     */
-    tokenA?: OrcautilpoolsTokenA;
-
-    /**
-     * @type {OrcautilpoolsTokenB}
-     * @memberof InlineResponse2004
-     */
-    tokenB?: OrcautilpoolsTokenB;
-
-    /**
-     * Indicates if the whirlpool is whitelisted.
-     *
-     * @type {boolean}
-     * @memberof InlineResponse2004
-     */
-    whitelisted?: boolean;
-
-    /**
-     * Tick spacing used in the pool.
-     *
-     * @type {number}
-     * @memberof InlineResponse2004
-     */
-    tickSpacing?: number;
-
-    /**
-     * Current price of token A in terms of token B.
-     *
-     * @type {number}
-     * @memberof InlineResponse2004
-     */
-    price?: number;
-
-    /**
-     * Liquidity provider fee rate for the pool.
-     *
-     * @type {number}
-     * @memberof InlineResponse2004
-     */
-    lpFeeRate?: number;
-
-    /**
-     * Protocol fee rate for the pool.
-     *
-     * @type {number}
-     * @memberof InlineResponse2004
-     */
-    protocolFeeRate?: number;
-
-    /**
-     * Identifier for the whirlpool configuration.
+     * The associated Program Derived Address (PDA) of the user.
      *
      * @type {string}
      * @memberof InlineResponse2004
      */
-    whirlpoolsConfig?: string;
+    userPda?: string;
 
     /**
-     * Last modified time of the pool in milliseconds.
-     *
-     * @type {number}
+     * @type {{ [key: string]: Array<any>; }}
      * @memberof InlineResponse2004
      */
-    modifiedTimeMs?: number;
-
-    /**
-     * Total value locked in the pool.
-     *
-     * @type {number}
-     * @memberof InlineResponse2004
-     */
-    tvl?: number;
-
-    /**
-     * @type {OrcautilpoolsVolume}
-     * @memberof InlineResponse2004
-     */
-    volume?: OrcautilpoolsVolume;
-
-    /**
-     * @type {OrcautilpoolsVolumeDenominatedA}
-     * @memberof InlineResponse2004
-     */
-    volumeDenominatedA?: OrcautilpoolsVolumeDenominatedA;
-
-    /**
-     * @type {OrcautilpoolsVolumeDenominatedB}
-     * @memberof InlineResponse2004
-     */
-    volumeDenominatedB?: OrcautilpoolsVolumeDenominatedB;
-
-    /**
-     * @type {OrcautilpoolsPriceRange}
-     * @memberof InlineResponse2004
-     */
-    priceRange?: OrcautilpoolsPriceRange;
-
-    /**
-     * @type {OrcautilpoolsFeeApr}
-     * @memberof InlineResponse2004
-     */
-    feeApr?: OrcautilpoolsFeeApr;
-
-    /**
-     * @type {OrcautilpoolsReward0Apr}
-     * @memberof InlineResponse2004
-     */
-    reward0Apr?: OrcautilpoolsReward0Apr;
-
-    /**
-     * @type {OrcautilpoolsReward1Apr}
-     * @memberof InlineResponse2004
-     */
-    reward1Apr?: OrcautilpoolsReward1Apr;
-
-    /**
-     * @type {OrcautilpoolsReward2Apr}
-     * @memberof InlineResponse2004
-     */
-    reward2Apr?: OrcautilpoolsReward2Apr;
-
-    /**
-     * @type {OrcautilpoolsTotalApr}
-     * @memberof InlineResponse2004
-     */
-    totalApr?: OrcautilpoolsTotalApr;
+    pools?: { [key: string]: Array<any>; };
 }

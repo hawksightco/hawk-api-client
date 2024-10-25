@@ -12,17 +12,6 @@
  * Do not edit the class manually.
  */
 
-import { OrcautilpoolsFeeApr } from './orcautilpools-fee-apr';
-import { OrcautilpoolsPriceRange } from './orcautilpools-price-range';
-import { OrcautilpoolsReward0Apr } from './orcautilpools-reward0-apr';
-import { OrcautilpoolsReward1Apr } from './orcautilpools-reward1-apr';
-import { OrcautilpoolsReward2Apr } from './orcautilpools-reward2-apr';
-import { OrcautilpoolsTokenA } from './orcautilpools-token-a';
-import { OrcautilpoolsTokenB } from './orcautilpools-token-b';
-import { OrcautilpoolsTotalApr } from './orcautilpools-total-apr';
-import { OrcautilpoolsVolume } from './orcautilpools-volume';
-import { OrcautilpoolsVolumeDenominatedA } from './orcautilpools-volume-denominated-a';
-import { OrcautilpoolsVolumeDenominatedB } from './orcautilpools-volume-denominated-b';
  /**
  * 
  *
@@ -32,7 +21,7 @@ import { OrcautilpoolsVolumeDenominatedB } from './orcautilpools-volume-denomina
 export interface InlineResponse2003 {
 
     /**
-     * The unique address identifier for the whirlpool.
+     * The unique address identifier for the pool.
      *
      * @type {string}
      * @memberof InlineResponse2003
@@ -40,132 +29,202 @@ export interface InlineResponse2003 {
     address?: string;
 
     /**
-     * @type {OrcautilpoolsTokenA}
-     * @memberof InlineResponse2003
-     */
-    tokenA?: OrcautilpoolsTokenA;
-
-    /**
-     * @type {OrcautilpoolsTokenB}
-     * @memberof InlineResponse2003
-     */
-    tokenB?: OrcautilpoolsTokenB;
-
-    /**
-     * Indicates if the whirlpool is whitelisted.
-     *
-     * @type {boolean}
-     * @memberof InlineResponse2003
-     */
-    whitelisted?: boolean;
-
-    /**
-     * Tick spacing used in the pool.
-     *
-     * @type {number}
-     * @memberof InlineResponse2003
-     */
-    tickSpacing?: number;
-
-    /**
-     * Current price of token A in terms of token B.
-     *
-     * @type {number}
-     * @memberof InlineResponse2003
-     */
-    price?: number;
-
-    /**
-     * Liquidity provider fee rate for the pool.
-     *
-     * @type {number}
-     * @memberof InlineResponse2003
-     */
-    lpFeeRate?: number;
-
-    /**
-     * Protocol fee rate for the pool.
-     *
-     * @type {number}
-     * @memberof InlineResponse2003
-     */
-    protocolFeeRate?: number;
-
-    /**
-     * Identifier for the whirlpool configuration.
+     * Name of the pool, typically indicating the token pair.
      *
      * @type {string}
      * @memberof InlineResponse2003
      */
-    whirlpoolsConfig?: string;
+    name?: string;
 
     /**
-     * Last modified time of the pool in milliseconds.
+     * Token mint address for the X asset in the pool.
+     *
+     * @type {string}
+     * @memberof InlineResponse2003
+     */
+    mintX?: string;
+
+    /**
+     * Token mint address for the Y asset in the pool.
+     *
+     * @type {string}
+     * @memberof InlineResponse2003
+     */
+    mintY?: string;
+
+    /**
+     * Reserve account address for the X asset.
+     *
+     * @type {string}
+     * @memberof InlineResponse2003
+     */
+    reserveX?: string;
+
+    /**
+     * Reserve account address for the Y asset.
+     *
+     * @type {string}
+     * @memberof InlineResponse2003
+     */
+    reserveY?: string;
+
+    /**
+     * Amount of X asset in the reserve.
      *
      * @type {number}
      * @memberof InlineResponse2003
      */
-    modifiedTimeMs?: number;
+    reserveXAmount?: number;
 
     /**
-     * Total value locked in the pool.
+     * Amount of Y asset in the reserve.
      *
      * @type {number}
      * @memberof InlineResponse2003
      */
-    tvl?: number;
+    reserveYAmount?: number;
 
     /**
-     * @type {OrcautilpoolsVolume}
+     * The bin step size used in the pool's operation.
+     *
+     * @type {number}
      * @memberof InlineResponse2003
      */
-    volume?: OrcautilpoolsVolume;
+    binStep?: number;
 
     /**
-     * @type {OrcautilpoolsVolumeDenominatedA}
+     * Base fee percentage charged for transactions in the pool.
+     *
+     * @type {string}
      * @memberof InlineResponse2003
      */
-    volumeDenominatedA?: OrcautilpoolsVolumeDenominatedA;
+    baseFeePercentage?: string;
 
     /**
-     * @type {OrcautilpoolsVolumeDenominatedB}
+     * Maximum possible fee percentage that can be charged.
+     *
+     * @type {string}
      * @memberof InlineResponse2003
      */
-    volumeDenominatedB?: OrcautilpoolsVolumeDenominatedB;
+    maxFeePercentage?: string;
 
     /**
-     * @type {OrcautilpoolsPriceRange}
+     * Fee percentage taken by the protocol.
+     *
+     * @type {string}
      * @memberof InlineResponse2003
      */
-    priceRange?: OrcautilpoolsPriceRange;
+    protocolFeePercentage?: string;
 
     /**
-     * @type {OrcautilpoolsFeeApr}
+     * Current liquidity in the pool.
+     *
+     * @type {string}
      * @memberof InlineResponse2003
      */
-    feeApr?: OrcautilpoolsFeeApr;
+    liquidity?: string;
 
     /**
-     * @type {OrcautilpoolsReward0Apr}
+     * Reward mint address for the X asset.
+     *
+     * @type {string}
      * @memberof InlineResponse2003
      */
-    reward0Apr?: OrcautilpoolsReward0Apr;
+    rewardMintX?: string;
 
     /**
-     * @type {OrcautilpoolsReward1Apr}
+     * Reward mint address for the Y asset.
+     *
+     * @type {string}
      * @memberof InlineResponse2003
      */
-    reward1Apr?: OrcautilpoolsReward1Apr;
+    rewardMintY?: string;
 
     /**
-     * @type {OrcautilpoolsReward2Apr}
+     * Fees generated in the pool over the last 24 hours.
+     *
+     * @type {number}
      * @memberof InlineResponse2003
      */
-    reward2Apr?: OrcautilpoolsReward2Apr;
+    fees24h?: number;
 
     /**
-     * @type {OrcautilpoolsTotalApr}
+     * Fees generated in the pool today.
+     *
+     * @type {number}
      * @memberof InlineResponse2003
      */
-    totalApr?: OrcautilpoolsTotalApr;
+    todayFees?: number;
+
+    /**
+     * Trade volume in the pool over the last 24 hours.
+     *
+     * @type {number}
+     * @memberof InlineResponse2003
+     */
+    tradeVolume24h?: number;
+
+    /**
+     * Cumulative trade volume in the pool since inception.
+     *
+     * @type {string}
+     * @memberof InlineResponse2003
+     */
+    cumulativeTradeVolume?: string;
+
+    /**
+     * Cumulative fees generated by the pool since inception.
+     *
+     * @type {string}
+     * @memberof InlineResponse2003
+     */
+    cumulativeFeeVolume?: string;
+
+    /**
+     * Current price of X asset in terms of Y asset.
+     *
+     * @type {number}
+     * @memberof InlineResponse2003
+     */
+    currentPrice?: number;
+
+    /**
+     * Annual Percentage Rate for earnings in the pool.
+     *
+     * @type {number}
+     * @memberof InlineResponse2003
+     */
+    apr?: number;
+
+    /**
+     * Annual Percentage Yield for earnings in the pool.
+     *
+     * @type {number}
+     * @memberof InlineResponse2003
+     */
+    apy?: number;
+
+    /**
+     * APR for farming activities associated with the pool.
+     *
+     * @type {number}
+     * @memberof InlineResponse2003
+     */
+    farmApr?: number;
+
+    /**
+     * APY for farming activities associated with the pool.
+     *
+     * @type {number}
+     * @memberof InlineResponse2003
+     */
+    farmApy?: number;
+
+    /**
+     * Indicates whether the pool is hidden from default views.
+     *
+     * @type {boolean}
+     * @memberof InlineResponse2003
+     */
+    hide?: boolean;
 }

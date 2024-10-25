@@ -18,7 +18,9 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 import { HawksightPool } from '../models';
+import { HawksightPoolResponse } from '../models';
 import { InlineResponse200 } from '../models';
+import { InlineResponse2001 } from '../models';
 import { InlineResponse400 } from '../models';
 import { MeteoraPosition } from '../models';
 import { RegisterBody } from '../models';
@@ -46,6 +48,44 @@ export const GeneralEndpointsApiAxiosParamCreator = function (configuration?: Co
             const localVarRequestOptions :AxiosRequestConfig = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.params) {
+                query.set(key, options.params[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Returns all closed positions from a user.
+         * @param {string} [user] User to search
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        hawksightClosedPositionsGet: async (user?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/hawksightClosedPositions`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions :AxiosRequestConfig = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (user !== undefined) {
+                localVarQueryParameter['user'] = user;
+            }
 
             const query = new URLSearchParams(localVarUrlObj.search);
             for (const key in localVarQueryParameter) {
@@ -105,6 +145,48 @@ export const GeneralEndpointsApiAxiosParamCreator = function (configuration?: Co
 
             if (positions !== undefined) {
                 localVarQueryParameter['positions'] = positions;
+            }
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.params) {
+                query.set(key, options.params[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Return info about the specified pool.
+         * @param {string} pairAddress The address of the pool to query.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        poolGet: async (pairAddress: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'pairAddress' is not null or undefined
+            if (pairAddress === null || pairAddress === undefined) {
+                throw new RequiredError('pairAddress','Required parameter pairAddress was null or undefined when calling poolGet.');
+            }
+            const localVarPath = `/pool`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions :AxiosRequestConfig = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (pairAddress !== undefined) {
+                localVarQueryParameter['pairAddress'] = pairAddress;
             }
 
             const query = new URLSearchParams(localVarUrlObj.search);
@@ -404,6 +486,19 @@ export const GeneralEndpointsApiFp = function(configuration?: Configuration) {
             };
         },
         /**
+         * Returns all closed positions from a user.
+         * @param {string} [user] User to search
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async hawksightClosedPositionsGet(user?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<InlineResponse2001>>>> {
+            const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).hawksightClosedPositionsGet(user, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Returns all pools integrated by Hawksight.
          * @param {string} user Position to search
          * @param {string} pool Position to search
@@ -413,6 +508,19 @@ export const GeneralEndpointsApiFp = function(configuration?: Configuration) {
          */
         async hawksightPositionAnalyticsGet(user: string, pool: string, positions: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<void>>> {
             const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).hawksightPositionAnalyticsGet(user, pool, positions, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Return info about the specified pool.
+         * @param {string} pairAddress The address of the pool to query.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async poolGet(pairAddress: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<HawksightPoolResponse>>> {
+            const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).poolGet(pairAddress, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -517,6 +625,15 @@ export const GeneralEndpointsApiFactory = function (configuration?: Configuratio
             return GeneralEndpointsApiFp(configuration).allTimeMeteoraPositionsGet(options).then((request) => request(axios, basePath));
         },
         /**
+         * Returns all closed positions from a user.
+         * @param {string} [user] User to search
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async hawksightClosedPositionsGet(user?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<Array<InlineResponse2001>>> {
+            return GeneralEndpointsApiFp(configuration).hawksightClosedPositionsGet(user, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Returns all pools integrated by Hawksight.
          * @param {string} user Position to search
          * @param {string} pool Position to search
@@ -526,6 +643,15 @@ export const GeneralEndpointsApiFactory = function (configuration?: Configuratio
          */
         async hawksightPositionAnalyticsGet(user: string, pool: string, positions: string, options?: AxiosRequestConfig): Promise<AxiosResponse<void>> {
             return GeneralEndpointsApiFp(configuration).hawksightPositionAnalyticsGet(user, pool, positions, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Return info about the specified pool.
+         * @param {string} pairAddress The address of the pool to query.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async poolGet(pairAddress: string, options?: AxiosRequestConfig): Promise<AxiosResponse<HawksightPoolResponse>> {
+            return GeneralEndpointsApiFp(configuration).poolGet(pairAddress, options).then((request) => request(axios, basePath));
         },
         /**
          * Returns all pools integrated by Hawksight.
@@ -604,6 +730,16 @@ export class GeneralEndpointsApi extends BaseAPI {
         return GeneralEndpointsApiFp(this.configuration).allTimeMeteoraPositionsGet(options).then((request) => request(this.axios, this.basePath));
     }
     /**
+     * Returns all closed positions from a user.
+     * @param {string} [user] User to search
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof GeneralEndpointsApi
+     */
+    public async hawksightClosedPositionsGet(user?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<InlineResponse2001>>> {
+        return GeneralEndpointsApiFp(this.configuration).hawksightClosedPositionsGet(user, options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
      * Returns all pools integrated by Hawksight.
      * @param {string} user Position to search
      * @param {string} pool Position to search
@@ -614,6 +750,16 @@ export class GeneralEndpointsApi extends BaseAPI {
      */
     public async hawksightPositionAnalyticsGet(user: string, pool: string, positions: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<void>> {
         return GeneralEndpointsApiFp(this.configuration).hawksightPositionAnalyticsGet(user, pool, positions, options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
+     * Return info about the specified pool.
+     * @param {string} pairAddress The address of the pool to query.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof GeneralEndpointsApi
+     */
+    public async poolGet(pairAddress: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<HawksightPoolResponse>> {
+        return GeneralEndpointsApiFp(this.configuration).poolGet(pairAddress, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * Returns all pools integrated by Hawksight.
