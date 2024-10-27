@@ -553,6 +553,7 @@ export class Transactions {
             minBinId: params.binRange.lowerRange,
             strategyType: StrategyTypeMap[params.distribution],
           },
+          skipInputTokenCheck: true, // Rebalance should be independent of user wallet TA
         },
         meteoraToHawksightAutomationIxs
       );
