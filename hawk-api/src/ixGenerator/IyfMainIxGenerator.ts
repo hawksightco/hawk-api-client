@@ -14,7 +14,8 @@ type IyfExtensionExecute = {
 
 type JupiterRouteIx = {
   connection: web3.Connection,
-  userWallet: web3.PublicKey,
+  userWallet?: web3.PublicKey,
+  userPda?: web3.PublicKey,
   sourceTokenAccount: web3.PublicKey,
   destinationTokenAccount: web3.PublicKey,
   destinationMint: web3.PublicKey,
@@ -114,6 +115,7 @@ export class IyfMainIxGenerator {
   async jupiterRouteIx({
     connection,
     userWallet,
+    userPda,
     sourceTokenAccount,
     destinationTokenAccount,
     destinationMint,
@@ -139,7 +141,11 @@ export class IyfMainIxGenerator {
     platformFeeBps = platformFeeBps === undefined ? platformFeeBps_default : platformFeeBps;
 
     // Generate user pda from given user wallet
-    const userPda = generateUserPda(userWallet);
+    userPda = userWallet !== undefined ? generateUserPda(userWallet) : userPda;
+
+    if (userPda === undefined) {
+      throw new Error("Either one of `userWallet` or `userPda` parameter must be defined!");
+    }
 
     const ix = await Anchor.instance().iyfMain
       .methods
