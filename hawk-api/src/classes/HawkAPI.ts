@@ -13,6 +13,7 @@ import { SimpleIxGenerator } from "./SimpleIxGenerator";
 import { TransactionBatchExecute, TransactionBatchExecuteParams } from "./TransactionBatchExecute";
 import { Atomicity } from "./Atomicity";
 import { JupiterAlts } from "./JupiterAlts";
+import { JupiterSwap } from "./JupiterSwap";
 
 /**
  * HawkAPI is a central gateway class that aggregates access to various functional modules
@@ -55,6 +56,9 @@ export class HawkAPI {
   /** Jupiter alts */
   public readonly jupAlts: JupiterAlts;
 
+  /** Jupiter swap */
+  public readonly jupiterSwap: JupiterSwap;
+
   /**
    * Initializes a new instance of the HawkAPI class with a specified API URL.
    * @param url The base URL for the HawkSight API services, defaulted to "https://api2.hawksight.co" if not specified.
@@ -74,6 +78,7 @@ export class HawkAPI {
     this.search = new Search(url);
     this.ix = new SimpleIxGenerator();
     this.jupAlts = new JupiterAlts();
+    this.jupiterSwap = new JupiterSwap(this.ix);
 
     // Load create tx metadata module
     if (this.options === undefined || !this.options!.disableTxMetadataLoad) {
