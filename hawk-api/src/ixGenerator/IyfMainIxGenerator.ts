@@ -21,6 +21,7 @@ type JupiterRouteIx = {
   destinationMint: web3.PublicKey,
   platformFeeAccount: web3.PublicKey,
   eventAuthority: web3.PublicKey,
+  remainingAccounts: web3.AccountMeta[],
   data: Buffer,
   quotedOutAmount?: BN,
   slippageBps?: number,
@@ -121,6 +122,7 @@ export class IyfMainIxGenerator {
     destinationMint,
     platformFeeAccount,
     eventAuthority,
+    remainingAccounts,
     data,
     quotedOutAmount,
     slippageBps,
@@ -166,6 +168,7 @@ export class IyfMainIxGenerator {
         eventAuthority,
         jupiterProgram: JUPITER_PROGRAM
       })
+      .remainingAccounts(remainingAccounts)
       .instruction();
 
     return ix;
