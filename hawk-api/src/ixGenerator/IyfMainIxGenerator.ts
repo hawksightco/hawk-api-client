@@ -1,14 +1,29 @@
 import * as web3 from "@solana/web3.js";
 import { Anchor } from "../anchor";
 import { setTransactionSlot, verifyTransactionSlot, AtomicityContextParams } from "../hawksight";
-import { generateUserPda } from "../functions";
-import { IYF_EXTENSION, IYF_MAIN, USDC_FARM } from "../addresses";
+import { generateUserPda, getJupiterRouteIxParams } from "../functions";
+import { HS_AUTHORITY, IYF_EXTENSION, IYF_MAIN, JUPITER_PROGRAM, TOKEN_PROGRAM_ID, USDC_FARM } from "../addresses";
 import { Transactions } from "../classes/Transactions";
 import { InitializeStorageTokenAccount } from "../types";
+import BN from "bn.js";
 
 type IyfExtensionExecute = {
   userWallet: web3.PublicKey,
   iyfExtensionIx: web3.TransactionInstruction,
+}
+
+type JupiterRouteIx = {
+  connection: web3.Connection,
+  userWallet: web3.PublicKey,
+  sourceTokenAccount: web3.PublicKey,
+  destinationTokenAccount: web3.PublicKey,
+  destinationMint: web3.PublicKey,
+  platformFeeAccount: web3.PublicKey,
+  eventAuthority: web3.PublicKey,
+  data: Buffer,
+  quotedOutAmount?: BN,
+  slippageBps?: number,
+  platformFeeBps?: number
 }
 
 /**
@@ -91,6 +106,60 @@ export class IyfMainIxGenerator {
         iyfExtensionProgram: iyfExtensionIx.programId
       })
       .remainingAccounts(iyfExtensionIx.keys.slice(4))
+      .instruction();
+
+    return ix;
+  }
+
+  async jupiterRouteIx({
+    connection,
+    userWallet,
+    sourceTokenAccount,
+    destinationTokenAccount,
+    destinationMint,
+    platformFeeAccount,
+    eventAuthority,
+    data,
+    quotedOutAmount,
+    slippageBps,
+    platformFeeBps,
+  }: JupiterRouteIx): Promise<web3.TransactionInstruction> {
+    // Initialize anchor
+    Anchor.initialize(connection);
+
+    const {
+      routePlan,
+      quotedOutAmount: quotedOutAmount_default,
+      slippageBps: slippageBps_default,
+      platformFeeBps: platformFeeBps_default,
+    } = getJupiterRouteIxParams(data);
+
+    quotedOutAmount = quotedOutAmount === undefined ? quotedOutAmount_default : quotedOutAmount;
+    slippageBps = slippageBps === undefined ? slippageBps_default : slippageBps;
+    platformFeeBps = platformFeeBps === undefined ? platformFeeBps_default : platformFeeBps;
+
+    // Generate user pda from given user wallet
+    const userPda = generateUserPda(userWallet);
+
+    const ix = await Anchor.instance().iyfMain
+      .methods
+      .jupiterRouteIx(
+        routePlan,
+        quotedOutAmount,
+        slippageBps,
+        platformFeeBps,
+      )
+      .accounts({
+        authority: HS_AUTHORITY,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        userPda,
+        userSourceTokenAccount: sourceTokenAccount,
+        userDestinationTokenAccount: destinationTokenAccount,
+        destinationMint,
+        platformFeeAccount,
+        eventAuthority,
+        jupiterProgram: JUPITER_PROGRAM
+      })
       .instruction();
 
     return ix;

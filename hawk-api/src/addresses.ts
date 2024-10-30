@@ -28,3 +28,4 @@ export const COMPUTE_BUDGET = new web3.PublicKey("ComputeBudget11111111111111111
 export const HS_AUTHORITY = new web3.PublicKey("dche7M2764e8AxNihBdn7uffVzZvTBNeL8x4LZg5E2c");
 export const ORCA_WHIRLPOOL_PROGRAM = new web3.PublicKey("whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc");
 export const WSOL_MINT = new web3.PublicKey("So11111111111111111111111111111111111111112");
+export const JUPITER_PROGRAM = new web3.PublicKey("JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4");

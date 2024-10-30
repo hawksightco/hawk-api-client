@@ -632,3 +632,74 @@ export async function inputTokenExists(
     }
   });
 }
+
+type JupiterRouteIxParams = {
+  routePlan: Buffer,
+  quotedOutAmount: BN,
+  slippageBps: number,
+  platformFeeBps: number,
+}
+
+/**
+ * Get Jupiter route ix parameters
+ *
+ * @param data
+ */
+export function getJupiterRouteIxParams(data: Buffer): JupiterRouteIxParams {
+  const boolIndices = [8, 17, 18, 21, 23, 58];
+  const sideIndices = [12, 15, 16, 24, 27, 28, 39];
+
+  const vecSize = new BN(data.subarray(8, 12), 10, 'le').toNumber();
+  let lastIndex = 0;
+  for (let i = 0; i < vecSize; i++) {
+    if (lastIndex === 0) lastIndex = 12;
+    const swapEnumId = data[lastIndex];
+
+    if (boolIndices.includes(swapEnumId) || sideIndices.includes(swapEnumId))
+      lastIndex += 4 + 1;
+
+    // Swap is "Symmetry"
+    else if (swapEnumId == 29)
+      lastIndex += 4 + 16;
+
+    // Swap is "StakeDexSwapViaStake" or "StakeDexPrefundWithdrawStakeAndDepositStake"
+    else if (swapEnumId == 33 || swapEnumId == 41)
+      lastIndex += 4 + 4;
+
+    // Swap is "Clone"
+    else if (swapEnumId == 42)
+      lastIndex += 4 + 3
+
+    // Swap is "SanctumS"
+    else if (swapEnumId == 43)
+      lastIndex += 4 + 10
+
+    // Swap is "SanctumSAddLiquidity" or "SanctumSRemoveLiquidity"
+    else if (swapEnumId == 44 || swapEnumId == 45)
+      lastIndex += 4 + 5;
+
+    // Swap is "WhirlpoolSwapV2"
+    else if (swapEnumId == 47) {
+      const vecSize = new BN(data.subarray(lastIndex + 1, lastIndex + 1 + 4), 10, 'le').toNumber();
+      lastIndex = 17 + 1 + 4 + (vecSize * 2);
+
+    // Rest of the swaps have the standard 4-bytes
+    } else
+      lastIndex += 4;
+  }
+
+  const r = data.subarray(8, lastIndex);
+  const vectorLength = new BN(r.length).toBuffer('le', 4);
+  const routePlan = Buffer.concat([vectorLength, r]);
+
+  const quotedOutAmount = new BN(data.subarray(lastIndex + 8, lastIndex + 16), 10, 'le');
+  const slippageBps = new BN(data.subarray(lastIndex + 16, lastIndex + 18), 10, 'le').toNumber();
+  const platformFeeBps = data[lastIndex + 18];
+
+  return {
+    routePlan,
+    quotedOutAmount,
+    slippageBps,
+    platformFeeBps,
+  }
+}

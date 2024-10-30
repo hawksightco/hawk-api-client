@@ -50,14 +50,14 @@ export async function meteoraToHawksightAutomationIxs({ixs, userPda, authority}:
 /**
  * Abstract base class `HawksightMeteoraCpi` for handling and chaining transaction instructions.
  * This class provides a framework for creating and linking complex transaction processes in a blockchain environment.
- * 
+ *
  * Attributes:
  * - `ix`: web3.TransactionInstruction - The transaction instruction associated with this CPI.
  * - `userPda`: web3.PublicKey - The public key of the user's program-derived address (PDA).
  * - `authority`: web3.PublicKey - The public key of the authority that can sign transactions.
  * - `_next`: HawksightMeteoraCpi | undefined - Pointer to the next CPI in the chain.
  * - `sighash`: Buffer - A buffer representing the signature hash used for identifying and validating instructions.
- * 
+ *
  * Methods:
  * - `constructor(ix, userPda, authority, sighash)`: Constructs an instance of the HawksightMeteoraCpi.
  * - `factory(ix, userPda, authority)`: Static factory method to create a chain of CPIs starting with `InitializePosition` and linking subsequent operations.
@@ -67,7 +67,7 @@ export async function meteoraToHawksightAutomationIxs({ixs, userPda, authority}:
  * - `sighashMatch()`: Checks if the current transaction instruction matches the provided sighash and recurses through the chain if not.
  * - `programIdMatch()`: Checks if the program ID of the transaction matches the expected ID.
  * - `addHawksightCpi()`: Modifies the transaction instruction to include specific Hawksight CPI details.
- * 
+ *
  * Usage:
  * This class is intended to be extended by specific CPI implementations like `InitializePosition`, each implementing their own `replace()` method to handle specific transaction modifications.
  */

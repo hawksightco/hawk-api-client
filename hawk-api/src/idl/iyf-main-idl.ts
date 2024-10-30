@@ -6327,6 +6327,95 @@ export type IndexYieldFarming = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "jupiterRouteIx",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userPda",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "multi-user"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "UserAccountMulti",
+                "path": "user_pda.farm"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "UserAccountMulti",
+                "path": "user_pda.authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "userSourceTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userDestinationTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "destinationMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "platformFeeAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "jupiterProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "routePlan",
+          "type": "bytes"
+        },
+        {
+          "name": "quotedOutAmount",
+          "type": "u64"
+        },
+        {
+          "name": "slippageBps",
+          "type": "u16"
+        },
+        {
+          "name": "platformFeeBps",
+          "type": "u8"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -6931,6 +7020,11 @@ export type IndexYieldFarming = {
       "code": 6029,
       "name": "MustBeHawksightAuthority",
       "msg": "Must be hawksight authority"
+    },
+    {
+      "code": 6030,
+      "name": "InstructionDiscriminatorNotExpected",
+      "msg": "Instruction discriminator is not the expected one"
     }
   ]
 };
@@ -13264,6 +13358,95 @@ export const IDL: IndexYieldFarming = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "jupiterRouteIx",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userPda",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "multi-user"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "UserAccountMulti",
+                "path": "user_pda.farm"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "UserAccountMulti",
+                "path": "user_pda.authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "userSourceTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userDestinationTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "destinationMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "platformFeeAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "jupiterProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "routePlan",
+          "type": "bytes"
+        },
+        {
+          "name": "quotedOutAmount",
+          "type": "u64"
+        },
+        {
+          "name": "slippageBps",
+          "type": "u16"
+        },
+        {
+          "name": "platformFeeBps",
+          "type": "u8"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -13868,6 +14051,11 @@ export const IDL: IndexYieldFarming = {
       "code": 6029,
       "name": "MustBeHawksightAuthority",
       "msg": "Must be hawksight authority"
+    },
+    {
+      "code": 6030,
+      "name": "InstructionDiscriminatorNotExpected",
+      "msg": "Instruction discriminator is not the expected one"
     }
   ]
 };
