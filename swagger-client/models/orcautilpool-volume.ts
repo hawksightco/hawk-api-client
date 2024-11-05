@@ -16,28 +16,25 @@
  * 
  *
  * @export
- * @interface InlineResponse4001
+ * @interface OrcautilpoolVolume
  */
-export interface InlineResponse4001 {
+export interface OrcautilpoolVolume {
 
     /**
-     * @type {string}
-     * @memberof InlineResponse4001
-     * @example custom
+     * @type {number}
+     * @memberof OrcautilpoolVolume
      */
-    code?: string;
+    day?: number;
 
     /**
-     * Error message describing the issue.
-     *
-     * @type {string}
-     * @memberof InlineResponse4001
+     * @type {number}
+     * @memberof OrcautilpoolVolume
      */
-    message?: string;
+    week?: number;
 
     /**
-     * @type {Array<string>}
-     * @memberof InlineResponse4001
+     * @type {number}
+     * @memberof OrcautilpoolVolume
      */
-    path?: Array<string>;
+    month?: number;
 }

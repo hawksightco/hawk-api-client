@@ -16,28 +16,19 @@
  * 
  *
  * @export
- * @interface InlineResponse4001
+ * @interface OrcautilpoolPriceRangeDay
  */
-export interface InlineResponse4001 {
+export interface OrcautilpoolPriceRangeDay {
 
     /**
-     * @type {string}
-     * @memberof InlineResponse4001
-     * @example custom
+     * @type {number}
+     * @memberof OrcautilpoolPriceRangeDay
      */
-    code?: string;
+    min?: number;
 
     /**
-     * Error message describing the issue.
-     *
-     * @type {string}
-     * @memberof InlineResponse4001
+     * @type {number}
+     * @memberof OrcautilpoolPriceRangeDay
      */
-    message?: string;
-
-    /**
-     * @type {Array<string>}
-     * @memberof InlineResponse4001
-     */
-    path?: Array<string>;
+    max?: number;
 }

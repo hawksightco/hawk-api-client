@@ -12,17 +12,9 @@
  * Do not edit the class manually.
  */
 
-import { OrcautilpoolsFeeApr } from './orcautilpools-fee-apr';
-import { OrcautilpoolsPriceRange } from './orcautilpools-price-range';
-import { OrcautilpoolsReward0Apr } from './orcautilpools-reward0-apr';
-import { OrcautilpoolsReward1Apr } from './orcautilpools-reward1-apr';
-import { OrcautilpoolsReward2Apr } from './orcautilpools-reward2-apr';
-import { OrcautilpoolsTokenA } from './orcautilpools-token-a';
-import { OrcautilpoolsTokenB } from './orcautilpools-token-b';
-import { OrcautilpoolsTotalApr } from './orcautilpools-total-apr';
-import { OrcautilpoolsVolume } from './orcautilpools-volume';
-import { OrcautilpoolsVolumeDenominatedA } from './orcautilpools-volume-denominated-a';
-import { OrcautilpoolsVolumeDenominatedB } from './orcautilpools-volume-denominated-b';
+import { OrcautilpoolPriceRange } from './orcautilpool-price-range';
+import { OrcautilpoolTokenA } from './orcautilpool-token-a';
+import { OrcautilpoolVolume } from './orcautilpool-volume';
  /**
  * 
  *
@@ -32,7 +24,7 @@ import { OrcautilpoolsVolumeDenominatedB } from './orcautilpools-volume-denomina
 export interface InlineResponse2006 {
 
     /**
-     * The unique address identifier for the whirlpool.
+     * Address of the Orca pool
      *
      * @type {string}
      * @memberof InlineResponse2006
@@ -40,132 +32,122 @@ export interface InlineResponse2006 {
     address?: string;
 
     /**
-     * @type {OrcautilpoolsTokenA}
+     * @type {OrcautilpoolTokenA}
      * @memberof InlineResponse2006
      */
-    tokenA?: OrcautilpoolsTokenA;
+    tokenA?: OrcautilpoolTokenA;
 
     /**
-     * @type {OrcautilpoolsTokenB}
+     * @type {OrcautilpoolTokenA}
      * @memberof InlineResponse2006
      */
-    tokenB?: OrcautilpoolsTokenB;
+    tokenB?: OrcautilpoolTokenA;
 
     /**
-     * Indicates if the whirlpool is whitelisted.
-     *
      * @type {boolean}
      * @memberof InlineResponse2006
      */
     whitelisted?: boolean;
 
     /**
-     * Tick spacing used in the pool.
-     *
+     * @type {boolean}
+     * @memberof InlineResponse2006
+     */
+    token2022?: boolean;
+
+    /**
      * @type {number}
      * @memberof InlineResponse2006
      */
     tickSpacing?: number;
 
     /**
-     * Current price of token A in terms of token B.
-     *
      * @type {number}
      * @memberof InlineResponse2006
      */
     price?: number;
 
     /**
-     * Liquidity provider fee rate for the pool.
-     *
      * @type {number}
      * @memberof InlineResponse2006
      */
     lpFeeRate?: number;
 
     /**
-     * Protocol fee rate for the pool.
-     *
      * @type {number}
      * @memberof InlineResponse2006
      */
     protocolFeeRate?: number;
 
     /**
-     * Identifier for the whirlpool configuration.
-     *
      * @type {string}
      * @memberof InlineResponse2006
      */
     whirlpoolsConfig?: string;
 
     /**
-     * Last modified time of the pool in milliseconds.
-     *
      * @type {number}
      * @memberof InlineResponse2006
      */
     modifiedTimeMs?: number;
 
     /**
-     * Total value locked in the pool.
-     *
      * @type {number}
      * @memberof InlineResponse2006
      */
     tvl?: number;
 
     /**
-     * @type {OrcautilpoolsVolume}
+     * @type {OrcautilpoolVolume}
      * @memberof InlineResponse2006
      */
-    volume?: OrcautilpoolsVolume;
+    volume?: OrcautilpoolVolume;
 
     /**
-     * @type {OrcautilpoolsVolumeDenominatedA}
+     * @type {OrcautilpoolVolume}
      * @memberof InlineResponse2006
      */
-    volumeDenominatedA?: OrcautilpoolsVolumeDenominatedA;
+    volumeDenominatedA?: OrcautilpoolVolume;
 
     /**
-     * @type {OrcautilpoolsVolumeDenominatedB}
+     * @type {OrcautilpoolVolume}
      * @memberof InlineResponse2006
      */
-    volumeDenominatedB?: OrcautilpoolsVolumeDenominatedB;
+    volumeDenominatedB?: OrcautilpoolVolume;
 
     /**
-     * @type {OrcautilpoolsPriceRange}
+     * @type {OrcautilpoolPriceRange}
      * @memberof InlineResponse2006
      */
-    priceRange?: OrcautilpoolsPriceRange;
+    priceRange?: OrcautilpoolPriceRange;
 
     /**
-     * @type {OrcautilpoolsFeeApr}
+     * @type {OrcautilpoolVolume}
      * @memberof InlineResponse2006
      */
-    feeApr?: OrcautilpoolsFeeApr;
+    feeApr?: OrcautilpoolVolume;
 
     /**
-     * @type {OrcautilpoolsReward0Apr}
+     * @type {OrcautilpoolVolume}
      * @memberof InlineResponse2006
      */
-    reward0Apr?: OrcautilpoolsReward0Apr;
+    reward0Apr?: OrcautilpoolVolume;
 
     /**
-     * @type {OrcautilpoolsReward1Apr}
+     * @type {OrcautilpoolVolume}
      * @memberof InlineResponse2006
      */
-    reward1Apr?: OrcautilpoolsReward1Apr;
+    reward1Apr?: OrcautilpoolVolume;
 
     /**
-     * @type {OrcautilpoolsReward2Apr}
+     * @type {OrcautilpoolVolume}
      * @memberof InlineResponse2006
      */
-    reward2Apr?: OrcautilpoolsReward2Apr;
+    reward2Apr?: OrcautilpoolVolume;
 
     /**
-     * @type {OrcautilpoolsTotalApr}
+     * @type {OrcautilpoolVolume}
      * @memberof InlineResponse2006
      */
-    totalApr?: OrcautilpoolsTotalApr;
+    totalApr?: OrcautilpoolVolume;
 }
