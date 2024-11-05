@@ -111,4 +111,22 @@ export class Util {
       data: result.data,
     };
   }
+
+  /**
+   * Get single orca pool from hawksight api
+   *
+   * @param params Whirlpool address.
+   * @returns A Promise resolving to a response object with the status and mint details of the position.
+   */
+  async orcaGetPosition(
+    params: {
+      pool: string,
+    }
+  ): Promise<ResponseWithStatus<any>> {
+    const result = await this.client.orcaUtilityFunctionsApi.orcaUtilPoolGet(params.pool).catch(e => e.response);
+    return {
+      status: result.status,
+      data: result.data,
+    };
+  }
 }
