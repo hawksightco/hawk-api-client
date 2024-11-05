@@ -729,6 +729,9 @@ export class Transactions {
       program: meteoraDlmmProgram,
     } = _params;
 
+    let userTokenX = params.useAta ? generateAta(userPda, tokenXMint.pubkey) : generateUserPdaStorageAccount(userPda, tokenXMint.pubkey);
+    let userTokenY = params.useAta ? generateAta(userPda, tokenYMint.pubkey) : generateUserPdaStorageAccount(userPda, tokenYMint.pubkey);
+
     const limitCloseAutomationIx = await Anchor.instance().iyfExtension.methods
       .meteoraDlmmLimitCloseAutomation(data, params.minBinId, params.maxBinId)
       .accounts({
@@ -740,8 +743,8 @@ export class Transactions {
         position: _position.pubkey,
         lbPair: lbPair.pubkey,
         binArrayBitmapExtension: binArrayBitmapExtension.pubkey,
-        userTokenX: generateUserPdaStorageAccount(userPda, tokenXMint.pubkey),
-        userTokenY: generateUserPdaStorageAccount(userPda, tokenYMint.pubkey),
+        userTokenX,
+        userTokenY,
         reserveX: reserveX.pubkey,
         reserveY: reserveY.pubkey,
         tokenXMint: tokenXMint.pubkey,

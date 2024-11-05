@@ -384,6 +384,7 @@ export type MeteoraLimitCloseAutomation = {
   position: web3.PublicKey;
   minBinId: number;
   maxBinId: number;
+  useAta?: boolean;
 };
 
 export type OrcaOpenPosition = {
