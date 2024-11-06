@@ -688,10 +688,7 @@ export function getJupiterRouteIxParams(data: Buffer): JupiterRouteIxParams {
       lastIndex += 4;
   }
 
-  const r = data.subarray(8, lastIndex);
-  const vectorLength = new BN(r.length).toBuffer('le', 4);
-  const routePlan = Buffer.concat([vectorLength, r]);
-
+  const routePlan = data.subarray(8, lastIndex);
   const quotedOutAmount = new BN(data.subarray(lastIndex + 8, lastIndex + 16), 10, 'le');
   const slippageBps = new BN(data.subarray(lastIndex + 16, lastIndex + 18), 10, 'le').toNumber();
   const platformFeeBps = data[lastIndex + 18];
