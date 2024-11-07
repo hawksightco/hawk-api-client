@@ -6416,6 +6416,53 @@ export type IndexYieldFarming = {
           "type": "u8"
         }
       ]
+    },
+    {
+      "name": "closeAta",
+      "accounts": [
+        {
+          "name": "userPda",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "multi-user"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "UserAccountMulti",
+                "path": "user_pda.farm"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "UserAccountMulti",
+                "path": "user_pda.authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "hsAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -13447,6 +13494,53 @@ export const IDL: IndexYieldFarming = {
           "type": "u8"
         }
       ]
+    },
+    {
+      "name": "closeAta",
+      "accounts": [
+        {
+          "name": "userPda",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "multi-user"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "UserAccountMulti",
+                "path": "user_pda.farm"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "UserAccountMulti",
+                "path": "user_pda.authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "hsAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
