@@ -1,6 +1,4 @@
 import * as web3 from "@solana/web3.js";
-import { SimpleIxGenerator } from "../../src/classes/SimpleIxGenerator";
-import { generateUserPda, sighashMatch } from "../../src/functions";
 import dotenv from "dotenv";
 import path from "path";
 import { HawkAPI } from "../../src";
