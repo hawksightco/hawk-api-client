@@ -1,6 +1,7 @@
 import * as web3 from "@solana/web3.js";
 import { SimpleIxGenerator } from "./SimpleIxGenerator";
 import BN from "bn.js";
+import { JupiterRouteIxReturn } from '../ixGenerator/IyfMainIxGenerator';
 
 type JupiterIxToHawksight = {
   connection: web3.Connection,
@@ -8,6 +9,7 @@ type JupiterIxToHawksight = {
   quotedOutAmountOverride?: BN,
   slippageBpsOverride?: number,
   platformFeeBpsOverride?: number,
+  checkDestinationTokenAccount?: boolean,
 };
 
 export class JupiterSwap {
@@ -16,7 +18,7 @@ export class JupiterSwap {
     private ix: SimpleIxGenerator,
   ){}
 
-  async jupiterIxToHawksight({connection, swapInstruction, quotedOutAmountOverride, slippageBpsOverride, platformFeeBpsOverride}: JupiterIxToHawksight): Promise<web3.TransactionInstruction> {
+  async jupiterIxToHawksight({connection, swapInstruction, quotedOutAmountOverride, slippageBpsOverride, platformFeeBpsOverride, checkDestinationTokenAccount}: JupiterIxToHawksight): Promise<JupiterRouteIxReturn> {
     return await this.ix.iyfMain.jupiterRouteIx({
       connection,
       userPda: swapInstruction.keys[1].pubkey,
@@ -30,6 +32,7 @@ export class JupiterSwap {
       quotedOutAmount: quotedOutAmountOverride,
       slippageBps: slippageBpsOverride,
       platformFeeBps: platformFeeBpsOverride,
-    })
+      checkDestinationTokenAccount,
+    });
   }
 }

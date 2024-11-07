@@ -1,7 +1,7 @@
 import * as web3 from "@solana/web3.js";
 import { Anchor } from "../anchor";
 import { setTransactionSlot, verifyTransactionSlot, AtomicityContextParams } from "../hawksight";
-import { generateUserPda, getJupiterRouteIxParams } from "../functions";
+import { createAtaIdempotentIxs, generateUserPda, getJupiterRouteIxParams } from "../functions";
 import { HS_AUTHORITY, IYF_EXTENSION, IYF_MAIN, JUPITER_PROGRAM, TOKEN_PROGRAM_ID, USDC_FARM } from "../addresses";
 import { Transactions } from "../classes/Transactions";
 import { InitializeStorageTokenAccount } from "../types";
@@ -26,7 +26,15 @@ type JupiterRouteIx = {
   quotedOutAmount?: BN,
   slippageBps?: number,
   platformFeeBps?: number
-}
+  checkDestinationTokenAccount?: boolean,
+};
+
+export type JupiterRouteIxReturn = {
+  swapIx: web3.TransactionInstruction,
+  createAtaIx: web3.TransactionInstruction,
+  closeAtaIx: web3.TransactionInstruction,
+  ataExists: boolean,
+};
 
 /**
  * Iyf Main IX Generator
@@ -127,7 +135,8 @@ export class IyfMainIxGenerator {
     quotedOutAmount,
     slippageBps,
     platformFeeBps,
-  }: JupiterRouteIx): Promise<web3.TransactionInstruction> {
+    checkDestinationTokenAccount,
+  }: JupiterRouteIx): Promise<JupiterRouteIxReturn> {
     // Initialize anchor
     Anchor.initialize(connection);
 
@@ -148,6 +157,35 @@ export class IyfMainIxGenerator {
     if (userPda === undefined) {
       throw new Error("Either one of `userWallet` or `userPda` parameter must be defined!");
     }
+
+    // Defaults to false
+    let ataExists = false;
+
+    // Flag must be enabled first to check ATA onchain
+    if (checkDestinationTokenAccount) {
+      const info = await connection.getAccountInfo(destinationTokenAccount);
+      ataExists = !(info === null || info === undefined);
+    }
+
+    // Generate create idempotent ata instruction
+    const [createAtaIx] = createAtaIdempotentIxs({
+      accounts: [{
+        payer: HS_AUTHORITY,
+        mint: destinationMint,
+        owner: userPda,
+      }]
+    });
+
+    const closeAtaIx = await Anchor.instance().iyfMain
+      .methods
+      .closeAta()
+      .accounts({
+        userPda,
+        hsAuthority: HS_AUTHORITY,
+        userTokenAccount: destinationTokenAccount,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      })
+      .instruction();
 
     const ix = await Anchor.instance().iyfMain
       .methods
@@ -171,6 +209,11 @@ export class IyfMainIxGenerator {
       .remainingAccounts(remainingAccounts)
       .instruction();
 
-    return ix;
+    return {
+      swapIx: ix,
+      createAtaIx,
+      closeAtaIx,
+      ataExists,
+    };
   }
 }
