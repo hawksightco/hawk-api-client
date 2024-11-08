@@ -20,7 +20,12 @@ describe('SimpleIxGenerator: Jupiter Route IX Tests', () => {
       connection,
       swapInstruction: new web3.TransactionInstruction({
         programId: web3.SystemProgram.programId,
-        keys: new Array(20).fill({ pubkey: web3.SystemProgram.programId, isSigner: false, isWritable: false }),
+        keys: [
+          { pubkey: web3.SystemProgram.programId, isSigner: false, isWritable: false },
+          { pubkey: web3.SystemProgram.programId, isSigner: false, isWritable: false },
+          { pubkey: web3.SystemProgram.programId, isSigner: false, isWritable: false },
+          { pubkey: new web3.PublicKey('2a8MS8dWyyYNgBHgtzeTwrsDKsE6RnCoUqnonB4C8Xc3'), isSigner: false, isWritable: false },
+          ...new Array(16).fill({ pubkey: web3.SystemProgram.programId, isSigner: false, isWritable: false })],
         data: Buffer.from([
           0xe5, 0x17, 0xcb, 0x97, 0x7a, 0xe3, 0xad, 0x2a, 0x01, 0x00, 0x00, 0x00, 0x3a, 0x00, 0x64, 0x00,
           0x01, 0x8e, 0xdf, 0x1e, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x46, 0xf2, 0x9f, 0x39, 0x00, 0x00, 0x00,

@@ -1,7 +1,7 @@
 import * as web3 from "@solana/web3.js";
 import { Anchor } from "../anchor";
 import { setTransactionSlot, verifyTransactionSlot, AtomicityContextParams } from "../hawksight";
-import { createAtaIdempotentIxs, generateUserPda, getJupiterRouteIxParams } from "../functions";
+import { createAtaIdempotentIxs, generateAta, generateUserPda, getJupiterRouteIxParams, generateUserPdaStorageAccount } from "../functions";
 import { HS_AUTHORITY, IYF_EXTENSION, IYF_MAIN, JUPITER_PROGRAM, TOKEN_PROGRAM_ID, USDC_FARM } from "../addresses";
 import { Transactions } from "../classes/Transactions";
 import { InitializeStorageTokenAccount } from "../types";
@@ -161,20 +161,44 @@ export class IyfMainIxGenerator {
     // Defaults to false
     let ataExists = false;
 
+    // Generate STA and ATA
+    const destATA = generateAta(userPda, destinationMint);
+    const destSTA = generateUserPdaStorageAccount(userPda, destinationMint);
+
+    // createAtaIx
+    let createAtaIx;
+
+    if (destATA.equals(destinationTokenAccount)) {
+      [createAtaIx] = createAtaIdempotentIxs({
+        accounts: [{
+          payer: HS_AUTHORITY,
+          mint: destinationMint,
+          owner: userPda,
+        }]
+      });
+    } else if (destSTA.equals(destinationTokenAccount)) {
+      createAtaIx = await Anchor.instance().iyfMain
+        .methods
+        .initializeStorageTokenAccount()
+        .accounts({
+          userPda,
+          payer: HS_AUTHORITY,
+          mint: destinationMint,
+          storageTokenAccount: destSTA,
+          rent: web3.SYSVAR_RENT_PUBKEY,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          systemProgram: web3.SystemProgram.programId,
+        })
+        .instruction();
+    } else {
+      throw new Error(`destinationTokenAccount: ${destinationTokenAccount} is neither ATA(${destATA}) or STA${destSTA}`);
+    }
+
     // Flag must be enabled first to check ATA onchain
     if (checkDestinationTokenAccount) {
       const info = await connection.getAccountInfo(destinationTokenAccount);
       ataExists = !(info === null || info === undefined);
     }
-
-    // Generate create idempotent ata instruction
-    const [createAtaIx] = createAtaIdempotentIxs({
-      accounts: [{
-        payer: HS_AUTHORITY,
-        mint: destinationMint,
-        owner: userPda,
-      }]
-    });
 
     const closeAtaIx = await Anchor.instance().iyfMain
       .methods

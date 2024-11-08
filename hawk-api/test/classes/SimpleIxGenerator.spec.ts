@@ -277,7 +277,7 @@ describe('SimpleIxGenerator: Jupiter Route IX Tests', () => {
         connection,
         userWallet,
         sourceTokenAccount: web3.SystemProgram.programId,
-        destinationTokenAccount: web3.SystemProgram.programId,
+        destinationTokenAccount: new web3.PublicKey('2a8MS8dWyyYNgBHgtzeTwrsDKsE6RnCoUqnonB4C8Xc3'),
         destinationMint: web3.SystemProgram.programId,
         platformFeeAccount: web3.SystemProgram.programId,
         eventAuthority: web3.SystemProgram.programId,
