@@ -6938,64 +6938,12 @@ export type IyfExtension = {
         {
           "name": "userTokenX",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "storage-token"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "token_x_mint"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "UserAccountMulti",
-                "path": "user_pda"
-              }
-            ],
-            "programId": {
-              "kind": "account",
-              "type": "publicKey",
-              "path": "iyf_program"
-            }
-          }
+          "isSigner": false
         },
         {
           "name": "userTokenY",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "storage-token"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "token_y_mint"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "UserAccountMulti",
-                "path": "user_pda"
-              }
-            ],
-            "programId": {
-              "kind": "account",
-              "type": "publicKey",
-              "path": "iyf_program"
-            }
-          }
+          "isSigner": false
         },
         {
           "name": "reserveX",
@@ -7070,6 +7018,139 @@ export type IyfExtension = {
         {
           "name": "maxBinId",
           "type": "i32"
+        }
+      ]
+    },
+    {
+      "name": "moveToken",
+      "accounts": [
+        {
+          "name": "farm",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userPda",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "multi-user"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "FarmAccountMulti",
+                "path": "farm"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "authority"
+              }
+            ],
+            "programId": {
+              "kind": "account",
+              "type": "publicKey",
+              "path": "iyf_program"
+            }
+          }
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "iyfProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "hawksightAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "sourceToken",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "UserAccountMulti",
+                "path": "user_pda"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "TokenAccount",
+                "path": "destination_token.mint"
+              }
+            ],
+            "programId": {
+              "kind": "account",
+              "type": "publicKey",
+              "path": "associated_token_program"
+            }
+          }
+        },
+        {
+          "name": "destinationToken",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "storage-token"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "TokenAccount",
+                "path": "source_token.mint"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "UserAccountMulti",
+                "path": "user_pda"
+              }
+            ],
+            "programId": {
+              "kind": "account",
+              "type": "publicKey",
+              "path": "iyf_program"
+            }
+          }
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
         }
       ]
     }
@@ -7217,10 +7298,7 @@ export type IyfExtension = {
           {
             "name": "padding",
             "type": {
-              "array": [
-                "u8",
-                285
-              ]
+              "defined": "UserAccountMultiPadding"
             }
           }
         ]
@@ -14454,64 +14532,12 @@ export const IDL: IyfExtension = {
         {
           "name": "userTokenX",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "storage-token"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "token_x_mint"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "UserAccountMulti",
-                "path": "user_pda"
-              }
-            ],
-            "programId": {
-              "kind": "account",
-              "type": "publicKey",
-              "path": "iyf_program"
-            }
-          }
+          "isSigner": false
         },
         {
           "name": "userTokenY",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "storage-token"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "token_y_mint"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "UserAccountMulti",
-                "path": "user_pda"
-              }
-            ],
-            "programId": {
-              "kind": "account",
-              "type": "publicKey",
-              "path": "iyf_program"
-            }
-          }
+          "isSigner": false
         },
         {
           "name": "reserveX",
@@ -14586,6 +14612,139 @@ export const IDL: IyfExtension = {
         {
           "name": "maxBinId",
           "type": "i32"
+        }
+      ]
+    },
+    {
+      "name": "moveToken",
+      "accounts": [
+        {
+          "name": "farm",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userPda",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "multi-user"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "FarmAccountMulti",
+                "path": "farm"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "authority"
+              }
+            ],
+            "programId": {
+              "kind": "account",
+              "type": "publicKey",
+              "path": "iyf_program"
+            }
+          }
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "iyfProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "hawksightAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "sourceToken",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "UserAccountMulti",
+                "path": "user_pda"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "TokenAccount",
+                "path": "destination_token.mint"
+              }
+            ],
+            "programId": {
+              "kind": "account",
+              "type": "publicKey",
+              "path": "associated_token_program"
+            }
+          }
+        },
+        {
+          "name": "destinationToken",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "storage-token"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "TokenAccount",
+                "path": "source_token.mint"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "UserAccountMulti",
+                "path": "user_pda"
+              }
+            ],
+            "programId": {
+              "kind": "account",
+              "type": "publicKey",
+              "path": "iyf_program"
+            }
+          }
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
         }
       ]
     }
@@ -14733,10 +14892,7 @@ export const IDL: IyfExtension = {
           {
             "name": "padding",
             "type": {
-              "array": [
-                "u8",
-                285
-              ]
+              "defined": "UserAccountMultiPadding"
             }
           }
         ]

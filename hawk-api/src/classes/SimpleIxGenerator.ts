@@ -1,3 +1,4 @@
+import { IyfExtensionIxGenerator } from "../ixGenerator/IyfExtensionIxGenerator";
 import { IyfMainIxGenerator } from "../ixGenerator/IyfMainIxGenerator";
 import { MeteoraDlmmIxGenerator } from "../ixGenerator/MeteoraDlmmIxGenerator";
 
@@ -13,6 +14,11 @@ export class SimpleIxGenerator {
    * IYF Main Instruction Generator
    */
   public iyfMain: IyfMainIxGenerator = new IyfMainIxGenerator();
+
+  /**
+   * IYF Main Instruction Generator
+   */
+  public iyfExtension: IyfExtensionIxGenerator = new IyfExtensionIxGenerator(this.iyfMain);
 
   /**
    * Meteora Ix Generator
