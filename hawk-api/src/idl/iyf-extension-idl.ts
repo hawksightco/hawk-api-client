@@ -7149,6 +7149,10 @@ export type IyfExtension = {
       ],
       "args": [
         {
+          "name": "useSourceAmount",
+          "type": "bool"
+        },
+        {
           "name": "amount",
           "type": "u64"
         }
@@ -14745,6 +14749,10 @@ export const IDL: IyfExtension = {
         }
       ],
       "args": [
+        {
+          "name": "useSourceAmount",
+          "type": "bool"
+        },
         {
           "name": "amount",
           "type": "u64"

@@ -9,7 +9,8 @@ type MoveTokenIx = {
   connection: web3.Connection,
   userWallet: web3.PublicKey,
   mint: web3.PublicKey,
-  amount: BN,
+  useSourceAmount: boolean,
+  amount?: BN,
 };
 
 /**
@@ -31,6 +32,7 @@ export class IyfExtensionIxGenerator {
     connection,
     userWallet,
     mint,
+    useSourceAmount,
     amount,
   }: MoveTokenIx): Promise<web3.TransactionInstruction> {
     // Initialize anchor
@@ -41,10 +43,18 @@ export class IyfExtensionIxGenerator {
     const sourceToken = generateAta(userPda, mint);
     const destinationToken = generateUserPdaStorageAccount(userPda, mint);
 
+    if (!useSourceAmount && amount === undefined) {
+      throw new Error('Source amount cannot be undefined if `useSourceAmount` is false');
+    }
+
+    if (amount === undefined) {
+      amount = new BN(0);
+    }
+
     // Generate move_token instruction
     const iyfExtensionIx = await Anchor.instance().iyfExtension
       .methods
-      .moveToken(amount)
+      .moveToken(useSourceAmount, amount)
       .accounts({
         farm: USDC_FARM,
         userPda,
