@@ -7298,7 +7298,10 @@ export type IyfExtension = {
           {
             "name": "padding",
             "type": {
-              "defined": "UserAccountMultiPadding"
+              "array": [
+                "u8",
+                285
+              ]
             }
           }
         ]
@@ -14892,7 +14895,10 @@ export const IDL: IyfExtension = {
           {
             "name": "padding",
             "type": {
-              "defined": "UserAccountMultiPadding"
+              "array": [
+                "u8",
+                285
+              ]
             }
           }
         ]
