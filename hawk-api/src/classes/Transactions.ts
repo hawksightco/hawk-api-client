@@ -563,25 +563,6 @@ export class Transactions {
         meteoraToHawksightAutomationIxs
       );
 
-    // Sweep dust
-    const sweepLiquidityBuilder = await dlmmPool.addLiquidityByStrategy(
-      params.userWallet,
-      HS_AUTHORITY,
-      {
-        positionPubKey: params.newPosition,
-        user: userPda,
-        totalXAmount: new BN(100_000), // This is overriden on-chain, so value here do not matter
-        totalYAmount: new BN(100_000), // This is overriden on-chain, so value here do not matter
-        strategy: {
-          maxBinId: params.binRange.upperRange,
-          minBinId: params.binRange.lowerRange,
-          strategyType: StrategyTypeMap["SPOT-IMBALANCED"],
-        },
-        skipInputTokenCheck: true,
-      },
-      meteoraToHawksightAutomationIxs
-    );
-
     const mainInstructions = [
       // Initialize required ATA
       ...removeLiquidityBuilder.createAtaIxs,
@@ -591,9 +572,6 @@ export class Transactions {
 
       // Re-deposit liquidity
       ...initPositionAndAddLiquidityBuilder.mainIxs,
-
-      // Sweep dust
-      ...sweepLiquidityBuilder.mainIxs,
     ];
 
     return createTransactionMeta({
