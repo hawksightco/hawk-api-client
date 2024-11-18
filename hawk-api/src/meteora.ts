@@ -6,7 +6,7 @@ import {
   METEORA_DLMM_PROGRAM,
   SOME_METEORA_DLMM_POOL
 } from './addresses';
-import { createAtaIdempotentIxs, getIxs, getMintsFromInstruction, wrapSolIfMintIsWsol, unwrapSolIfMintIsWsol, inputTokenExists, sighashMatch, sighash, generateUserPdaStorageAccount } from './functions';
+import { createAtaIdempotentIxs, getIxs, getMintsFromInstruction, wrapSolIfMintIsWsol, unwrapSolIfMintIsWsol, inputTokenExists, sighashMatch, sighash, generateUserPdaStorageAccount, generateAta } from './functions';
 import { depositMultipleToken, withdrawMultipleToken } from './hawksight';
 import { MeteoraToHawksightFn } from './types';
 import { Anchor } from './anchor';
@@ -498,7 +498,7 @@ export class MeteoraDLMM {
 
 /**
  * A builder class for constructing transaction instructions to claim all rewards by position.
- * 
+ *
  * This class provides a structured way to build the necessary transaction instructions for claiming
  * rewards, removing liquidity, and managing wrapped SOL (wSOL) accounts.
  */
@@ -506,7 +506,7 @@ export class ClaimAllRewardsByPositionBuilder {
 
   /**
    * Constructs an instance of the ClaimAllRewardsByPositionBuilder class.
-   * 
+   *
    * @param {web3.TransactionInstruction[]} createAtaIxs - Instructions to create associated token accounts (ATAs) prior to withdrawal.
    * @param {web3.TransactionInstruction[]} mainIxs - Main instructions for claiming fees and/or rewards.
    * @param {web3.TransactionInstruction} withdrawMultipleTokenIx - Instruction to withdraw multiple tokens to the user wallet.
@@ -521,13 +521,13 @@ export class ClaimAllRewardsByPositionBuilder {
 
   /**
    * Builds the default sequence of transaction instructions for claiming all rewards by position.
-   * 
+   *
    * This method returns an array of transaction instructions that includes:
    * - Initializing ATAs prior to withdrawal
    * - Claiming fees and/or rewards
    * - Withdrawing tokens to the user wallet
    * - Closing wSOL accounts, if any
-   * 
+   *
    * @returns {web3.TransactionInstruction[]} - An array of transaction instructions in the required order.
    */
   default(): web3.TransactionInstruction[] {
@@ -549,7 +549,7 @@ export class ClaimAllRewardsByPositionBuilder {
 
 /**
  * A builder class for constructing transaction instructions to add liquidity according to a specified strategy.
- * 
+ *
  * This class provides a structured way to build the necessary transaction instructions for adding liquidity to a position
  * based on a strategy, handling operations such as wrapping SOL, depositing tokens, adding liquidity, refunding dust, and
  * managing wrapped SOL (wSOL) accounts.
@@ -558,7 +558,7 @@ export class AddLiquidityByStrategyBuilder {
 
   /**
    * Constructs an instance of the AddLiquidityByStrategyBuilder class.
-   * 
+   *
    * @param {web3.TransactionInstruction[]} wrapSolIxs - Instructions to wrap SOL to wSOL if needed.
    * @param {web3.TransactionInstruction} depositToPdaIxs - Instruction to deposit X and Y tokens to the UserPDA.
    * @param {web3.TransactionInstruction[]} mainIxs - Main instructions for adding liquidity by strategy.
@@ -575,14 +575,14 @@ export class AddLiquidityByStrategyBuilder {
 
   /**
    * Builds the default sequence of transaction instructions for adding liquidity by strategy.
-   * 
+   *
    * This method returns an array of transaction instructions that includes:
    * - Initializing wSOL token accounts if needed
    * - Depositing X and Y tokens to the UserPDA
    * - Adding liquidity according to the strategy
    * - Refunding dust tokens to the user wallet
    * - Closing wSOL accounts if any
-   * 
+   *
    * @returns {web3.TransactionInstruction[]} - An array of transaction instructions in the required order.
    */
   default(): web3.TransactionInstruction[] {
@@ -694,11 +694,50 @@ export class RemoveLiquidityBuilder {
     const staToken = generateUserPdaStorageAccount(userPda, tokenMint);
     this.mainIxs[index].keys[11].pubkey = staToken;
   }
+
+  /**
+   * Replaces claim fee token ixs into associated token account
+   */
+  replaceClaimFeeTokenToATA() {
+    const index = this.mainIxs.findIndex(mainIx => {
+      const dataWithoutIyfExtensionExecute = mainIx.data.subarray(12);
+      return sighashMatch(dataWithoutIyfExtensionExecute, "MeteoraDlmmClaimFeeAutomation");
+    });
+    if (index === -1) {
+      console.warn(`Warn: claim fee instruction not found! This should not happen if \`shouldClaimAndClose\` is set to true.`);
+      return;
+    }
+    const userPda = this.mainIxs[index].keys[1].pubkey;
+    const tokenXMint = this.mainIxs[index].keys[14].pubkey;
+    const tokenYMint = this.mainIxs[index].keys[15].pubkey;
+    const ataTokenX = generateAta(userPda, tokenXMint);
+    const ataTokenY = generateAta(userPda, tokenYMint);
+    this.mainIxs[index].keys[12].pubkey = ataTokenX;
+    this.mainIxs[index].keys[13].pubkey = ataTokenY;
+  }
+
+  /**
+   * Replaces reward token into associated token account
+   */
+  replaceClaimRewardToATA() {
+    const index = this.mainIxs.findIndex(mainIx => {
+      const dataWithoutIyfExtensionExecute = mainIx.data.subarray(12);
+      return sighashMatch(dataWithoutIyfExtensionExecute, "MeteoraDlmmClaimRewardAutomation");
+    })
+    if (index === -1) {
+      console.warn(`Warn: Reward instruction not found! This may happen if pool has no rewards`);
+      return;
+    }
+    const userPda = this.mainIxs[index].keys[1].pubkey;
+    const tokenMint = this.mainIxs[index].keys[10].pubkey;
+    const ataToken = generateAta(userPda, tokenMint);
+    this.mainIxs[index].keys[11].pubkey = ataToken;
+  }
 }
 
 /**
  * A builder class for constructing transaction instructions to remove liquidity from a position.
- * 
+ *
  * This class provides a structured way to build the necessary transaction instructions for removing liquidity
  * from a position, handling operations such as creating associated token accounts (ATAs), claiming rewards,
  * withdrawing tokens, and managing wrapped SOL (wSOL) accounts.
@@ -707,7 +746,7 @@ export class InitializePositionAndAddLiquidityByStrategyBuilder {
 
   /**
    * Constructs an instance of the InitializePositionAndAddLiquidityByStrategyBuilder class.
-   * 
+   *
    * @param {web3.TransactionInstruction[]} wrapSolIxs - Instructions to wrap SOL to wSOL if needed.
    * @param {web3.TransactionInstruction} depositToPdaIxs - Instruction to deposit X and Y tokens to the UserPDA.
    * @param {web3.TransactionInstruction[]} mainIxs - Main instructions for adding liquidity by strategy.
@@ -724,13 +763,13 @@ export class InitializePositionAndAddLiquidityByStrategyBuilder {
 
   /**
    * Builds the default sequence of transaction instructions for removing liquidity from a position.
-   * 
+   *
    * This method returns an array of transaction instructions that includes:
    * - Initializing associated token accounts (ATAs) prior to withdrawal
    * - Claiming fees and/or rewards, removing liquidity, and possibly closing the position
    * - Withdrawing tokens to the user wallet
    * - Closing wSOL accounts, if any
-   * 
+   *
    * @returns {web3.TransactionInstruction[]} - An array of transaction instructions in the required order.
    */
   default(): web3.TransactionInstruction[] {

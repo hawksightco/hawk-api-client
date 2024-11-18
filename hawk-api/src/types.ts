@@ -377,6 +377,7 @@ export type MeteoraRebalance = {
   newPosition: web3.PublicKey;
   binRange: BinRange;
   distribution: Distribution;
+  useAta?: boolean;
 };
 
 export type MeteoraLimitCloseAutomation = {

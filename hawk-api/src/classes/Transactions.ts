@@ -535,8 +535,13 @@ export class Transactions {
       meteoraToHawksightAutomationIxs
     );
 
-    removeLiquidityBuilder.replaceClaimFeeTokenToSTA();
-    removeLiquidityBuilder.replaceClaimRewardToSTA();
+    if (!!params.useAta) {
+      removeLiquidityBuilder.replaceClaimFeeTokenToATA();
+      removeLiquidityBuilder.replaceClaimRewardToATA();
+    } else {
+      removeLiquidityBuilder.replaceClaimFeeTokenToSTA();
+      removeLiquidityBuilder.replaceClaimRewardToSTA();
+    }
 
     // Re-deposit fees (TODO: How to re-deposit reward tokens that is not X or Y token?)
     const initPositionAndAddLiquidityBuilder =
