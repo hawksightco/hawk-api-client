@@ -1,6 +1,6 @@
 import * as web3 from "@solana/web3.js";
 import * as _client from "@hawksightco/swagger-client";
-import { ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, TransactionPriority, Distribution, OrcaWithdraw, OrcaDeposit, OrcaClosePosition, OrcaOpenPosition, OrcaClaimRewards } from "../types";
+import { ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, TransactionPriority, Distribution, OrcaWithdraw, OrcaDeposit, OrcaClosePosition, OrcaOpenPosition, OrcaClaimRewards, MeteoraClaimAll } from "../types";
 import { Client } from "./Client";
 import { createTxMetadata, resultOrError } from "../functions";
 import { GeneralUtility } from "./GeneralUtility";
@@ -205,6 +205,50 @@ export class TxGenerator {
           payer,
           result
         ),
+      };
+    } catch (e) {
+      return {
+        status: 400,
+        data: {
+          code: "custom",
+          message: e,
+          path: [],
+        } as any,
+      };
+    }
+  }
+
+  /**
+   * Creates meteora instruction that claims fees and rewards.
+   *
+   * @param connection The Solana web3 connection object for blockchain interactions.
+   * @param payer The public key of the payer for transaction fees.
+   * @param params Parameters required
+   * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
+   */
+  async meteoraClaimAll(connection: web3.Connection, payer: string, params: MeteoraClaimAll): Promise<ResponseWithStatus<TransactionMetadata[]>> {
+    // Initialize anchor
+    Anchor.initialize(connection);
+    try {
+      const startTime = new Date().getTime() / 1000;
+      const result = await txgen.meteoraClaimAll({
+        connection,
+        params,
+      });
+      const data = [];
+      for (const r of result) {
+        data.push(
+          await createTxMetadata(
+            this.generalUtility,
+            connection,
+            payer,
+            r
+          )
+        );
+      }
+      return {
+        status: 200,
+        data,
       };
     } catch (e) {
       return {

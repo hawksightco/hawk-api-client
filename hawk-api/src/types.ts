@@ -361,6 +361,10 @@ export type MeteoraClaim = {
   };
 };
 
+export type MeteoraClaimAll = {
+  userWallet: web3.PublicKey,
+};
+
 export type MeteoraClose = {
   userWallet: web3.PublicKey;
   position: web3.PublicKey;

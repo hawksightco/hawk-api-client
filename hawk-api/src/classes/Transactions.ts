@@ -18,6 +18,7 @@ import {
 } from "../addresses";
 import {
   MeteoraClaim,
+  MeteoraClaimAll,
   MeteoraClose,
   MeteoraCompound,
   MeteoraCreatePositionAndDeposit,
@@ -63,6 +64,7 @@ import axios from "axios";
 import { depositMultipleToken, withdrawMultipleToken } from "../hawksight";
 import { Protocol } from "../types";
 import { Log } from "./Logging";
+import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 
 export class Transactions {
   /**
@@ -398,6 +400,77 @@ export class Transactions {
     });
     return txMeta;
   }
+
+  /**
+   * Claim all meteora fees and rewards by list of pools owned by given user
+   *
+   * @param connection The Solana web3 connection object for blockchain interactions.
+   * @param payer The public key of the payer for transaction fees.
+   * @param params Parameters required
+   * @returns A ResponseWithStatus containing either TransactionMetadataResponse.
+   */
+    async meteoraClaimAll({
+      connection,
+      params,
+    }: TxgenParams<MeteoraClaimAll>): Promise<TransactionMetadataResponse[]> {
+      const userPda = generateUserPda(params.userWallet);
+      const txs: TransactionMetadataResponse[] = [];
+
+      // Returns all position owned by user.
+      // What is not sure is whether these positions are closed already.
+      const promiseResult = await Promise.all([
+        userPda && (await MeteoraDLMM.program(connection)).account.position.all([
+          {
+            memcmp: {
+              bytes: bs58.encode(userPda.toBuffer()),
+              offset: 8 + 32
+            }
+          }
+        ]),
+        userPda && (await MeteoraDLMM.program(connection)).account.positionV2.all([
+          {
+            memcmp: {
+              bytes: bs58.encode(userPda.toBuffer()),
+              offset: 8 + 32
+            }
+          }
+        ])
+      ]);
+
+      const [_positions, _positionsV2] = promiseResult;
+      const positions = [..._positions, ..._positionsV2];
+
+      for (const position of positions) {
+        position.account.lbPair
+        const dlmmPool = await MeteoraDLMM.create(connection, position.account.lbPair);
+        const { userPositions } = await dlmmPool.getPositionsByUserAndLbPair(
+          userPda
+        );
+        for (const position of userPositions) {
+          const mainInstructions = (
+            await dlmmPool.claimAllRewardsByPosition(
+              params.userWallet,
+              params.userWallet,
+              {
+                owner: userPda,
+                position,
+              },
+              meteoraToHawksight
+            )
+          ).default();
+          txs.push(
+            await createTransactionMeta({
+              payer: params.userWallet,
+              description: "Claim fees / rewards from Meteora DLMM Position",
+              addressLookupTableAddresses: GLOBAL_ALT,
+              mainInstructions,
+            })
+          );
+        }
+      }
+
+      return txs;
+    }
 
   /**
    * Creates meteora instruction that closes position.
