@@ -715,12 +715,12 @@ class AddLiquidityByWeightAutomation extends HawksightMeteoraAutomationCpi {
 
     // Generate IX via extension contract
     const data = this.ix.data.subarray(8);
-    const activeId = data.subarray(0, 4).readInt32LE();
-    const maxActiveBinSlippage = data.subarray(4, 8).readInt32LE();
-    const strategyParametersMinBinId = data.subarray(8, 12).readInt32LE();
-    const strategyParametersMaxBinId = data.subarray(12, 16).readInt32LE();
-    const strategyParametersStrategyType = data[16];
-    const strategyParametersParameters = Array.from(data.subarray(17));
+    const activeId = data.subarray(16, 20).readInt32LE();
+    const maxActiveBinSlippage = data.subarray(20, 24).readInt32LE();
+    const strategyParametersMinBinId = data.subarray(24, 28).readInt32LE();
+    const strategyParametersMaxBinId = data.subarray(28, 32).readInt32LE();
+    const strategyParametersStrategyType = data[32];
+    const strategyParametersParameters = Array.from(data.subarray(33));
     const depositIx = await Anchor.instance().iyfExtension.methods
       .meteoraDlmmDepositAutomation(
         activeId,
