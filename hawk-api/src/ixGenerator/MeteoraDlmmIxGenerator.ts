@@ -42,16 +42,17 @@ export class MeteoraDlmmIxGenerator {
     const userPda = generateUserPda(userWallet);
 
     // Generate instruction
+    const width = upperBinId - lowerBinId + 1;
     return this.iyfMain.iyfExtensionExecute(
       connection,
       {
         userWallet,
         iyfExtensionIx: await Anchor.instance().iyfExtension
           .methods
-          .meteoraDlmmInitializePositionAutomation(Buffer.concat([
-            Buffer.from(new BN(lowerBinId).toArray('le', 4)),
-            Buffer.from(new BN(upperBinId - lowerBinId + 1).toArray('le', 4)),
-          ]))
+          .meteoraDlmmInitializePositionAutomation(
+            lowerBinId,
+            width,
+          )
           .accounts({
             farm: USDC_FARM,
             userPda,

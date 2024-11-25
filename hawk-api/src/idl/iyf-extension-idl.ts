@@ -5904,8 +5904,12 @@ export type IyfExtension = {
       ],
       "args": [
         {
-          "name": "param",
-          "type": "bytes"
+          "name": "lowerBinId",
+          "type": "i32"
+        },
+        {
+          "name": "width",
+          "type": "i32"
         }
       ]
     },
@@ -6524,8 +6528,33 @@ export type IyfExtension = {
       ],
       "args": [
         {
-          "name": "param",
-          "type": "bytes"
+          "name": "activeId",
+          "type": "i32"
+        },
+        {
+          "name": "maxActiveBinSlippage",
+          "type": "i32"
+        },
+        {
+          "name": "strategyParametersMinBinId",
+          "type": "i32"
+        },
+        {
+          "name": "strategyParametersMaxBinId",
+          "type": "i32"
+        },
+        {
+          "name": "strategyParametersStrategyType",
+          "type": "u8"
+        },
+        {
+          "name": "strategyParametersParameters",
+          "type": {
+            "array": [
+              "u8",
+              64
+            ]
+          }
         }
       ]
     },
@@ -13505,8 +13534,12 @@ export const IDL: IyfExtension = {
       ],
       "args": [
         {
-          "name": "param",
-          "type": "bytes"
+          "name": "lowerBinId",
+          "type": "i32"
+        },
+        {
+          "name": "width",
+          "type": "i32"
         }
       ]
     },
@@ -14125,8 +14158,33 @@ export const IDL: IyfExtension = {
       ],
       "args": [
         {
-          "name": "param",
-          "type": "bytes"
+          "name": "activeId",
+          "type": "i32"
+        },
+        {
+          "name": "maxActiveBinSlippage",
+          "type": "i32"
+        },
+        {
+          "name": "strategyParametersMinBinId",
+          "type": "i32"
+        },
+        {
+          "name": "strategyParametersMaxBinId",
+          "type": "i32"
+        },
+        {
+          "name": "strategyParametersStrategyType",
+          "type": "u8"
+        },
+        {
+          "name": "strategyParametersParameters",
+          "type": {
+            "array": [
+              "u8",
+              64
+            ]
+          }
         }
       ]
     },
