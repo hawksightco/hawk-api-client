@@ -622,8 +622,14 @@ class InitializePositionAutomation extends HawksightMeteoraAutomationCpi {
     const hawksightAuthority = HS_AUTHORITY;
 
     // Generate IX via extension contract
+    const data = this.ix.data.subarray(8);
+    const lowerBinId = data.subarray(0, 4).readInt32LE();
+    const width = data.subarray(4).readInt32LE();
     const initializePositionIx = await Anchor.instance().iyfExtension.methods
-      .meteoraDlmmInitializePositionAutomation(this.ix.data.subarray(8))
+      .meteoraDlmmInitializePositionAutomation(
+        lowerBinId,
+        width,
+      )
       .accounts({
         farm,
         userPda,
@@ -708,8 +714,22 @@ class AddLiquidityByWeightAutomation extends HawksightMeteoraAutomationCpi {
     const tokenYMint = this.ix.keys[8].pubkey;
 
     // Generate IX via extension contract
+    const data = this.ix.data.subarray(8);
+    const activeId = data.subarray(0, 4).readInt32LE();
+    const maxActiveBinSlippage = data.subarray(4, 8).readInt32LE();
+    const strategyParametersMinBinId = data.subarray(8, 12).readInt32LE();
+    const strategyParametersMaxBinId = data.subarray(12, 16).readInt32LE();
+    const strategyParametersStrategyType = data[16];
+    const strategyParametersParameters = Array.from(data.subarray(17));
     const depositIx = await Anchor.instance().iyfExtension.methods
-      .meteoraDlmmDepositAutomation(this.ix.data.subarray(8))
+      .meteoraDlmmDepositAutomation(
+        activeId,
+        maxActiveBinSlippage,
+        strategyParametersMinBinId,
+        strategyParametersMaxBinId,
+        strategyParametersStrategyType,
+        strategyParametersParameters,
+      )
       .accounts({
         farm,
         userPda,

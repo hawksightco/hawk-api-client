@@ -268,7 +268,7 @@ describe('SimpleIxGenerator: Jupiter Route IX Tests', () => {
     const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
 
     // Generate wallet
-    const userWallet = web3.Keypair.generate().publicKey;
+    const userWallet = new web3.PublicKey(`n491NZYXJ1Hbi1Vqt91XB4jG1CZPjQU56sfec1KuMF9`);
 
     // Generate instruction
     let throwsException = false;
@@ -277,7 +277,7 @@ describe('SimpleIxGenerator: Jupiter Route IX Tests', () => {
         connection,
         userWallet,
         sourceTokenAccount: web3.SystemProgram.programId,
-        destinationTokenAccount: new web3.PublicKey('2a8MS8dWyyYNgBHgtzeTwrsDKsE6RnCoUqnonB4C8Xc3'),
+        destinationTokenAccount: new web3.PublicKey('HMR3L6tkbDoQvvN655WR3jzYJZzStzsqSjtmGBAkNeqJ'),
         destinationMint: web3.SystemProgram.programId,
         platformFeeAccount: web3.SystemProgram.programId,
         eventAuthority: web3.SystemProgram.programId,
