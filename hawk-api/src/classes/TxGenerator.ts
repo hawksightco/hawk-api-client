@@ -182,6 +182,7 @@ export class TxGenerator {
     Anchor.initialize(connection);
     try {
       const startTime = new Date().getTime() / 1000;
+      console.log(`meteoraClaim: Benchmarking txgen.meteoraClaim`);
       const result = await txgen.meteoraClaim({
         connection,
         params: {
@@ -194,6 +195,7 @@ export class TxGenerator {
             : undefined,
         },
       });
+      console.log(`meteoraClaim: await txgen.meteoraClaim: ${new Date().getTime() / 1000 - startTime}`);
       return {
         status: 200,
         data: await createTxMetadata(

@@ -14,6 +14,7 @@ import {
   USDC_FARM,
   ASSOCIATED_TOKEN_PROGRAM,
   ORCA_WHIRLPOOL_PROGRAM,
+  METEORA_EVENT_AUTHORITY,
 } from "../addresses";
 import {
   MeteoraClaim,
@@ -56,7 +57,7 @@ import {
   meteoraToHawksight,
   meteoraToHawksightAutomationIxs,
 } from "../hsToMeteora";
-import { MeteoraDLMM } from "../meteora";
+import { MeteoraDLMM, MeteoraFunctions } from "../meteora";
 import { Anchor } from "../anchor";
 import axios from "axios";
 import { depositMultipleToken, withdrawMultipleToken } from "../hawksight";
@@ -365,39 +366,36 @@ export class Transactions {
     connection,
     params,
   }: TxgenParams<MeteoraClaim>): Promise<TransactionMetadataResponse> {
-    const program = await MeteoraDLMM.program(connection);
     let lbPair;
     if (params.fastGeneration !== undefined) {
       lbPair = params.fastGeneration.pool;
     } else {
+      const program = await MeteoraDLMM.program(connection);
       const position = await program.account.positionV2.fetch(params.position);
       lbPair = position.lbPair;
     }
-    const dlmmPool = await MeteoraDLMM.create(connection, lbPair);
     const userPda = generateUserPda(params.userWallet);
-    const { userPositions } = await dlmmPool.getPositionsByUserAndLbPair(
-      userPda
-    );
-    const index = userPositions.findIndex((v) =>
-      v.publicKey.equals(params.position)
-    );
+    const fn = new MeteoraFunctions();
     const mainInstructions = (
-      await dlmmPool.claimAllRewardsByPosition(
+      await fn.claimAllRewardsByPosition(
+        connection,
         params.userWallet,
         params.userWallet,
         {
           owner: userPda,
-          position: userPositions[index],
+          position: params.position,
+          lbPair,
         },
-        meteoraToHawksight
+        meteoraToHawksight,
       )
     ).default();
-    return createTransactionMeta({
+    const txMeta = createTransactionMeta({
       payer: params.userWallet,
       description: "Claim fees / rewards from Meteora DLMM Position",
       addressLookupTableAddresses: GLOBAL_ALT,
       mainInstructions,
     });
+    return txMeta;
   }
 
   /**

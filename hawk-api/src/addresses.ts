@@ -24,6 +24,7 @@ export const SITE_FEE_OWNER = new web3.PublicKey("4K3a2ucXiGvuMJMPNneRDyzmNp6i4R
 export const USDC_FARM = new web3.PublicKey("7jLQhREMxXjKdpwVuN6gwsWt3BNfAg9WqbepffPbi4ww");
 export const SOME_METEORA_DLMM_POOL = new web3.PublicKey("7eexH14UjhNxJe6zTT3f1Vb1E8iACsBMVaWheDEmxdT2");
 export const METEORA_DLMM_PROGRAM = new web3.PublicKey("LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo");
+export const METEORA_EVENT_AUTHORITY = new web3.PublicKey("D1ZN9Wj1fRSUQfCjhvnu1hqDMT7hzjzBBpi12nVniYD6");
 export const COMPUTE_BUDGET = new web3.PublicKey("ComputeBudget111111111111111111111111111111");
 export const HS_AUTHORITY = new web3.PublicKey("dche7M2764e8AxNihBdn7uffVzZvTBNeL8x4LZg5E2c");
 export const ORCA_WHIRLPOOL_PROGRAM = new web3.PublicKey("whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc");

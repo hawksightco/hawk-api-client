@@ -4,7 +4,9 @@ import * as web3 from "@solana/web3.js";
 import { AppError } from './errors';
 import {
   METEORA_DLMM_PROGRAM,
-  SOME_METEORA_DLMM_POOL
+  METEORA_EVENT_AUTHORITY,
+  SOME_METEORA_DLMM_POOL,
+  TOKEN_PROGRAM_ID,
 } from './addresses';
 import { createAtaIdempotentIxs, getIxs, getMintsFromInstruction, wrapSolIfMintIsWsol, unwrapSolIfMintIsWsol, inputTokenExists, sighashMatch, sighash, generateUserPdaStorageAccount, generateAta } from './functions';
 import { depositMultipleToken, withdrawMultipleToken } from './hawksight';
@@ -492,6 +494,288 @@ export class MeteoraDLMM {
         authority: userWallet,
       })),
     ];
+    return ixs;
+  }
+}
+
+/**
+ * Meteora functions / transaction generators that we re-written for performance improvement purposes
+ */
+export class MeteoraFunctions {
+
+  /**
+   * Claims all rewards for a specified position.
+   *
+   * This method communicates with the DLMM (Dynamic Liquidity Market Maker) to claim all rewards
+   * for a given position. It filters the transaction instructions to include only those relevant
+   * to the Meteora DLMM program. The method returns a `ClaimAllRewardsByPositionBuilder` object
+   * which provides a structured way to build the necessary transaction instructions for the reward
+   * claiming process.
+   *
+   * @param {web3.PublicKey} userWallet - The public key of the user's wallet executing the transaction.
+   * @param {web3.PublicKey} payer - The public key of the transaction payer.
+   * @param {Object} params - The parameters for claiming rewards.
+   * @param {web3.PublicKey} params.owner - The public key of the owner of the position.
+   * @param {LbPosition} params.position - The position object representing the liquidity position.
+   * @param {Function} meteoraToHawksight - A function to convert Meteora instructions to Hawksight instructions.
+   *
+   * @returns {Promise<ClaimAllRewardsByPositionBuilder>} - A promise that resolves to a `ClaimAllRewardsByPositionBuilder` object.
+   */
+  async claimAllRewardsByPosition(
+    connection: web3.Connection,
+    userWallet: web3.PublicKey,
+    payer: web3.PublicKey,
+    params: {
+      owner: web3.PublicKey,
+      lbPair: web3.PublicKey,
+      position: web3.PublicKey,
+    },
+    meteoraToHawksight: MeteoraToHawksightFn,
+  ): Promise<ClaimAllRewardsByPositionBuilder> {
+
+    // Generate claim fee and reward instruction (fast generator)
+    const ixs = await this.claimFeeAndRewardIxs(
+      connection,
+      params.lbPair,
+      params.position,
+      params.owner,
+    );
+
+    // Find mint from meteora instructions
+    const mints = getMintsFromInstruction({
+      instructions: ixs,
+      find: {
+        ClaimFee: {
+          programId: METEORA_DLMM_PROGRAM.toBase58(),
+          mintIndices: [9, 10],
+        },
+        ClaimReward: {
+          programId: METEORA_DLMM_PROGRAM.toBase58(),
+          mintIndices: [6],
+        },
+      },
+    });
+    return new ClaimAllRewardsByPositionBuilder(
+      // Step 1: Init ATA prior to withdrawal
+      createAtaIdempotentIxs({
+        accounts: mints.map((mint) => {
+          return { owner: params.owner, payer, mint };
+        }),
+      }),
+
+      // Step 2: Claim fees and/or rewards, remove liquidity, and possibly close position (if set)
+      await meteoraToHawksight({
+        ixs,
+        userPda: params.owner,
+        authority: userWallet,
+      }),
+
+      // Step 3: Withdraw tokens to user wallet
+      await withdrawMultipleToken({
+        payer: userWallet,
+        withdraw: mints.map((mint) => {
+          return { mint };
+        }),
+      }),
+
+      // Step 4: Close wSOL account (if there's any)
+      unwrapSolIfMintIsWsol(userWallet, mints)
+    );
+  }
+
+  constants(program: any) {
+    const CONSTANTS = Object.entries(program.idl.constants);
+    const MAX_BIN_ARRAY_SIZE = new BN(
+      (CONSTANTS.find(([k, v]) => (v as any).name == "MAX_BIN_PER_ARRAY")?.[1] as any).value ?? 0
+    );
+    const MAX_BIN_PER_POSITION = new BN(
+      (CONSTANTS.find(([k, v]) => (v as any).name == "MAX_BIN_PER_POSITION")?.[1] as any).value ?? 0
+    );
+    const BIN_ARRAY_BITMAP_SIZE = new BN(
+      (CONSTANTS.find(([k, v]) => (v as any).name == "BIN_ARRAY_BITMAP_SIZE")?.[1] as any).value ?? 0
+    );
+    const EXTENSION_BINARRAY_BITMAP_SIZE = new BN(
+      (CONSTANTS.find(([k, v]) => (v as any).name == "EXTENSION_BINARRAY_BITMAP_SIZE")?.[1] as any)
+        .value ?? 0
+    );
+    return {
+      MAX_BIN_ARRAY_SIZE,
+      MAX_BIN_PER_POSITION,
+      BIN_ARRAY_BITMAP_SIZE,
+      EXTENSION_BINARRAY_BITMAP_SIZE,
+    }
+  }
+
+  deriveReserve(token: web3.PublicKey, lbPair: web3.PublicKey) {
+    const [reserve] = web3.PublicKey.findProgramAddressSync([
+      lbPair.toBuffer(),
+      token.toBuffer(),
+    ], METEORA_DLMM_PROGRAM);
+    return reserve;
+  }
+
+  deriveBinArray(lbPair: web3.PublicKey, index: BN): web3.PublicKey {
+    let binArrayBytes;
+    if (index.isNeg()) {
+      binArrayBytes = new Uint8Array(
+        index.toTwos(64).toArrayLike(Buffer, "le", 8)
+      );
+    } else {
+      binArrayBytes = new Uint8Array(index.toArrayLike(Buffer, "le", 8));
+    }
+    const [binArray] = web3.PublicKey.findProgramAddressSync(
+      [Buffer.from("bin_array"), lbPair.toBytes(), binArrayBytes],
+      METEORA_DLMM_PROGRAM
+    );
+    return binArray;
+  }
+
+  binIdToBinArrayIndex(MAX_BIN_ARRAY_SIZE: BN, binId: BN) {
+    const { div: idx, mod } = binId.divmod(MAX_BIN_ARRAY_SIZE);
+    return binId.isNeg() && !mod.isZero() ? idx.sub(new BN(1)) : idx;
+  }
+
+  async getPositionAndLbPair(
+    connection: web3.Connection,
+    lbPair: web3.PublicKey,
+    position: web3.PublicKey,
+  ): Promise<{
+    lbPairAccount: any,
+    positionAccount: any,
+    constants: any
+  }> {
+    const program = await MeteoraDLMM.program(connection);
+    const constants = this.constants(program);
+    const [lbPairInfo, positionInfo] = await connection.getMultipleAccountsInfo([lbPair, position]);
+    const lbPairAccount = program.coder.accounts.decode('lbPair', lbPairInfo!.data);
+    const positionAccount = program.coder.accounts.decode('positionV2', positionInfo!.data);
+    return {
+      lbPairAccount,
+      positionAccount,
+      constants,
+    }
+  }
+
+  async claimFeeAndRewardIxs(
+    connection: web3.Connection,
+    lbPair: web3.PublicKey,
+    position: web3.PublicKey,
+    userPda: web3.PublicKey,
+  ): Promise<web3.TransactionInstruction[]> {
+    const result = await this.getPositionAndLbPair(connection, lbPair, position);
+    const claimFeeIx = this.claimFeeIx(lbPair, position, userPda, result);
+    const claimRewardIxs = this.claimRewardIxs(lbPair, position, userPda, result);
+    return [
+      claimFeeIx,
+      ...claimRewardIxs
+    ]
+  }
+
+  claimFeeIx(
+    lbPair: web3.PublicKey,
+    position: web3.PublicKey,
+    userPda: web3.PublicKey,
+    getPositionAndLbPairResult: {
+      lbPairAccount: any,
+      positionAccount: any
+      constants: any,
+    }
+  ): web3.TransactionInstruction {
+    const tokenMintX = getPositionAndLbPairResult.lbPairAccount.tokenXMint;
+    const tokenMintY = getPositionAndLbPairResult.lbPairAccount.tokenYMint;
+    const { lowerBinId } = getPositionAndLbPairResult.positionAccount;
+    const MAX_BIN_ARRAY_SIZE = getPositionAndLbPairResult.constants.MAX_BIN_ARRAY_SIZE;
+    const lowerBinArrayIndex = this.binIdToBinArrayIndex(MAX_BIN_ARRAY_SIZE, new BN(lowerBinId));
+    const binArrayLower = this.deriveBinArray(
+      lbPair,
+      lowerBinArrayIndex,
+    );
+    const upperBinArrayIndex = lowerBinArrayIndex.add(new BN(1));
+    const binArrayUpper = this.deriveBinArray(
+      lbPair,
+      upperBinArrayIndex,
+    );
+    const userTokenX = generateAta(userPda, tokenMintX);
+    const userTokenY = generateAta(userPda, tokenMintY);
+    const reserveX = this.deriveReserve(tokenMintX, lbPair);
+    const reserveY = this.deriveReserve(tokenMintX, lbPair);
+    const ix = new web3.TransactionInstruction({
+      programId: METEORA_DLMM_PROGRAM,
+      keys: [
+        { pubkey: lbPair, isSigner: false, isWritable: true },
+        { pubkey: position, isSigner: false, isWritable: true },
+        { pubkey: binArrayLower, isSigner: false, isWritable: true },
+        { pubkey: binArrayUpper, isSigner: false, isWritable: true },
+        { pubkey: userPda, isSigner: false, isWritable: false},
+        { pubkey: reserveX, isSigner: false, isWritable: true },
+        { pubkey: reserveY, isSigner: false, isWritable: true },
+        { pubkey: userTokenX, isSigner: false, isWritable: true },
+        { pubkey: userTokenY, isSigner: false, isWritable: true },
+        { pubkey: tokenMintX, isSigner: false, isWritable: false },
+        { pubkey: tokenMintY, isSigner: false, isWritable: false },
+        { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+        { pubkey: METEORA_EVENT_AUTHORITY, isSigner: false, isWritable: false },
+        { pubkey: METEORA_DLMM_PROGRAM, isSigner: false, isWritable: false },
+      ],
+      data: Buffer.concat([
+        sighash('ClaimFee')
+      ]),
+    });
+    return ix;
+  }
+
+  claimRewardIxs(
+    lbPair: web3.PublicKey,
+    position: web3.PublicKey,
+    userPda: web3.PublicKey,
+    getPositionAndLbPairResult: {
+      lbPairAccount: any,
+      positionAccount: any
+      constants: any,
+    }
+  ): web3.TransactionInstruction[] {
+    const { lowerBinId } = getPositionAndLbPairResult.positionAccount;
+    const MAX_BIN_ARRAY_SIZE = getPositionAndLbPairResult.constants.MAX_BIN_ARRAY_SIZE;
+    const lowerBinArrayIndex = this.binIdToBinArrayIndex(MAX_BIN_ARRAY_SIZE, new BN(lowerBinId));
+    const binArrayLower = this.deriveBinArray(
+      lbPair,
+      lowerBinArrayIndex,
+    );
+    const upperBinArrayIndex = lowerBinArrayIndex.add(new BN(1));
+    const binArrayUpper = this.deriveBinArray(
+      lbPair,
+      upperBinArrayIndex,
+    );
+
+    const ixs: web3.TransactionInstruction[] = [];
+    for (const rewardInfo of getPositionAndLbPairResult.lbPairAccount.rewardInfos) {
+      if (!rewardInfo || rewardInfo.mint.equals(web3.PublicKey.default))
+        continue;
+
+      const userTokenAccount = generateAta(userPda, rewardInfo.mint);
+      const ix = new web3.TransactionInstruction({
+        programId: METEORA_DLMM_PROGRAM,
+        keys: [
+          { pubkey: lbPair, isSigner: false, isWritable: true },
+          { pubkey: position, isSigner: false, isWritable: true },
+          { pubkey: binArrayLower, isSigner: false, isWritable: true },
+          { pubkey: binArrayUpper, isSigner: false, isWritable: true },
+          { pubkey: userPda, isSigner: false, isWritable: false},
+          { pubkey: rewardInfo.vault, isSigner: false, isWritable: true },
+          { pubkey: rewardInfo.mint, isSigner: false, isWritable: true },
+          { pubkey: userTokenAccount, isSigner: false, isWritable: true },
+          { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+          { pubkey: METEORA_EVENT_AUTHORITY, isSigner: false, isWritable: false },
+          { pubkey: METEORA_DLMM_PROGRAM, isSigner: false, isWritable: false },
+        ],
+        data: Buffer.concat([
+          sighash('ClaimReward')
+        ]),
+      });
+      ixs.push(ix);
+    }
+
+    console.log(`Reward ixs count: ` + ixs.length);
     return ixs;
   }
 }
