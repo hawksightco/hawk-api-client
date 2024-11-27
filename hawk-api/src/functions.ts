@@ -9,6 +9,7 @@ import {
   TokenAccountData,
   CreateAtaIdempotentParams,
   GetMintsFromInstructionParams,
+  Instruction,
 } from "./types";
 import { GeneralUtility } from "./classes/GeneralUtility";
 import { CreateTxMetadata } from "./classes/CreateTxMetadata";
@@ -699,4 +700,54 @@ export function getJupiterRouteIxParams(data: Buffer): JupiterRouteIxParams {
     slippageBps,
     platformFeeBps,
   }
+}
+
+/**
+ * Converts tx metadata to versioned transaction
+ *
+ * @param txMessage
+ */
+export async function toVersionedTransaction(connection: web3.Connection, txMessage: TransactionMetadataResponse) {
+  const alts = await stringToAlt(connection, txMessage.addressLookupTableAddresses);
+  const result = new web3.VersionedTransaction(
+    new web3.TransactionMessage({
+      instructions: txMessage.mainInstructions.map((ix) => ixStrToWeb3Ix(ix)),
+      payerKey: new web3.PublicKey(txMessage.payer),
+      recentBlockhash: web3.PublicKey.default.toString(),
+    }).compileToV0Message(alts)
+  );
+  return result;
+}
+
+export function ixStrToWeb3Ix(ix: Instruction) {
+  return {
+    keys: ix.accounts.map((account) => {
+      return {
+        isSigner: account.isSigner,
+        isWritable: account.isWritable,
+        pubkey: new web3.PublicKey(account.pubkey),
+      };
+    }),
+    data: Buffer.from(ix.data, "base64"),
+    programId: new web3.PublicKey(ix.programId),
+  };
+}
+
+
+export async function stringToAlt(
+  connection: web3.Connection,
+  alts: string[]
+): Promise<web3.AddressLookupTableAccount[]> {
+  const _alts = [];
+  const pubkeys = alts.map(alt => new web3.PublicKey(alt));
+  const accountInfos = await connection.getMultipleAccountsInfo(pubkeys);
+  for (let i = 0; i < accountInfos.length; i++) {
+    _alts.push(
+      new web3.AddressLookupTableAccount({
+        key: pubkeys[i],
+        state: web3.AddressLookupTableAccount.deserialize(accountInfos[i]!.data)
+      })
+    )
+  }
+  return _alts;
 }
