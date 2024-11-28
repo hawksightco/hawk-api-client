@@ -766,8 +766,6 @@ export class MeteoraFunctions {
       if (!rewardInfo || rewardInfo.mint.equals(web3.PublicKey.default))
         continue;
 
-      (new BN(1)).toBuffer()
-
       const userTokenAccount = generateAta(userPda, rewardInfo.mint);
       const ix = new web3.TransactionInstruction({
         programId: METEORA_DLMM_PROGRAM,
