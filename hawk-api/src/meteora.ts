@@ -596,7 +596,7 @@ export class MeteoraFunctions {
     );
   }
 
-  constants(program: any) {
+  constants(program: ClmmProgram) {
     const CONSTANTS = Object.entries(program.idl.constants);
     const MAX_BIN_ARRAY_SIZE = new BN(
       (CONSTANTS.find(([k, v]) => (v as any).name == "MAX_BIN_PER_ARRAY")?.[1] as any).value ?? 0
@@ -761,7 +761,8 @@ export class MeteoraFunctions {
     );
 
     const ixs: web3.TransactionInstruction[] = [];
-    for (const rewardInfo of getPositionAndLbPairResult.lbPairAccount.rewardInfos) {
+    for (let i = 0; i < 2; i++) {
+      const rewardInfo = getPositionAndLbPairResult.lbPairAccount.rewardInfos[i];
       if (!rewardInfo || rewardInfo.mint.equals(web3.PublicKey.default))
         continue;
 
@@ -782,7 +783,8 @@ export class MeteoraFunctions {
           { pubkey: METEORA_DLMM_PROGRAM, isSigner: false, isWritable: false },
         ],
         data: Buffer.concat([
-          sighash('ClaimReward')
+          sighash('ClaimReward'),
+          (new BN(i)).toBuffer('le', 8),
         ]),
       });
       ixs.push(ix);
