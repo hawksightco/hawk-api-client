@@ -18,12 +18,22 @@ export class MeteoraDLMM {
 
   readonly pubkey = this.dlmm.pubkey;
 
+  private static _program: ClmmProgram;
+  private static _instance: MeteoraDLMM;
+  private static _poolAddress: web3.PublicKey;
+  private static _connection: web3.Connection;
+
   static async create(
     connection: web3.Connection,
     poolAddress: web3.PublicKey
-  ) {
-    const dlmm = await DLMM.create(connection, poolAddress);
-    return new MeteoraDLMM(dlmm);
+  ): Promise<MeteoraDLMM> {
+    if (this._instance == undefined || this._poolAddress !== poolAddress || this._connection.rpcEndpoint !== connection.rpcEndpoint) {
+      const dlmm = await DLMM.create(connection, poolAddress);
+      this._poolAddress = poolAddress;
+      this._instance = new MeteoraDLMM(dlmm);
+      this._program = dlmm.program;
+    }
+    return this._instance;
   }
 
   /**
@@ -32,8 +42,11 @@ export class MeteoraDLMM {
    * @param connection
    */
   static async program(connection: web3.Connection): Promise<ClmmProgram> {
-    const dlmm = await DLMM.create(connection, SOME_METEORA_DLMM_POOL);
-    return dlmm.program;
+    if (this._program == undefined) {
+      const dlmm = await DLMM.create(connection, SOME_METEORA_DLMM_POOL);
+      this._program = dlmm.program;
+    }
+    return this._program;
   }
 
   getXYAmountDistribution(
@@ -698,7 +711,7 @@ export class MeteoraFunctions {
     const userTokenX = generateAta(userPda, tokenMintX);
     const userTokenY = generateAta(userPda, tokenMintY);
     const reserveX = this.deriveReserve(tokenMintX, lbPair);
-    const reserveY = this.deriveReserve(tokenMintX, lbPair);
+    const reserveY = this.deriveReserve(tokenMintY, lbPair);
     const ix = new web3.TransactionInstruction({
       programId: METEORA_DLMM_PROGRAM,
       keys: [
