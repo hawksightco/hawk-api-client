@@ -10,6 +10,7 @@ import {
   CreateAtaIdempotentParams,
   GetMintsFromInstructionParams,
   Instruction,
+  PriorityFeeEstimate,
 } from "./types";
 import { GeneralUtility } from "./classes/GeneralUtility";
 import { CreateTxMetadata } from "./classes/CreateTxMetadata";
@@ -19,6 +20,7 @@ import { snakeCase } from "lodash";
 import { sha256 } from "js-sha256";
 import BN from "bn.js";
 import { createAssociatedTokenAccountIdempotentInstruction, createCloseAccountInstruction, createSyncNativeInstruction } from "@solana/spl-token";
+import bs58 from "bs58";
 
 export const METEORA_API_URL = "https://dlmm-api.meteora.ag";
 
@@ -740,4 +742,80 @@ export async function stringToAlt(
   const c = CreateTxMetadata.instance();
   c.setConnection(connection);
   return await c.stringToAlt(alts);
+}
+
+let previousHeliusFeeLevels: { priorityFeeLevels: Record<string, number> } = {
+  priorityFeeLevels: {
+    high: 9327508,
+    low: 500000,
+    medium: 2675228,
+    min: 500000,
+    unsafeMax: 2368000000,
+    veryHigh: 28631588,
+  }
+}
+export function getPriorityFeeEstimate(
+  priorityLevel: string,
+  transaction: web3.VersionedTransaction,
+  rpcUrl: string,
+): PriorityFeeEstimate {
+  const tx = bs58.encode(transaction.serialize());
+  const heliusFeeLevels = getPriorityFeeEstimate2(
+    tx,
+    { includeAllPriorityFeeLevels: true },
+    rpcUrl,
+  );
+  heliusFeeLevels.then(feeLevels => {
+    previousHeliusFeeLevels = feeLevels;
+  });
+  const m: Record<string, string> = {
+    Min: "min",
+    Low: "low",
+    Default: "medium",
+    Medium: "medium",
+    High: "high",
+    VeryHigh: "veryHigh",
+    UnsafeMax: "unsafeMax",
+  };
+  const feeLevels = {
+    low: previousHeliusFeeLevels.priorityFeeLevels.medium * 2,
+    default: mid(
+      previousHeliusFeeLevels.priorityFeeLevels.medium,
+      previousHeliusFeeLevels.priorityFeeLevels.high
+    ),
+    high: previousHeliusFeeLevels.priorityFeeLevels.high,
+    veryHigh: previousHeliusFeeLevels.priorityFeeLevels.veryHigh,
+  };
+  return {
+    priorityFeeEstimate: previousHeliusFeeLevels.priorityFeeLevels[m[priorityLevel]],
+    feeLevels,
+  };
+}
+
+export async function getPriorityFeeEstimate2(
+  transaction: string,
+  options: any,
+  url: string,
+) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: "1",
+      method: "getPriorityFeeEstimate",
+      params: [
+        {
+          transaction,
+          options,
+        },
+      ],
+    }),
+  });
+  const data = await response.json();
+  return data.result;
+}
+
+export function mid(min: number, max: number) {
+  return min + (max - min) / 2;
 }

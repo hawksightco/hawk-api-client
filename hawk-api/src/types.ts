@@ -470,3 +470,8 @@ export type HawkApiOptions = {
   disableTokenLoad?: boolean,
   disableTxMetadataLoad?: boolean,
 }
+
+export type PriorityFeeEstimate = {
+  priorityFeeEstimate: number;
+  feeLevels: Record<string, number>;
+};
