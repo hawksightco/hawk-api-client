@@ -102,6 +102,53 @@ export class CreateTxMetadata {
   }
 
   /**
+   * Store address lookup table in the object
+   *
+   * @param alt
+   * @param account
+   */
+  storeAlt(alt: string, account: web3.AddressLookupTableAccount) {
+    this.alts[alt] = account;
+  }
+
+  /**
+   * String to address lookup table. Can input multiple address lookup table addresses
+   *
+   * @param connection
+   * @param alts
+   * @returns
+   */
+  async stringToAlt(
+    alts: string[]
+  ): Promise<web3.AddressLookupTableAccount[]> {
+    const _alts: web3.AddressLookupTableAccount[] = [];
+    const notExist: number[] = [];
+    alts.map((key, index) => {
+      const alt = this.alts[key];
+      if (!!alt) {
+        _alts.push(alt);
+      } else {
+        notExist.push(index);
+      }
+    });
+    if (notExist.length === 0) {
+      return _alts;
+    }
+    const pubkeys: web3.PublicKey[] = notExist.map(index => new web3.PublicKey(alts[index]));
+    const accountInfos = await this.connection!.getMultipleAccountsInfo(pubkeys);
+    for (let i = 0; i < accountInfos.length; i++) {
+      const key = pubkeys[i].toString();
+      const alt = new web3.AddressLookupTableAccount({
+        key: pubkeys[i],
+        state: web3.AddressLookupTableAccount.deserialize(accountInfos[i]!.data)
+      });
+      this.alts[key] = alt;
+      _alts.push(alt);
+    }
+    return _alts;
+  }
+
+  /**
    * Asynchronously creates transaction metadata based on the provided transaction parameters and network state.
    * This includes constructing a transaction with given instructions, calculating fees, and optionally handling priority fees.
    *

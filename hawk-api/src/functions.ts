@@ -733,21 +733,11 @@ export function ixStrToWeb3Ix(ix: Instruction) {
   };
 }
 
-
 export async function stringToAlt(
   connection: web3.Connection,
   alts: string[]
 ): Promise<web3.AddressLookupTableAccount[]> {
-  const _alts = [];
-  const pubkeys = alts.map(alt => new web3.PublicKey(alt));
-  const accountInfos = await connection.getMultipleAccountsInfo(pubkeys);
-  for (let i = 0; i < accountInfos.length; i++) {
-    _alts.push(
-      new web3.AddressLookupTableAccount({
-        key: pubkeys[i],
-        state: web3.AddressLookupTableAccount.deserialize(accountInfos[i]!.data)
-      })
-    )
-  }
-  return _alts;
+  const c = CreateTxMetadata.instance();
+  c.setConnection(connection);
+  return await c.stringToAlt(alts);
 }
