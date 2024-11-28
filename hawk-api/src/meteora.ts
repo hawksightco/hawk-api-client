@@ -766,6 +766,8 @@ export class MeteoraFunctions {
       if (!rewardInfo || rewardInfo.mint.equals(web3.PublicKey.default))
         continue;
 
+      (new BN(1)).toBuffer()
+
       const userTokenAccount = generateAta(userPda, rewardInfo.mint);
       const ix = new web3.TransactionInstruction({
         programId: METEORA_DLMM_PROGRAM,
@@ -784,7 +786,7 @@ export class MeteoraFunctions {
         ],
         data: Buffer.concat([
           sighash('ClaimReward'),
-          (new BN(i)).toBuffer('le', 8),
+          (new BN(i)).toArrayLike(Buffer, 'le', 8),
         ]),
       });
       ixs.push(ix);
