@@ -14,6 +14,7 @@ import { TransactionBatchExecute, TransactionBatchExecuteParams } from "./Transa
 import { Atomicity } from "./Atomicity";
 import { JupiterAlts } from "./JupiterAlts";
 import { JupiterSwap } from "./JupiterSwap";
+import { logging } from "./Logging";
 
 /**
  * HawkAPI is a central gateway class that aggregates access to various functional modules
@@ -131,5 +132,14 @@ export class HawkAPI {
       this.jupAlts,
       this.ix,
     );
+  }
+
+  /**
+   * Whether enable logging or not
+   *
+   * @param flag
+   */
+  logging(flag: boolean) {
+    logging(flag);
   }
 }

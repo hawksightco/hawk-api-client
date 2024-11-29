@@ -62,6 +62,7 @@ import { Anchor } from "../anchor";
 import axios from "axios";
 import { depositMultipleToken, withdrawMultipleToken } from "../hawksight";
 import { Protocol } from "../types";
+import { Log } from "./Logging";
 
 export class Transactions {
   /**
@@ -627,7 +628,7 @@ export class Transactions {
 
     for (let i = 0; i < accountsData.length; i++) {
       if (!accountsData[i]) {
-        console.log(`initializing STA: ${filteredMints[i].toBase58()}`);
+        Log(`initializing STA: ${filteredMints[i].toBase58()}`);
         mainInstructions.push(
           await Anchor.instance().iyfMain.methods
             .initializeStorageTokenAccount()

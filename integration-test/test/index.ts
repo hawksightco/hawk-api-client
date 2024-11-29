@@ -8,6 +8,7 @@ import { Anchor } from "../src/anchor";
 import { PriorityLevel } from "@hawksightco/swagger-client";
 import { generateOrcaPositionPDA } from "../src/functions";
 import { BN } from "bn.js";
+import { Log } from '../../hawk-api/src/classes/Logging';
 
 dotenv.config({
   path: path.join(process.cwd(), 'test', '.env')
@@ -54,7 +55,7 @@ describe('Health Endpoints', () => {
 
 describe('Search', () => {
   it ('Search for token (Partial String)', async () => {
-    console.log(client.search.token("USDC"));
+    Log(client.search.token("USDC"));
   }, TIMEOUT);
 });
 
@@ -254,7 +255,7 @@ describe('Orca Transaction Generation', () => {
     const position = generateOrcaPositionPDA(testPositionMint);
     let positionInfo = await Anchor.instance().orcaProgram.account.position.fetch(position);
     const currentLiquidity = positionInfo.liquidity;
-    console.log(`position: ${position}`);
+    Log(`position: ${position}`);
     const result = await client.txGenerator.orcaDeposit(
       connection,
       testWallet.toString(),
@@ -287,7 +288,7 @@ describe('Orca Transaction Generation', () => {
   }, TIMEOUT);
 
   it ('Orca Withdraw', async () => {
-    console.log(`liquidityDelta: ${liquidityDelta}`);
+    Log(`liquidityDelta: ${liquidityDelta}`);
     const result = await client.txGenerator.orcaWithdraw(
       connection,
       testWallet.toString(),
@@ -305,7 +306,7 @@ describe('Orca Transaction Generation', () => {
 
 function logIfNot200(result: ResponseWithStatus<any>) {
   if (result.status !== 200) {
-    console.log(result.data);
+    Log(result.data);
   }
 }
 
@@ -318,16 +319,16 @@ function logIfNot200(result: ResponseWithStatus<any>) {
  * @returns
  */
 async function simulateOrExecuteTransaction(txMetadata: TransactionMetadata, signers: web3.Keypair[] = []) {
-  console.log(txMetadata.description);
-  console.log(`-----------------------------------------`);
+  Log(txMetadata.description);
+  Log(`-----------------------------------------`);
   const simulation = await txMetadata.transaction.simulateTransaction(connection, signers);
   if (simulation.err) {
     for (const log of simulation.logs as string[]) {
-      console.log(log);
+      Log(log);
     }
-    console.log(``)
-    console.log(``)
-    console.log(``)
+    Log(``)
+    Log(``)
+    Log(``)
     throw new Error(`Simulation has error`);
   }
   const executeTransaction = (process.env.EXECUTE_TRANSACTION as string).toLowerCase() === 'true';
@@ -336,14 +337,14 @@ async function simulateOrExecuteTransaction(txMetadata: TransactionMetadata, sig
     txMetadata.transaction.sign(signers);
     const rawTx = txMetadata.transaction.versionedTransaction.serialize();
     const signature = await connection.sendRawTransaction(rawTx);
-    console.log(`Transaction signature: ${signature}`);
+    Log(`Transaction signature: ${signature}`);
     const result = await connection.confirmTransaction({
       signature,
       blockhash: txMetadata.transaction.recentBlockhash,
       lastValidBlockHeight: txMetadata.transaction.lastValidBlockHeight
     }, 'finalized');
-    console.log(`Transaction result`, result);
-    console.log(`\n\n`);
+    Log(`Transaction result`, result);
+    Log(`\n\n`);
   }
   return simulation;
 }

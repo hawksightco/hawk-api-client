@@ -12,6 +12,7 @@ import { createAtaIdempotentIxs, getIxs, getMintsFromInstruction, wrapSolIfMintI
 import { depositMultipleToken, withdrawMultipleToken } from './hawksight';
 import { MeteoraToHawksightFn } from './types';
 import { Anchor } from './anchor';
+import { Log } from './classes/Logging';
 
 export class MeteoraDLMM {
   private constructor(public readonly dlmm: DLMM) {}
@@ -790,7 +791,7 @@ export class MeteoraFunctions {
       ixs.push(ix);
     }
 
-    console.log(`Reward ixs count: ` + ixs.length);
+    Log(`Reward ixs count: ` + ixs.length);
     return ixs;
   }
 }

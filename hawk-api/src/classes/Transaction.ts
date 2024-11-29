@@ -7,6 +7,7 @@ import {
   TransactionMetadataResponse,
 } from "../types";
 import { GeneralUtility } from "./GeneralUtility";
+import { Log } from "./Logging";
 
 /**
  * Represents a transaction object in Solana using the web3.js library.
@@ -209,7 +210,7 @@ export class Transaction {
     priorityLevelOrPriorityFee: client.PriorityLevel | number,
     maxPriorityFee?: number,
   ): Promise<web3.TransactionInstruction[]> {
-    console.log(`addPriorityFeeIx`);
+    Log(`addPriorityFeeIx`);
     // First, remove any existing priority fee instructions
     this.removePriorityFeeIxs();
 
@@ -224,13 +225,13 @@ export class Transaction {
 
       // Get fee estimate by simulating the transaction
       const startTime = new Date().getTime() / 1000;
-      console.log(`addPriorityFeeIx: Starting getFeeEstimate function`);
+      Log(`addPriorityFeeIx: Starting getFeeEstimate function`);
       let estimate = await getFeeEstimate(
         this.generalUtility,
         priorityLevelOrPriorityFee,
         this.txMetadataResponse
       );
-      console.log(`addPriorityFeeIx: Starting getFeeEstimate function: Elapsed Time: ${(new Date().getTime() / 1000) - startTime}`);
+      Log(`addPriorityFeeIx: Starting getFeeEstimate function: Elapsed Time: ${(new Date().getTime() / 1000) - startTime}`);
 
       // If priority is set to default or medium, we multiply estimate by 2 to increase its chance on blockchain.
       if (priorityLevelOrPriorityFee === client.PriorityLevel.Default || priorityLevelOrPriorityFee === client.PriorityLevel.Medium) {
@@ -294,10 +295,10 @@ export class Transaction {
     const simulation = await this.simulateTransaction(connection);
     if (simulation.err !== null) {
       if (simulation.logs === null) {
-        console.log(simulation.err);
+        Log(simulation.err);
       } else {
         for (const log of simulation.logs) {
-          console.log(log);
+          Log(log);
         }
       }
       throw new Error(`Transaction simulation error. See logs above.`);

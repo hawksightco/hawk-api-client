@@ -7,6 +7,7 @@ import { GeneralUtility } from "./GeneralUtility";
 import { Anchor } from "../anchor";
 import { txgen } from "./Transactions";
 import { BN } from "bn.js";
+import { Log } from "./Logging";
 
 /**
  * The `TxGenerator` class encapsulates methods to generate transactions with various trading operations
@@ -182,7 +183,7 @@ export class TxGenerator {
     Anchor.initialize(connection);
     try {
       const startTime = new Date().getTime() / 1000;
-      console.log(`meteoraClaim: Benchmarking txgen.meteoraClaim`);
+      Log(`meteoraClaim: Benchmarking txgen.meteoraClaim`);
       const result = await txgen.meteoraClaim({
         connection,
         params: {
@@ -195,7 +196,7 @@ export class TxGenerator {
             : undefined,
         },
       });
-      console.log(`meteoraClaim: await txgen.meteoraClaim: ${new Date().getTime() / 1000 - startTime}`);
+      Log(`meteoraClaim: await txgen.meteoraClaim: ${new Date().getTime() / 1000 - startTime}`);
       return {
         status: 200,
         data: await createTxMetadata(

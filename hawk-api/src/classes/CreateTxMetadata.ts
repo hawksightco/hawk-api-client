@@ -2,6 +2,7 @@ import * as web3 from "@solana/web3.js";
 import { TransactionMetadata, TransactionMetadataResponse } from "../types";
 import { Transaction } from "./Transaction";
 import { GeneralUtility } from "./GeneralUtility";
+import { Log } from "./Logging";
 
 /**
  * The CreateTxMetadata class is responsible for creating and managing transaction metadata,
@@ -172,13 +173,13 @@ export class CreateTxMetadata {
   ): Promise<TransactionMetadata> {
     // Retrieve address lookup table accounts
     const alts: web3.AddressLookupTableAccount[] = [];
-    console.log(`createTxMetadata`);
+    Log(`createTxMetadata`);
     const mainStartTime = new Date().getTime() / 1000;
 
     // Find jup alts
     let startTime = mainStartTime;
     const jupAlts = await generalUtility.findAltWithTxPost({ transaction: data });
-    console.log(`createTxMetadata: Checkpoint: (jupAlts) ${(new Date().getTime() / 1000) - startTime}`);
+    Log(`createTxMetadata: Checkpoint: (jupAlts) ${(new Date().getTime() / 1000) - startTime}`);
 
     startTime = new Date().getTime() / 1000;
     for (const alt of data.addressLookupTableAddresses) {
@@ -202,12 +203,12 @@ export class CreateTxMetadata {
     } else {
       console.error(jupAlts.data);
     }
-    console.log(`createTxMetadata: Checkpoint: (jupAlts after loop) ${(new Date().getTime() / 1000) - startTime}`);
+    Log(`createTxMetadata: Checkpoint: (jupAlts after loop) ${(new Date().getTime() / 1000) - startTime}`);
 
     // Get the recent blockhash
     startTime = new Date().getTime() / 1000;
     const latestBlockhash = await connection.getLatestBlockhash();
-    console.log(`createTxMetadata: Checkpoint: (latestBlockhash) ${(new Date().getTime() / 1000) - startTime}`);
+    Log(`createTxMetadata: Checkpoint: (latestBlockhash) ${(new Date().getTime() / 1000) - startTime}`);
 
     // Create initial transaction instance
     const transaction = new Transaction(
@@ -217,7 +218,7 @@ export class CreateTxMetadata {
       alts,
       generalUtility,
     );
-    console.log(`createTxMetadata: Elapsed time: ${(new Date().getTime() / 1000) - mainStartTime}`);
+    Log(`createTxMetadata: Elapsed time: ${(new Date().getTime() / 1000) - mainStartTime}`);
 
     // Return transaction metadata
     return {

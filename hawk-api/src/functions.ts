@@ -21,6 +21,7 @@ import { sha256 } from "js-sha256";
 import BN from "bn.js";
 import { createAssociatedTokenAccountIdempotentInstruction, createCloseAccountInstruction, createSyncNativeInstruction } from "@solana/spl-token";
 import bs58 from "bs58";
+import { Log } from "./classes/Logging";
 
 export const METEORA_API_URL = "https://dlmm-api.meteora.ag";
 
@@ -396,7 +397,7 @@ export function parseTokenAccountData(data: Buffer): TokenAccountData {
  *   { payer: anotherPayerPublicKey, owner: anotherOwnerPublicKey, mint: anotherMintPublicKey }
  * ];
  * const instructions = createAtaIdempotent({ accounts });
- * console.log(instructions); // Logs an array of TransactionInstruction objects.
+ * Log(instructions); // Logs an array of TransactionInstruction objects.
  */
 export function createAtaIdempotentIxs({
   accounts,
@@ -436,7 +437,7 @@ export function createAtaIdempotentIxs({
  *   }
  * };
  * const mints = getMintsFromInstruction({ instructions, find: findCriteria });
- * console.log(mints); // Logs an array of unique PublicKey objects.
+ * Log(mints); // Logs an array of unique PublicKey objects.
  */
 export function getMintsFromInstruction({
   instructions,

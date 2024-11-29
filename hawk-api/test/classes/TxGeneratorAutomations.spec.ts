@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { HawkAPI } from "../../src";
 import { HS_AUTHORITY } from "../../src/addresses";
+import { Log } from "../../src/classes/Logging";
 
 dotenv.config({
   path: path.join(process.cwd(), 'test', '.env')
@@ -36,7 +37,7 @@ describe('TxGenerationAutomations: Test meteoraRebalanceIxs', () => {
   //     }
   //   );
 
-  //   console.log(ixs);
+  //   Log(ixs);
   // }, TIMEOUT);
 
   // it('Debug this.hawkClient.txGeneratorAutomation.meteoraCompoundIxs issue', async () => {
@@ -72,22 +73,22 @@ describe('TxGenerationAutomations: Test meteoraRebalanceIxs', () => {
   //   );
 
   //   tx.data.transaction.instructions.map(ix => {
-  //     console.log(``);
-  //     console.log(``);
-  //     console.log(`ix.programId: ${ix.programId}`);
-  //     console.log(`--------------------------------------------`);
+  //     Log(``);
+  //     Log(``);
+  //     Log(`ix.programId: ${ix.programId}`);
+  //     Log(`--------------------------------------------`);
   //     // Assuming ix.data is a Buffer
   //     const formattedHex = ix.data.toString('hex')
   //       .match(/.{1,2}/g) // Split into pairs of hex characters (1 byte each)
   //       ?.map(byte => `0x${byte}`) // Prefix each pair with '0x'
   //       .join(', '); // Join with space between each 0x byte
 
-  //     console.log(`ix.data: ${formattedHex}`);
+  //     Log(`ix.data: ${formattedHex}`);
   //     ix.keys.map(meta => {
-  //       console.log(`pubkey: ${meta.pubkey}, isSigner: ${meta.isSigner}, isWritable: ${meta.isWritable}`);
+  //       Log(`pubkey: ${meta.pubkey}, isSigner: ${meta.isSigner}, isWritable: ${meta.isWritable}`);
   //     })
   //   })
 
-  //   console.log(ixs);
+  //   Log(ixs);
   // }, TIMEOUT);
 });
