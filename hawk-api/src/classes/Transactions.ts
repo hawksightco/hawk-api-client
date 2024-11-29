@@ -453,14 +453,17 @@ export class Transactions {
     }
 
     // Claim fee and claim reward ixs
-    const claimBuilder = await dlmmPool.claimAllRewardsByPosition(
+    const fn = new MeteoraFunctions();
+    const claimBuilder = await fn.claimAllRewardsByPosition(
+      connection,
       params.userWallet,
       HS_AUTHORITY,
       {
         owner: userPda,
-        position: userPosition,
+        position: params.position,
+        lbPair: position.lbPair,
       },
-      meteoraToHawksightAutomationIxs
+      meteoraToHawksightAutomationIxs,
     );
 
     // Re-deposit fees (TODO: How to re-deposit reward tokens that is not X or Y token?)
