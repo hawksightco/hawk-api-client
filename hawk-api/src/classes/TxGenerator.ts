@@ -2,7 +2,7 @@ import * as web3 from "@solana/web3.js";
 import * as _client from "@hawksightco/swagger-client";
 import { ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, TransactionPriority, Distribution, OrcaWithdraw, OrcaDeposit, OrcaClosePosition, OrcaOpenPosition, OrcaClaimRewards, MeteoraClaimAll } from "../types";
 import { Client } from "./Client";
-import { createTxMetadata, resultOrError } from "../functions";
+import { createTxMetadata, createTxMetadata2, resultOrError } from "../functions";
 import { GeneralUtility } from "./GeneralUtility";
 import { Anchor } from "../anchor";
 import { txgen } from "./Transactions";
@@ -196,7 +196,7 @@ export class TxGenerator {
             : undefined,
         },
       });
-      Log(`meteoraClaim: await txgen.meteoraClaim: ${new Date().getTime() / 1000 - startTime}`);
+      Log(`meteoraClaim: await txgen.meteoraClaim elapsed time: ${new Date().getTime() / 1000 - startTime}`);
       return {
         status: 200,
         data: await createTxMetadata(
@@ -231,24 +231,20 @@ export class TxGenerator {
     Anchor.initialize(connection);
     try {
       const startTime = new Date().getTime() / 1000;
+      Log(`meteoraClaimAll: Benchmarking txgen.meteoraClaimAll`);
       const result = await txgen.meteoraClaimAll({
         connection,
         params,
       });
-      const data = [];
-      for (const r of result) {
-        data.push(
-          await createTxMetadata(
-            this.generalUtility,
-            connection,
-            payer,
-            r
-          )
-        );
-      }
+      Log(`meteoraClaim: await txgen.meteoraClaimAll elapsed time: ${new Date().getTime() / 1000 - startTime}`);
       return {
         status: 200,
-        data,
+        data: await createTxMetadata2(
+          this.generalUtility,
+          connection,
+          payer,
+          result
+        ),
       };
     } catch (e) {
       return {

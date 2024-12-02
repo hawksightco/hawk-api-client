@@ -64,22 +64,43 @@ export class Transaction {
     readonly payerKey: web3.PublicKey,
     private latestBlockhash: web3.BlockhashWithExpiryBlockHeight,
     readonly alts: web3.AddressLookupTableAccount[],
-    private generalUtility: GeneralUtility
+    private generalUtility: GeneralUtility,
+    _mainIxs: web3.TransactionInstruction[] = [],
   ) {
-    // Construct main instructions
-    const mainIxs = txMetadataResponse.mainInstructions.map((ix) => {
-      return new web3.TransactionInstruction({
-        keys: ix.accounts.map((meta) => {
+    let mainIxs;
+    if (_mainIxs.length > 0) {
+      mainIxs = _mainIxs;
+      txMetadataResponse.mainInstructions = mainIxs.map(ix => {
+        const accounts = ix.keys.map(meta => {
           return {
-            pubkey: new web3.PublicKey(meta.pubkey),
+            pubkey: meta.pubkey.toString(),
             isSigner: meta.isSigner,
             isWritable: meta.isWritable,
-          };
-        }),
-        programId: new web3.PublicKey(ix.programId),
-        data: Buffer.from(ix.data, "base64"),
+          }
+        });
+        return {
+          accounts,
+          programId: ix.programId.toString(),
+          data: ix.data.toString('base64'),
+        }
+      })
+    }
+    else {
+      // Construct main instructions
+      mainIxs = txMetadataResponse.mainInstructions.map((ix) => {
+        return new web3.TransactionInstruction({
+          keys: ix.accounts.map((meta) => {
+            return {
+              pubkey: new web3.PublicKey(meta.pubkey),
+              isSigner: meta.isSigner,
+              isWritable: meta.isWritable,
+            };
+          }),
+          programId: new web3.PublicKey(ix.programId),
+          data: Buffer.from(ix.data, "base64"),
+        });
       });
-    });
+    }
 
     this._instructions = [...mainIxs];
     const [txMessage, versionedTransaction] =
@@ -151,9 +172,9 @@ export class Transaction {
 
   /**
    * Add priority fee instructions (compute budget) with a fixed priority fee.
-   * 
+   *
    * This method adds priority fee instructions to the transaction based on a fixed priority fee.
-   * 
+   *
    * @param connection - The connection to the Solana cluster.
    * @param computeUnitLimit - The limit on the number of compute units.
    * @param fixedPriority - Set to true to indicate a fixed priority fee.

@@ -54,6 +54,20 @@ export async function createTxMetadata(
   )
 }
 
+export async function createTxMetadata2(
+  generalUtility: GeneralUtility,
+  connection: web3.Connection,
+  payer: string,
+  data: TransactionMetadataResponse,
+): Promise<TransactionMetadata[]> {
+  return await CreateTxMetadata.instance().createTxMetadata2(
+    generalUtility,
+    connection,
+    payer,
+    data,
+  )
+}
+
 /**
  * Wraps the result of an API call or operation in an object containing status information.
  * If the result status is 200, applies a success function to the data.

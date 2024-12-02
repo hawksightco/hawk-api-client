@@ -1,4 +1,4 @@
-import DLMM, { calculateSpotDistribution, calculateNormalDistribution, calculateBidAskDistribution, ClmmProgram, LbPosition, StrategyType } from '@meteora-ag/dlmm';
+import DLMM, { calculateSpotDistribution, calculateNormalDistribution, calculateBidAskDistribution, ClmmProgram, LbPosition, StrategyType, PositionV2, Position, LbPairAccount, LbPair } from '@meteora-ag/dlmm';
 import BN from "bn.js";
 import * as web3 from "@solana/web3.js";
 import { AppError } from './errors';
@@ -13,6 +13,7 @@ import { depositMultipleToken, withdrawMultipleToken } from './hawksight';
 import { MeteoraToHawksightFn } from './types';
 import { Anchor } from './anchor';
 import { Log } from './classes/Logging';
+import bs58 from "bs58";
 
 export class MeteoraDLMM {
   private constructor(public readonly dlmm: DLMM) {}
@@ -518,6 +519,21 @@ export class MeteoraDLMM {
 export class MeteoraFunctions {
 
   /**
+   * Position cache (v1)
+   */
+  readonly positions_v1: Record<string, Position> = {};
+
+  /**
+   * Position cache (v2)
+   */
+  readonly positions_v2: Record<string, PositionV2> = {};
+
+  /**
+   * Pool cache
+   */
+  readonly pools: Record<string, LbPair> = {};
+
+  /**
    * Claims all rewards for a specified position.
    *
    * This method communicates with the DLMM (Dynamic Liquidity Market Maker) to claim all rewards
@@ -668,6 +684,117 @@ export class MeteoraFunctions {
       positionAccount,
       constants,
     }
+  }
+
+  /**
+   * Returns all position of user
+   *
+   * @param connection
+   * @param userPda
+   */
+  async getAllUserPosition(connection: web3.Connection, userPda: web3.PublicKey) {
+    const program = await MeteoraDLMM.program(connection);
+
+    // Returns all position owned by user.
+    // What is not sure is whether these positions are closed already.
+    const promiseResult = await Promise.all([
+      userPda && program.account.position.all([
+        {
+          memcmp: {
+            bytes: bs58.encode(userPda.toBuffer()),
+            offset: 8 + 32
+          }
+        }
+      ]),
+      userPda && program.account.positionV2.all([
+        {
+          memcmp: {
+            bytes: bs58.encode(userPda.toBuffer()),
+            offset: 8 + 32
+          }
+        }
+      ])
+    ]);
+    const [_positions, _positionsV2] = promiseResult;
+    const positions = [..._positions, ..._positionsV2];
+
+    // Remember v1 positions
+    for (const position of _positions) {
+      this.positions_v1[position.publicKey.toString()] = position.account;
+    }
+
+    // Remember v2 positions
+    for (const position of _positionsV2) {
+      this.positions_v2[position.publicKey.toString()] = position.account;
+    }
+
+    // Get all pools (lbPair)
+    const temp = positions.map(position => position.account.lbPair);
+    const pools: web3.PublicKey[] = [];
+
+    // Trim repeat pool (ensure that pools are unique)
+    const unique: Record<string, web3.PublicKey> = {};
+    for (const pool of temp) {
+      if (unique[pool.toString()] === undefined) {
+        pools.push(pool);
+        unique[pool.toString()] = pool;
+      }
+    }
+
+    // Download all pools and update cache
+    const lbPairs = await program.account.lbPair.fetchMultiple(pools);
+    lbPairs.map((lbPair, index) => {
+      const key = pools[index].toString();
+      if (lbPair !== undefined && lbPair !== null) {
+        this.pools[key] = lbPair;
+      }
+    });
+
+    return positions.map(position => position.publicKey);
+  }
+
+
+  /**
+   * Generate instruction that claims all fees and rewards by user
+   *
+   * @param connection
+   * @param lbPair
+   * @param positions
+   * @param userPda
+   * @returns
+   */
+  async claimFeeAndRewardIxs2(
+    connection: web3.Connection,
+    positions: web3.PublicKey[],
+    userPda: web3.PublicKey,
+  ): Promise<web3.TransactionInstruction[]> {
+    // const result = await this.getPositionAndLbPair(connection, lbPair, position);
+    const program = await MeteoraDLMM.program(connection);
+    const constants = this.constants(program);
+    const ixs: web3.TransactionInstruction[] = [];
+    for (const position of positions) {
+      const positionAccountV1 = this.positions_v1[position.toString()];
+      const positionAccountV2 = this.positions_v2[position.toString()];
+      let positionAccount;
+      if (positionAccountV1 !== undefined) {
+        positionAccount = positionAccountV1;
+      } else if (positionAccountV2 !== undefined) {
+        positionAccount = positionAccountV2;
+      } else {
+        throw new Error(`Unexpected error: Position ${position.toString()} does not exist.`);
+      }
+      const lbPair = positionAccount!.lbPair;
+      const lbPairAccount = this.pools[lbPair.toString()];
+      const result = {
+        lbPairAccount,
+        positionAccount,
+        constants
+      };
+      const claimFeeIx = this.claimFeeIx(lbPair, position, userPda, result);
+      const claimRewardIxs = this.claimRewardIxs(lbPair, position, userPda, result);
+      ixs.push(claimFeeIx, ...claimRewardIxs);
+    }
+    return ixs;
   }
 
   async claimFeeAndRewardIxs(

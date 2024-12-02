@@ -3,6 +3,7 @@ import { TransactionMetadata, TransactionMetadataResponse } from "../types";
 import { Transaction } from "./Transaction";
 import { GeneralUtility } from "./GeneralUtility";
 import { Log } from "./Logging";
+import { TransactionBatchExecute2 } from "./TransactionBatchExecute2";
 
 /**
  * The CreateTxMetadata class is responsible for creating and managing transaction metadata,
@@ -226,5 +227,94 @@ export class CreateTxMetadata {
       estimatedFeeInSOL: data.estimatedFeeInSOL,
       transaction,
     };
+  }
+
+  async createTxMetadata2(
+    generalUtility: GeneralUtility,
+    connection: web3.Connection,
+    payer: string,
+    data: TransactionMetadataResponse,
+  ): Promise<TransactionMetadata[]> {
+    // Retrieve address lookup table accounts
+    const alts: web3.AddressLookupTableAccount[] = [];
+    Log(`createTxMetadata2`);
+    const mainStartTime = new Date().getTime() / 1000;
+
+    // Find jup alts
+    let startTime = mainStartTime;
+    const jupAlts = await generalUtility.findAltWithTxPost({ transaction: data });
+    Log(`createTxMetadata2: Checkpoint: (jupAlts) ${(new Date().getTime() / 1000) - startTime}`);
+
+    startTime = new Date().getTime() / 1000;
+    const lookupTableAddresses = data.addressLookupTableAddresses.map(p => new web3.PublicKey(p));
+    if (jupAlts.status === 200) {
+      lookupTableAddresses.push(...jupAlts.data.map(p => new web3.PublicKey(p)));
+    }
+    Log(`createTxMetadata2: Checkpoint: (jupAlts after loop) ${(new Date().getTime() / 1000) - startTime}`);
+
+    // Get the recent blockhash
+    startTime = new Date().getTime() / 1000;
+    const latestBlockhash = await connection.getLatestBlockhash();
+    Log(`createTxMetadata2: Checkpoint: (latestBlockhash) ${(new Date().getTime() / 1000) - startTime}`);
+
+    startTime = new Date().getTime() / 1000;
+    const batchExecute = new TransactionBatchExecute2(
+      lookupTableAddresses,
+      data.mainInstructions.map(ix => {
+        const keys = ix.accounts.map(meta => {
+          return {
+            pubkey: new web3.PublicKey(meta.pubkey),
+            isSigner: meta.isSigner,
+            isWritable: meta.isWritable,
+          }
+        });
+        return {
+          keys,
+          programId: new web3.PublicKey(ix.programId),
+          data: Buffer.from(ix.data, 'base64'),
+        }
+      }),
+      connection,
+      this,
+      latestBlockhash,
+      new web3.PublicKey(payer),
+    );
+    Log(`createTxMetadata2: Checkpoint: Create 'batchExecute' instance ${(new Date().getTime() / 1000) - startTime}`);
+
+    startTime = new Date().getTime() / 1000;
+    const batch = await batchExecute.buildBatch();
+    Log(`createTxMetadata2: Checkpoint: Create batch of transactions ${(new Date().getTime() / 1000) - startTime}`);
+    Log(`Number of transactions: ${batch.length}`);
+
+    startTime = new Date().getTime() / 1000;
+    const txMetadata: TransactionMetadata[] = [];
+    let i = 0;
+    for (const tx of batch) {
+      let description = data.description;
+      if (batch.length > 1) {
+        description = `${description} #${i + 1}`;
+      }
+      const alts = batchExecute.findRequiredAltsForBatch2(tx);
+      // Create initial transaction instance
+      const transaction = new Transaction(
+        data,
+        new web3.PublicKey(payer),
+        latestBlockhash,
+        alts,
+        generalUtility,
+        tx,
+      );
+      txMetadata.push({
+        description,
+        estimatedFeeInSOL: data.estimatedFeeInSOL,
+        transaction,
+      });
+    }
+    Log(`createTxMetadata2: Checkpoint: Generated multiple transaction metadata ${(new Date().getTime() / 1000) - startTime}`);
+
+    Log(`createTxMetadata2: Elapsed time: ${(new Date().getTime() / 1000) - mainStartTime}`);
+
+    // Return transaction metadata
+    return txMetadata;
   }
 }

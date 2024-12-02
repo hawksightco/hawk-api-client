@@ -1,5 +1,6 @@
 import * as web3 from '@solana/web3.js';
 import { JupiterAlts } from './JupiterAlts';
+import { Log } from './Logging';
 
 /**
  * Dummy signers
@@ -36,6 +37,11 @@ export class TransactionBatchExecute {
   protected alts: web3.AddressLookupTableAccount[] = [];
 
   /**
+   * Map of public keys to address lookup table
+   */
+  protected pubkeyToAlt: Record<string, web3.AddressLookupTableAccount> = {};
+
+  /**
    * Creates an instance of TransactionExecute class
    *
    * @param lookupTableAddresses Address lookup table addresses to be used by batch of transactions
@@ -50,22 +56,44 @@ export class TransactionBatchExecute {
     protected payer: web3.Keypair,
     protected connection: web3.Connection,
     protected signers: web3.Keypair[] = [],
-    protected jupiterAlts: JupiterAlts,
+    protected jupiterAlts?: JupiterAlts,
   ) {};
+
+  /**
+   * Download all jupiter alts (overridable)
+   */
+  protected async jupiterDownloadAlts() {
+    if (this.jupiterAlts) {
+      await this.jupiterAlts.downloadAlts();
+    } else {
+      throw new Error('Unexpected error: jupiterDownloadAlts not implemented!');
+    }
+  }
+
+  /**
+   * Find alt by pubkeys (overridable)
+   */
+  protected async jupiterFindAltByPubkeys(pubkeys: web3.PublicKey[]): Promise<web3.PublicKey[]> {
+    if (this.jupiterAlts) {
+      return this.jupiterAlts.findAltByPubkeys(pubkeys);
+    } else {
+      throw new Error('Unexpected error: jupiterFindAltByPubkeys not implemented!');
+    }
+  }
 
   /**
    * Downoad address lookup table from given cluster
    */
-  async downloadAlts() {
+  protected async downloadAlts() {
 
     // Public keys across all instructions
     const pubkeys = this.getPubkeyFromInstruction();
 
     // Download jupiter alts first
-    await this.jupiterAlts.downloadAlts();
+    await this.jupiterDownloadAlts();
 
     // Then find alts from pubkeys
-    const jupAlts = this.jupiterAlts.findAltByPubkeys(pubkeys);
+    const jupAlts = await this.jupiterFindAltByPubkeys(pubkeys);
 
     // Then append jupiter alts in the lookup table address
     this.lookupTableAddresses.push(...jupAlts);
@@ -77,12 +105,52 @@ export class TransactionBatchExecute {
     const lookupTableAddresses = this.getListOfAltsToDownload();
 
     // Download if address lookup table does not match with downloaded alts
+    await this.downloadAlts2(lookupTableAddresses);
+
+    // Map public key to alt
+    const s0 = new Date().getTime() / 1000;
+    this.mapPubkeyToAlt(pubkeys);
+    Log(`TransactionBatchExecute::downloadAlts(): this.mapPubkeyToAlt benchmark: ${(new Date().getTime() / 1000) - s0}`);
+  }
+
+  /**
+   * Downoad address lookup table from given cluster
+   */
+  protected async downloadAlts2(lookupTableAddresses: web3.PublicKey[]) {
     for (const lookupTable of lookupTableAddresses) {
       const alt = await this.connection.getAddressLookupTable(lookupTable);
       if (alt.value === null) {
         throw new Error(`Address lookup table: ${lookupTable} does not exist on the blockchain.`);
       }
       this.alts.push(alt.value);
+    }
+  }
+
+  /**
+   * Map public key to alt
+   *
+   * @param pubkeys
+   */
+  private mapPubkeyToAlt(pubkeys: web3.PublicKey[]) {
+    const addressesInAlt: string[] = [];
+    const map: Record<string, [web3.AddressLookupTableAccount, string[]]> = {};
+    for (const alt of this.alts) {
+      const addresses = alt.state.addresses.map(p => p.toString());
+      addressesInAlt.push(...addresses);
+      map[alt.key.toString()] = [alt, addresses];
+    }
+    for (const pubkey of pubkeys) {
+      // If pubkey is not in alt, then skip
+      const inAlt = addressesInAlt.includes(pubkey.toString());
+      if (!inAlt) continue;
+
+      // Find the alt where public key is included
+      for (const key in map) {
+        if (map[key][1].includes(pubkey.toString())) {
+          this.pubkeyToAlt[pubkey.toString()] = map[key][0];
+          break;
+        }
+      }
     }
   }
 
@@ -302,6 +370,34 @@ export class TransactionBatchExecute {
   }
 
   /**
+   * Find required signers from instructions
+   *
+   * @param ixs
+   * @param dummySigners
+   */
+  protected findRequiredSignersFromIxs(ixs: web3.TransactionInstruction[]): web3.PublicKey[] {
+    const signers: web3.PublicKey[] = [];
+    signers.push(this.payer.publicKey);
+    for (const instruction of ixs) {
+      const _signers = instruction.keys
+        .filter(meta => meta.isSigner)
+        .map(meta => meta.pubkey);
+      if (_signers.length > 0) {
+        signers.push(..._signers);
+      }
+    }
+    const uniqueSigners: Record<string, web3.PublicKey> = {};
+    for (const signer of signers) {
+      uniqueSigners[signer.toBase58()] = signer;
+    }
+    const result: web3.PublicKey[] = [];
+    for (const id in uniqueSigners) {
+      result.push(uniqueSigners[id]);
+    }
+    return result;
+  }
+
+  /**
    * Find required signers from batch
    *
    * @param ixs
@@ -335,33 +431,6 @@ export class TransactionBatchExecute {
         throw new Error(`Keypair ${signer} cannot be found in $this.signers array. Perhaps you forgot to add it?`);
       }
       result.push(keypair);
-    }
-    return result;
-  }
-
-  /**
-   * Find required signers from instructions
-   *
-   * @param ixs
-   * @param dummySigners
-   */
-  private findRequiredSignersFromIxs(ixs: web3.TransactionInstruction[]): web3.PublicKey[] {
-    const signers: web3.PublicKey[] = [];
-    for (const instruction of ixs) {
-      const _signers = instruction.keys
-        .filter(meta => meta.isSigner)
-        .map(meta => meta.pubkey);
-      if (_signers.length > 0) {
-        signers.push(..._signers);
-      }
-    }
-    const uniqueSigners: Record<string, web3.PublicKey> = {};
-    for (const signer of signers) {
-      uniqueSigners[signer.toBase58()] = signer;
-    }
-    const result: web3.PublicKey[] = [];
-    for (const id in uniqueSigners) {
-      result.push(uniqueSigners[id]);
     }
     return result;
   }

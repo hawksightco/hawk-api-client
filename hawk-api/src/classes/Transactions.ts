@@ -412,64 +412,25 @@ export class Transactions {
     async meteoraClaimAll({
       connection,
       params,
-    }: TxgenParams<MeteoraClaimAll>): Promise<TransactionMetadataResponse[]> {
+    }: TxgenParams<MeteoraClaimAll>): Promise<TransactionMetadataResponse> {
       const userPda = generateUserPda(params.userWallet);
       const txs: TransactionMetadataResponse[] = [];
+      const fn = new MeteoraFunctions();
 
-      // Returns all position owned by user.
-      // What is not sure is whether these positions are closed already.
-      const promiseResult = await Promise.all([
-        userPda && (await MeteoraDLMM.program(connection)).account.position.all([
-          {
-            memcmp: {
-              bytes: bs58.encode(userPda.toBuffer()),
-              offset: 8 + 32
-            }
-          }
-        ]),
-        userPda && (await MeteoraDLMM.program(connection)).account.positionV2.all([
-          {
-            memcmp: {
-              bytes: bs58.encode(userPda.toBuffer()),
-              offset: 8 + 32
-            }
-          }
-        ])
-      ]);
+      // Step 1: Get all user position
+      // This function also downloads pools needed to generate claim all transaction.
+      const positions = await fn.getAllUserPosition(connection, userPda);
 
-      const [_positions, _positionsV2] = promiseResult;
-      const positions = [..._positions, ..._positionsV2];
+      // Step 2: Generate claim fee and claim reward transactions
+      const mainInstructions = await fn.claimFeeAndRewardIxs2(connection, positions, userPda);
 
-      for (const position of positions) {
-        position.account.lbPair
-        const dlmmPool = await MeteoraDLMM.create(connection, position.account.lbPair);
-        const { userPositions } = await dlmmPool.getPositionsByUserAndLbPair(
-          userPda
-        );
-        for (const position of userPositions) {
-          const mainInstructions = (
-            await dlmmPool.claimAllRewardsByPosition(
-              params.userWallet,
-              params.userWallet,
-              {
-                owner: userPda,
-                position,
-              },
-              meteoraToHawksight
-            )
-          ).default();
-          txs.push(
-            await createTransactionMeta({
-              payer: params.userWallet,
-              description: "Claim fees / rewards from Meteora DLMM Position",
-              addressLookupTableAddresses: GLOBAL_ALT,
-              mainInstructions,
-            })
-          );
-        }
-      }
-
-      return txs;
+      // Step 3: Return the instructions
+      return await createTransactionMeta({
+        payer: params.userWallet,
+        description: "Claim all fees and rewards across all meteora positions.",
+        addressLookupTableAddresses: GLOBAL_ALT,
+        mainInstructions,
+      });
     }
 
   /**

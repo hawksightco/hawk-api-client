@@ -30,6 +30,7 @@ describe('Atomicity', () => {
   it('Be able to chunk transactions into set of 6 transactions without any error using atomicity', async () => {
     const connection = new web3.Connection(process.env.RPC_URL as string);
     const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
+    hawkAPI.logging(false);
     const signers = [
       web3.Keypair.generate(),
       web3.Keypair.generate(),
@@ -73,6 +74,7 @@ describe('Atomicity', () => {
   it('Be able to chunk transactions into set of 6 transactions without any error using atomicity', async () => {
     const connection = new web3.Connection(process.env.RPC_URL as string);
     const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
+    hawkAPI.logging(false);
     const signers = [
       web3.Keypair.generate(),
       web3.Keypair.generate(),
@@ -151,6 +153,7 @@ describe('Atomicity', () => {
   it('Be able to create batch of versioned transactions without any error', async () => {
     const connection = new web3.Connection(process.env.RPC_URL as string);
     const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
+    hawkAPI.logging(false);
     const signers = [
       web3.Keypair.generate(),
       web3.Keypair.generate(),
