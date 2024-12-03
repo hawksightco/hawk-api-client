@@ -698,8 +698,12 @@ export function getJupiterRouteIxParams(data: Buffer): JupiterRouteIxParams {
 
     // Swap is "WhirlpoolSwapV2"
     else if (swapEnumId == 47) {
-      const vecSize = new BN(data.subarray(lastIndex + 1, lastIndex + 1 + 4), 10, 'le').toNumber();
-      lastIndex = 17 + 1 + 4 + (vecSize * 2);
+      lastIndex += 2;
+      if (data[lastIndex] !== 0) {
+        lastIndex += 1;
+        const vecSize = new BN(data.subarray(lastIndex, lastIndex + 4), 10, 'le').toNumber();
+        lastIndex += 4 + (vecSize * 2);
+      }
 
     // Rest of the swaps have the standard 4-bytes
     } else
