@@ -287,15 +287,13 @@ export class MultiTransaction {
     txMetadataResponse: TransactionMetadataResponse, // todo: figure out how to skip requiring tx
   ) {
     // Get fee estimate by simulating the transaction
-    const startTime = new Date().getTime() / 1000;
-    Log(`addPriorityFeeIx: Starting getFeeEstimate function`);
+    benchmark({ name: `getFeeEstimate2`, msg: `Starting getFeeEstimate function` });
     let estimate = await getFeeEstimate(
       this.generalUtility,
       priorityLevel,
       txMetadataResponse
     );
-    Log(`addPriorityFeeIx: Starting getFeeEstimate function: Elapsed Time: ${(new Date().getTime() / 1000) - startTime}`);
-
+    benchmark({ name: `getFeeEstimate2`, msg: `getFeeEstimate function`, end: true });
     return estimate;
   }
 }

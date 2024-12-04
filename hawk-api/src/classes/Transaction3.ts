@@ -103,6 +103,7 @@ export class Transaction3 {
     protected generalUtility: GeneralUtility,
     _mainIxs: web3.TransactionInstruction[] = [],
   ) {
+    txMetadataResponse.payer = payerKey.toBase58();
     let mainIxs;
     if (_mainIxs.length > 0) {
       mainIxs = _mainIxs;
