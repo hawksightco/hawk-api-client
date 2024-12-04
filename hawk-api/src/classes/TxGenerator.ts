@@ -2,12 +2,13 @@ import * as web3 from "@solana/web3.js";
 import * as _client from "@hawksightco/swagger-client";
 import { ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, TransactionPriority, Distribution, OrcaWithdraw, OrcaDeposit, OrcaClosePosition, OrcaOpenPosition, OrcaClaimRewards, MeteoraClaimAll } from "../types";
 import { Client } from "./Client";
-import { createTxMetadata, createTxMetadata2, resultOrError } from "../functions";
+import { createTxMetadata } from "../functions";
 import { GeneralUtility } from "./GeneralUtility";
 import { Anchor } from "../anchor";
 import { txgen } from "./Transactions";
 import { BN } from "bn.js";
 import { Log } from "./Logging";
+import { MultiTransaction } from "./MultiTransaction";
 
 /**
  * The `TxGenerator` class encapsulates methods to generate transactions with various trading operations
@@ -226,36 +227,17 @@ export class TxGenerator {
    * @param params Parameters required
    * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
    */
-  async meteoraClaimAll(connection: web3.Connection, payer: string, params: MeteoraClaimAll): Promise<ResponseWithStatus<TransactionMetadata[]>> {
+  async meteoraClaimAll(connection: web3.Connection, payer: string, params: MeteoraClaimAll): Promise<MultiTransaction> {
     // Initialize anchor
     Anchor.initialize(connection);
-    try {
-      const startTime = new Date().getTime() / 1000;
-      Log(`meteoraClaimAll: Benchmarking txgen.meteoraClaimAll`);
-      const result = await txgen.meteoraClaimAll({
-        connection,
-        params,
-      });
-      Log(`meteoraClaim: await txgen.meteoraClaimAll elapsed time: ${new Date().getTime() / 1000 - startTime}`);
-      return {
-        status: 200,
-        data: await createTxMetadata2(
-          this.generalUtility,
-          connection,
-          payer,
-          result
-        ),
-      };
-    } catch (e) {
-      return {
-        status: 400,
-        data: {
-          code: "custom",
-          message: e,
-          path: [],
-        } as any,
-      };
-    }
+    const startTime = new Date().getTime() / 1000;
+    Log(`meteoraClaimAll: Benchmarking txgen.meteoraClaimAll`);
+    const result = await txgen.meteoraClaimAll({
+      connection,
+      params,
+    }, new web3.PublicKey(payer), this.generalUtility);
+    Log(`meteoraClaim: await txgen.meteoraClaimAll elapsed time: ${new Date().getTime() / 1000 - startTime}`);
+    return result;
   }
 
   /**

@@ -36,7 +36,7 @@ import {
   OrcaDeposit,
   OrcaWithdraw,
   OrcaClaimRewards,
-  TransactionMetadataResponse
+  TransactionMetadataResponse,
 } from '../types';
 
 import {
@@ -65,6 +65,10 @@ import { depositMultipleToken, withdrawMultipleToken } from "../hawksight";
 import { Protocol } from "../types";
 import { Log } from "./Logging";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
+import { TransactionBatchExecute2 } from "./TransactionBatchExecute2";
+import { CreateTxMetadata } from "./CreateTxMetadata";
+import { GeneralUtility } from "./GeneralUtility";
+import { MultiTransaction } from "./MultiTransaction";
 
 export class Transactions {
   /**
@@ -407,14 +411,13 @@ export class Transactions {
    * @param connection The Solana web3 connection object for blockchain interactions.
    * @param payer The public key of the payer for transaction fees.
    * @param params Parameters required
-   * @returns A ResponseWithStatus containing either TransactionMetadataResponse.
+   * @returns Array of transaction instructions (simplified output)
    */
     async meteoraClaimAll({
       connection,
       params,
-    }: TxgenParams<MeteoraClaimAll>): Promise<TransactionMetadataResponse> {
+    }: TxgenParams<MeteoraClaimAll>, payer: web3.PublicKey, generalUtility: GeneralUtility): Promise<MultiTransaction> {
       const userPda = generateUserPda(params.userWallet);
-      const txs: TransactionMetadataResponse[] = [];
       const fn = new MeteoraFunctions();
 
       // Step 1: Get all user position
@@ -422,15 +425,31 @@ export class Transactions {
       const positions = await fn.getAllUserPosition(connection, userPda);
 
       // Step 2: Generate claim fee and claim reward transactions
-      const mainInstructions = await fn.claimFeeAndRewardIxs2(connection, positions, userPda);
+      const builder = await fn.claimFeeAndRewardIxs2(connection, positions, params.userWallet, userPda, meteoraToHawksight);
 
-      // Step 3: Return the instructions
-      return await createTransactionMeta({
-        payer: params.userWallet,
-        description: "Claim all fees and rewards across all meteora positions.",
-        addressLookupTableAddresses: GLOBAL_ALT,
+      // Step 2.5: Generate transactions
+      const mainInstructions = builder.default();
+
+      const latestBlockhash = await connection.getLatestBlockhash();
+      const batchGenerator = new TransactionBatchExecute2(
+        GLOBAL_ALT.map(p => new web3.PublicKey(p)),
         mainInstructions,
+        connection,
+        CreateTxMetadata.instance(),
+        latestBlockhash,
+        payer,
+      );
+
+      // Insert nonce advance tx at end of transaction
+      batchGenerator.insertNonceAt({
+        onlyEndOfTx: true,
       });
+
+      // Generate batch of transactions
+      const txs = await batchGenerator.buildBatchWithAlts('Claim all fees / rewards from Meteora DLMM position', generalUtility);
+
+      // Simplified return value
+      return txs;
     }
 
   /**

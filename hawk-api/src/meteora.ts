@@ -766,8 +766,10 @@ export class MeteoraFunctions {
   async claimFeeAndRewardIxs2(
     connection: web3.Connection,
     positions: web3.PublicKey[],
+    userWallet: web3.PublicKey,
     userPda: web3.PublicKey,
-  ): Promise<web3.TransactionInstruction[]> {
+    meteoraToHawksight: MeteoraToHawksightFn,
+  ): Promise<ClaimAllRewardsByPositionBuilder> {
     // const result = await this.getPositionAndLbPair(connection, lbPair, position);
     const program = await MeteoraDLMM.program(connection);
     const constants = this.constants(program);
@@ -794,7 +796,48 @@ export class MeteoraFunctions {
       const claimRewardIxs = this.claimRewardIxs(lbPair, position, userPda, result);
       ixs.push(claimFeeIx, ...claimRewardIxs);
     }
-    return ixs;
+
+    // Find mint from meteora instructions
+    const mints = getMintsFromInstruction({
+      instructions: ixs,
+      find: {
+        ClaimFee: {
+          programId: METEORA_DLMM_PROGRAM.toBase58(),
+          mintIndices: [9, 10],
+        },
+        ClaimReward: {
+          programId: METEORA_DLMM_PROGRAM.toBase58(),
+          mintIndices: [6],
+        },
+      },
+    });
+
+    return new ClaimAllRewardsByPositionBuilder(
+      // Step 1: Init ATA prior to withdrawal
+      createAtaIdempotentIxs({
+        accounts: mints.map((mint) => {
+          return { owner: userPda, payer: userWallet, mint };
+        }),
+      }),
+
+      // Step 2: Claim fees and/or rewards, remove liquidity, and possibly close position (if set)
+      await meteoraToHawksight({
+        ixs,
+        userPda,
+        authority: userWallet,
+      }),
+
+      // Step 3: Withdraw tokens to user wallet
+      await withdrawMultipleToken({
+        payer: userWallet,
+        withdraw: mints.map((mint) => {
+          return { mint };
+        }),
+      }),
+
+      // Step 4: Close wSOL account (if there's any)
+      unwrapSolIfMintIsWsol(userWallet, mints)
+    );
   }
 
   async claimFeeAndRewardIxs(
