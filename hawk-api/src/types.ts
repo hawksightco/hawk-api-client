@@ -268,14 +268,6 @@ export type TransactionMetadata = {
   transaction: TransactionClass,
 }
 
-export type SimulatedTransactionResponse = {
-  err: web3.TransactionError | string | null,
-  logs: Array<string> | null,
-  accounts?: (web3.SimulatedTransactionAccountInfo | null)[] | null,
-  unitsConsumed: number,
-  returnData?: web3.TransactionReturnData | null,
-};
-
 /**
  * Type definition for search indices and their associated hash.
  */
@@ -479,3 +471,11 @@ export type PriorityFeeEstimate = {
   priorityFeeEstimate: number;
   feeLevels: Record<string, number>;
 };
+
+export type InsertNonceAtOpt = {
+  onlyEndOfTx?: boolean,
+}
+
+export type SignerPlugin = (transaction: web3.VersionedTransaction) => Promise<web3.VersionedTransaction>;
+export type SignerPlugin2 = (transaction: web3.VersionedTransaction[]) => Promise<web3.VersionedTransaction[]>;
+export type SendSignedTx = (signedTx: web3.VersionedTransaction, lastValidBlockHeight: number) => Promise<string>;

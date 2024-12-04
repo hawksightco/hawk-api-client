@@ -838,3 +838,73 @@ export async function getPriorityFeeEstimate2(
 export function mid(min: number, max: number) {
   return min + (max - min) / 2;
 }
+
+/**
+ * Find all nonce pubkey owned by given owner and index
+ *
+ * @param owner
+ */
+export async function generateNonceAddressFromIndex(owner: web3.PublicKey, index: number): Promise<web3.PublicKey> {
+  return await web3.PublicKey.createWithSeed(owner, `hs-nonce-${index}`, web3.SystemProgram.programId);
+}
+
+/**
+ * Find all nonce pubkey owned by given owner
+ *
+ * @param owner
+ */
+export async function generateNonceAddressesOwnedBy(owner: web3.PublicKey, count: number): Promise<web3.PublicKey[]> {
+  const nonceAddresses = [];
+  for (let i = 0; i < count; i++) {
+    nonceAddresses.push(await generateNonceAddressFromIndex(owner, i));
+  }
+  return nonceAddresses;
+}
+
+/**
+ * Find all nonce pubkey owned by given owner
+ *
+ * TODO: Put this into a class and the class must serve as cache of nonce accounts (so that we don't query nonce account multiple times)
+ *
+ * @param owner
+ */
+export async function findNonceOwnedBy(connection: web3.Connection, owner: web3.PublicKey, count: number): Promise<web3.AccountInfo<web3.NonceAccount>[]> {
+  const nonceAddresses = await generateNonceAddressesOwnedBy(owner, count);
+  const infos = await connection.getMultipleAccountsInfo(nonceAddresses);
+  const result: web3.AccountInfo<web3.NonceAccount>[] = infos.filter(info => info !== null).map(
+    info => {
+      const result: web3.AccountInfo<web3.NonceAccount> = {
+        /** `true` if this account's data contains a loaded program */
+        executable: info!.executable,
+        /** Identifier of the program that owns the account */
+        owner: info!.owner,
+        /** Number of lamports assigned to the account */
+        lamports: info!.lamports,
+        /** Optional data assigned to the account */
+        data: web3.NonceAccount.fromAccountData(info!.data),
+        /** Optional rent epoch info for account */
+        rentEpoch: info!.rentEpoch,
+      }
+      return result
+    }
+  );
+  return result;
+}
+
+export const benchmark = (() => {
+  type Params = {
+    name: string,
+    msg: string,
+    end?: boolean,
+  }
+
+  let startTime: number;
+  return ({end, name, msg}: Params) => {
+    if (end) {
+      Log(`${name}: ${msg} elapsed time: ${new Date().getTime() / 1000 - startTime}`);
+    } else {
+      startTime = new Date().getTime() / 1000;
+      Log(`${name}: Benchmarking ${msg}`);
+    }
+  }
+})();

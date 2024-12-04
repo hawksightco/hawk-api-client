@@ -240,26 +240,14 @@ export class CreateTxMetadata {
     Log(`createTxMetadata2`);
     const mainStartTime = new Date().getTime() / 1000;
 
-    // Find jup alts
-    let startTime = mainStartTime;
-    const jupAlts = await generalUtility.findAltWithTxPost({ transaction: data });
-    Log(`createTxMetadata2: Checkpoint: (jupAlts) ${(new Date().getTime() / 1000) - startTime}`);
-
-    startTime = new Date().getTime() / 1000;
-    const lookupTableAddresses = data.addressLookupTableAddresses.map(p => new web3.PublicKey(p));
-    if (jupAlts.status === 200) {
-      lookupTableAddresses.push(...jupAlts.data.map(p => new web3.PublicKey(p)));
-    }
-    Log(`createTxMetadata2: Checkpoint: (jupAlts after loop) ${(new Date().getTime() / 1000) - startTime}`);
-
     // Get the recent blockhash
-    startTime = new Date().getTime() / 1000;
+    let startTime = mainStartTime;
     const latestBlockhash = await connection.getLatestBlockhash();
     Log(`createTxMetadata2: Checkpoint: (latestBlockhash) ${(new Date().getTime() / 1000) - startTime}`);
 
     startTime = new Date().getTime() / 1000;
     const batchExecute = new TransactionBatchExecute2(
-      lookupTableAddresses,
+      data.addressLookupTableAddresses.map(p => new web3.PublicKey(p)),
       data.mainInstructions.map(ix => {
         const keys = ix.accounts.map(meta => {
           return {

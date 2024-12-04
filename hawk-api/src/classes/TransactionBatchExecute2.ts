@@ -1,11 +1,17 @@
 import * as web3 from '@solana/web3.js';
 import { TransactionBatchExecute, DummySigners } from './TransactionBatchExecute';
 import { CreateTxMetadata } from './CreateTxMetadata';
+import { InsertNonceAtOpt } from '../types';
+import { GeneralUtility } from './GeneralUtility';
+import { MultiTransaction } from './MultiTransaction';
+import { generateNonceAddressFromIndex } from '../functions';
 
 /**
  * Executes transactions in batches
  */
 export class TransactionBatchExecute2 extends TransactionBatchExecute {
+
+  private _insertNonceAt: InsertNonceAtOpt = {};
 
   /**
    * Creates an instance of TransactionExecute class
@@ -63,6 +69,15 @@ export class TransactionBatchExecute2 extends TransactionBatchExecute {
   }
 
   /**
+   * Option to include nonce advance instruction
+   *
+   * @param opt
+   */
+  insertNonceAt(opt: InsertNonceAtOpt) {
+    this._insertNonceAt = opt;
+  }
+
+  /**
    * Builds a batch of executable transaction instructions
    */
   async buildBatch(): Promise<web3.TransactionInstruction[][]> {
@@ -78,7 +93,10 @@ export class TransactionBatchExecute2 extends TransactionBatchExecute {
     // Batch of actual instructions
     const batch: web3.TransactionInstruction[][] = [];
     let index = 0;
+    let i = 0;
+    const lastIndex = dummyBatches.length - 1;
     for (const dummyIxs of dummyBatches) {
+      const isLastIndex = i == lastIndex;
       const currentBatch: web3.TransactionInstruction[] = [];
       for (const ix of dummyIxs) {
         // If program id is compute budget, ignore
@@ -87,7 +105,51 @@ export class TransactionBatchExecute2 extends TransactionBatchExecute {
         // Otherwise, include in batch
         currentBatch.push(this.instructions[index++]);
       }
+      if (isLastIndex && this._insertNonceAt.onlyEndOfTx) {
+        currentBatch.push(await this.generateNonceAdvanceIx(i));
+      }
       batch.push(currentBatch);
+      i++;
+    }
+
+    return batch;
+  }
+
+  /**
+   * Builds a batch of executable transaction instructions
+   */
+  async buildBatchWithAlts(description: string, generalUtility: GeneralUtility): Promise<MultiTransaction> {
+    // Download address lookup table from given cluster
+    await this.downloadAlts();
+
+    // Generate dummy instructions for batch calculation
+    const [simulationIxs, dummySigners] = this.generateSimulationIxs();
+
+    // Split simulation ixs
+    const dummyBatches = await this.splitToTransactions(simulationIxs, dummySigners);
+
+    // Batch of actual instructions
+    const batch: MultiTransaction = new MultiTransaction(description, generalUtility, this.latestBlockhash, this.payerKey);
+    let index = 0;
+    let i = 0;
+    const lastIndex = dummyBatches.length - 1;
+    for (const dummyIxs of dummyBatches) {
+      const isLastIndex = i == lastIndex;
+      const currentBatch: web3.TransactionInstruction[] = [];
+      for (const ix of dummyIxs) {
+        // If program id is compute budget, ignore
+        if (ix.programId.equals(web3.ComputeBudgetProgram.programId)) continue;
+
+        // Otherwise, include in batch
+        currentBatch.push(this.instructions[index++]);
+      }
+      if (lastIndex !== 0 && isLastIndex && this._insertNonceAt.onlyEndOfTx) {
+        currentBatch.push(await this.generateNonceAdvanceIx(i));
+      }
+
+      const alts = this.findRequiredAltsForBatch2(currentBatch);
+      batch.push(alts, currentBatch);
+      i++;
     }
 
     return batch;
@@ -125,7 +187,10 @@ export class TransactionBatchExecute2 extends TransactionBatchExecute {
         const estimateTxSize = this.getEstimateSize([...preIxs, ...batch]);
         if (estimateTxSize < this.MAX_SIZE) continue;
 
-        const txSize = this.calculateTransactionSize(this.latestBlockhash, [...preIxs, ...batch], dummySigners);
+        // Generate dummy nonce advance (anticipation)
+        const nonceAdvance = this._insertNonceAt.onlyEndOfTx ? [await this.generateNonceAdvanceIx(result.length)] : [];
+
+        const txSize = this.calculateTransactionSize(this.latestBlockhash, [...preIxs, ...nonceAdvance, ...batch], dummySigners);
         if (txSize > this.MAX_SIZE) {
           batch.pop();
           result.push([...preIxs, ...batch]);
@@ -143,6 +208,20 @@ export class TransactionBatchExecute2 extends TransactionBatchExecute {
     }
 
     return result;
+  }
+
+  /**
+   * Generate nonde advance instruction (dummy instruction)
+   */
+  private async generateNonceAdvanceIx(index: number): Promise<web3.TransactionInstruction> {
+    const noncePubkey = await generateNonceAddressFromIndex(this.payerKey, index);
+    // Generate dummy nonce ix
+    return web3.SystemProgram.nonceAdvance({
+      /** Nonce account */
+      noncePubkey,
+      /** Public key of the nonce authority */
+      authorizedPubkey: this.payerKey,
+    });
   }
 
   private getEstimateSize(ixs: web3.TransactionInstruction[]) {

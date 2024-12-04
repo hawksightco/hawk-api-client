@@ -1,3 +1,15 @@
+///
+/// I call this the weirdshit class. I don't understand the full mechanism why.
+/// The difference between `Transaction3` and `Transaction` class is its name.
+/// This file is just the exact copy of `Transaction` class except this comment.
+///
+/// I will keep this class for now. I just want this thing to compile with our
+/// front-end. This class is meant to isolate the compile error we're experiencing.
+/// But the moment I created this file, everything worked like WTF? Maybe it's
+/// just a "typescript" shit or something. Some undocumented bug...
+///
+/// Therefore I'll keep this for now...
+///
 import * as client from "@hawksightco/swagger-client";
 import * as web3 from "@solana/web3.js";
 import { BN } from "bn.js";
@@ -37,7 +49,7 @@ export type Instruction = {
  * Represents a transaction object in Solana using the web3.js library.
  * This class encapsulates the logic for creating, signing, and verifying signatures of transactions.
  */
-export class Transaction {
+export class Transaction3 {
   /** Compiled TransactionMessage which includes payer, instructions, and recent blockhash */
   protected _txMessage: web3.TransactionMessage;
   get txMessage(): web3.TransactionMessage {
