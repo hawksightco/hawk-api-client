@@ -6,6 +6,7 @@ import path from "path";
 import { HawkAPI } from "../../src";
 import { JupiterAlts } from "../../src/classes/JupiterAlts";
 import { IYF_EXTENSION, IYF_MAIN, USDC_FARM } from "../../src/addresses";
+import { Anchor } from "../../src/anchor";
 
 dotenv.config({
   path: path.join(process.cwd(), 'test', '.env')
@@ -124,6 +125,77 @@ describe('SimpleIxGenerator', () => {
         position: web3.SystemProgram.programId,
         lowerBinId: 0,
         upperBinId: 1
+      });
+    } catch {
+      throwsException = true;
+    }
+    expect(throwsException).toBe(false);
+  });
+
+  it('Generate meteora.openPositionAndDepositAutomation instruction', async () => {
+    // Connection instance
+    const connection = new web3.Connection(process.env.RPC_URL as string);
+
+    // Initialize Anchor
+    Anchor.initialize(connection);
+
+    // Create instance of HawkAPI
+    const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
+
+    // Generate wallet
+    const userWallet = web3.Keypair.generate().publicKey;
+
+    const lbPair = new web3.PublicKey('EdEU6L2yLbXC78fdpruEFWubK7AQUGSjTNummi5zJRyY');
+    const lbPairInfo = await (Anchor.instance().meteoraProgram.account as any).lbPair.fetch(lbPair);
+
+    // Generate instruction
+    let throwsException = false;
+    try {
+      const ix = await hawkAPI.ix.meteoraDlmm.openPositionAndDepositAutomation(connection, {
+        userWallet,
+        lbPair,
+        position: web3.SystemProgram.programId,
+        relativeLowerBinId: 34,
+        relativeUpperBinId: 34,
+        maxActiveBinSlippage: 3,
+        strategyType: 8,
+        checkRange: {
+          minBinId: lbPairInfo.activeId - 20,
+          maxBinId: lbPairInfo.activeId + 20,
+        }
+      });
+    } catch {
+      throwsException = true;
+    }
+    expect(throwsException).toBe(false);
+  });
+
+  it('Generate meteora.openPositionAndDepositAutomation instruction -- no check range', async () => {
+    // Connection instance
+    const connection = new web3.Connection(process.env.RPC_URL as string);
+
+    // Initialize Anchor
+    Anchor.initialize(connection);
+
+    // Create instance of HawkAPI
+    const hawkAPI = new HawkAPI('https://api2.hawksight.co', { disableTokenLoad: true, disableTxMetadataLoad: true });
+
+    // Generate wallet
+    const userWallet = web3.Keypair.generate().publicKey;
+
+    const lbPair = new web3.PublicKey('EdEU6L2yLbXC78fdpruEFWubK7AQUGSjTNummi5zJRyY');
+
+    // Generate instruction
+    let throwsException = false;
+    try {
+      const ix = await hawkAPI.ix.meteoraDlmm.openPositionAndDepositAutomation(connection, {
+        userWallet,
+        lbPair,
+        position: web3.SystemProgram.programId,
+        relativeLowerBinId: 34,
+        relativeUpperBinId: 34,
+        maxActiveBinSlippage: 3,
+        strategyType: 8,
       });
     } catch {
       throwsException = true;
