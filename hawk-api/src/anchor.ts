@@ -3,10 +3,12 @@ import * as anchor from "@coral-xyz/anchor";
 import { IDL as _IyfMain, IndexYieldFarming } from "./idl/iyf-main-idl";
 import { IDL as _IyfExtension, IyfExtension as IyfExtensionNew } from "./idl/iyf-extension-idl";
 import { IDL as _Whirlpool, Whirlpool } from "./idl/orca-idl";
+import { IDL as _LbClmm, LbClmm } from "./idl/meteora-idl";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import {
   IYF_EXTENSION,
   IYF_MAIN,
+  METEORA_DLMM_PROGRAM,
   ORCA_WHIRLPOOL_PROGRAM
 } from "./addresses";
 
@@ -142,6 +144,7 @@ export class Anchor {
   iyfMain: anchor.Program<IndexYieldFarming>;
   iyfExtension: anchor.Program<IyfExtension>;
   orcaProgram: anchor.Program<Whirlpool>;
+  meteoraProgram: anchor.Program<LbClmm>;
 
   private constructor(
     public connection: web3.Connection,
@@ -180,6 +183,7 @@ export class Anchor {
     } as IyfExtension;
     this.iyfExtension =  new anchor.Program(IyfExtension, IYF_EXTENSION, this.provider);
     this.orcaProgram = new anchor.Program(_Whirlpool, ORCA_WHIRLPOOL_PROGRAM, this.provider);
+    this.meteoraProgram = new anchor.Program(_LbClmm, METEORA_DLMM_PROGRAM, this.provider);
   }
 
   static initialize(connection: web3.Connection) {
