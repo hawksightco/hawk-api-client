@@ -1,11 +1,12 @@
 import * as web3 from "@solana/web3.js";
-import { Anchor } from "../anchor";
+import { Anchor, IyfExtension } from '../anchor';
 import { setTransactionSlot, verifyTransactionSlot, AtomicityContextParams } from "../hawksight";
 import { IyfMainIxGenerator } from "./IyfMainIxGenerator";
-import { generateUserPda } from "../functions";
-import { HS_AUTHORITY, IYF_MAIN, USDC_FARM } from "../addresses";
-import { MeteoraDLMM } from "../meteora";
+import { generateAta, generateUserPda } from "../functions";
+import { HS_AUTHORITY, IYF_MAIN, TOKEN_PROGRAM_ID, USDC_FARM } from "../addresses";
+import { MeteoraDLMM, MeteoraFunctions } from "../meteora";
 import BN from "bn.js";
+import { StrategyType } from "@meteora-ag/dlmm";
 
 /**
  * Meteora event authority
@@ -23,6 +24,20 @@ type InitializePositionAutomation = {
   position: web3.PublicKey,
   lowerBinId: number,
   upperBinId: number,
+}
+
+type OpenPositionAndDepositAutomation = {
+  userWallet: web3.PublicKey,
+  lbPair: web3.PublicKey,
+  position: web3.PublicKey,
+  relativeLowerBinId: number,
+  relativeUpperBinId: number,
+  maxActiveBinSlippage: number,
+  strategyType: StrategyType,
+  checkRange?: {
+    minBinId: number,
+    maxBinId: number,
+  }
 }
 
 /**
@@ -67,6 +82,79 @@ export class MeteoraDlmmIxGenerator {
             meteoraDlmmProgram: METEORA_DLMM_PROGRAM,
           })
           .instruction()
+      }
+    );
+  }
+
+  async openPositionAndDepositAutomation(connection: web3.Connection, { userWallet, lbPair, position, relativeLowerBinId, relativeUpperBinId, maxActiveBinSlippage, strategyType, checkRange }: OpenPositionAndDepositAutomation): Promise<web3.TransactionInstruction> {
+    // Initialize anchor
+    Anchor.initialize(connection);
+
+    // Meteora utility function
+    const fn = new MeteoraFunctions();
+
+    // Generate user pda
+    const userPda = generateUserPda(userWallet);
+
+    // Get meteora pool
+    const lbPairInfo = await (Anchor.instance().meteoraProgram.account as any).lbPair.fetch(lbPair);
+    const tokenXMint = lbPairInfo.tokenXMint;
+    const tokenYMint = lbPairInfo.tokenYMint;
+    const reserveX = lbPairInfo.reserveX;
+    const reserveY = lbPairInfo.reserveY;
+    const userTokenX = generateAta(userPda, tokenXMint);
+    const userTokenY = generateAta(userPda, tokenYMint);
+    const activeBinId = lbPairInfo.activeId;
+    const MAX_BIN_ARRAY_SIZE = new BN(Anchor.instance().meteoraProgram.idl.constants[1].value);
+    const lowerBinArrayIndex = fn.binIdToBinArrayIndex(MAX_BIN_ARRAY_SIZE, new BN(activeBinId - relativeLowerBinId));
+    const binArrayLower = fn.deriveBinArray(lbPair, lowerBinArrayIndex);
+    const binArrayUpper = fn.deriveBinArray(lbPair, lowerBinArrayIndex.add(new BN(1)));
+
+    let _checkRange: null | [number, number];
+    if (!!checkRange) {
+      const { minBinId, maxBinId } = checkRange;
+      _checkRange = [minBinId, maxBinId];
+    } else {
+      _checkRange = null;
+    }
+
+    // Generate instruction
+    return this.iyfMain.iyfExtensionExecute(
+      connection,
+      {
+        userWallet,
+        iyfExtensionIx: await Anchor.instance().iyfExtension
+        .methods
+        .meteoraDlmmOpenPositionAndDepositAutomation(
+          relativeLowerBinId,
+          relativeUpperBinId,
+          maxActiveBinSlippage,
+          strategyType,
+          _checkRange,
+        )
+        .accounts({
+          farm: USDC_FARM,
+          userPda,
+          authority: userWallet,
+          iyfProgram: IYF_MAIN,
+          hawksightAuthority: HS_AUTHORITY,
+          position,
+          lbPair,
+          userTokenX,
+          userTokenY,
+          reserveX,
+          reserveY,
+          tokenXMint,
+          tokenYMint,
+          binArrayLower,
+          binArrayUpper,
+          systemProgram: web3.SystemProgram.programId,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          rent: web3.SYSVAR_RENT_PUBKEY,
+          eventAuthority: METEORA_EVENT_AUTHORITY,
+          meteoraDlmmProgram: METEORA_DLMM_PROGRAM,
+        })
+        .instruction(),
       }
     );
   }
