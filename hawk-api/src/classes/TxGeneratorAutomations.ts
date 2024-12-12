@@ -1,6 +1,6 @@
 import * as web3 from "@solana/web3.js";
 import * as _client from "@hawksightco/swagger-client";
-import { MeteoraCompound, MeteoraLimitCloseAutomation, MeteoraRebalance, ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, TransactionPriority } from "../types";
+import { MeteoraCompound, MeteoraLimitCloseAutomation, MeteoraRebalance, MeteoraRebalance2, ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, TransactionPriority } from "../types";
 import { Client } from "./Client";
 import { createTxMetadata, resultOrError } from "../functions";
 import { GeneralUtility } from "./GeneralUtility";
@@ -93,6 +93,45 @@ export class TxGeneratorAutomations {
     Anchor.initialize(connection);
     try {
       const result = await txgen.rebalanceAutomationIx({
+        connection,
+        params,
+      });
+      return {
+        status: 200,
+        data: await createTxMetadata(
+          this.generalUtility,
+          connection,
+          payer,
+          result
+        ),
+      };
+    } catch (e) {
+      return {
+        status: 400,
+        data: {
+          code: "custom",
+          message: e,
+          path: [],
+        } as any,
+      };
+    }
+  }
+
+  /**
+   * Creates meteora auto-rebalance instruction (uses new re-deposit instruction)
+   *
+   * NOTE: For hawksight devs only.
+   *
+   * @param connection The Solana web3 connection object for blockchain interactions.
+   * @param payer The public key of the payer for transaction fees.
+   * @param params Parameters required
+   * @returns A ResponseWithStatus containing either TransactionMetadataResponse or TransactionMetadata.
+   */
+  async meteoraRebalanceIxs2(connection: web3.Connection, payer: string, params: MeteoraRebalance2): Promise<ResponseWithStatus<TransactionMetadata>> {
+    // Initialize anchor
+    Anchor.initialize(connection);
+    try {
+      const result = await txgen.rebalanceAutomationIx2({
         connection,
         params,
       });

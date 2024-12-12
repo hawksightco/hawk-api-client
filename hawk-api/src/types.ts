@@ -32,7 +32,9 @@ export type Distribution =
   | "SPOT-IMBALANCED"
   | "CURVE-IMBALANCED"
   | "BID-ASK-IMBALANCED"
-  | "SPOT-ONE-SIDE";
+  | "SPOT-ONE-SIDE"
+  | "CURVE-ONE-SIDE"
+  | "BID-ASK-ONE-SIDE";
 
 export type MeteoraPoolInfo = {
   address: string,
@@ -376,6 +378,16 @@ export type MeteoraRebalance = {
   useAta?: boolean;
 };
 
+export type MeteoraRebalance2 = {
+  userWallet: web3.PublicKey;
+  currentPosition: web3.PublicKey;
+  newPosition: web3.PublicKey;
+  relativeBinRange: BinRange;
+  checkRange?: BinRange;
+  distribution: Distribution;
+  useAta?: boolean;
+};
+
 export type MeteoraLimitCloseAutomation = {
   userWallet: web3.PublicKey;
   position: web3.PublicKey;
@@ -423,6 +435,8 @@ export const StrategyTypeMap: Record<Distribution, StrategyType> = {
   "CURVE-IMBALANCED": StrategyType.CurveImBalanced,
   "BID-ASK-IMBALANCED": StrategyType.BidAskImBalanced,
   "SPOT-ONE-SIDE": StrategyType.SpotOneSide,
+  "CURVE-ONE-SIDE": StrategyType.CurveOneSide,
+  "BID-ASK-ONE-SIDE": StrategyType.BidAskOneSide,
 };
 
 export interface TokenAccountData {
