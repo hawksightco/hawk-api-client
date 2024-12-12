@@ -15,6 +15,7 @@ import { Atomicity } from "./Atomicity";
 import { JupiterAlts } from "./JupiterAlts";
 import { JupiterSwap } from "./JupiterSwap";
 import { logging } from "./Logging";
+import { txgen } from "./Transactions";
 
 /**
  * HawkAPI is a central gateway class that aggregates access to various functional modules
@@ -80,6 +81,7 @@ export class HawkAPI {
     this.ix = new SimpleIxGenerator();
     this.jupAlts = new JupiterAlts();
     this.jupiterSwap = new JupiterSwap(this.ix);
+    txgen.ix = this.ix;
 
     // Load create tx metadata module
     if (this.options === undefined || !this.options!.disableTxMetadataLoad) {

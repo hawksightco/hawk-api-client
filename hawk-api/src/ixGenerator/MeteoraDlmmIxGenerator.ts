@@ -32,7 +32,6 @@ type OpenPositionAndDepositAutomation = {
   position: web3.PublicKey,
   relativeLowerBinId: number,
   relativeUpperBinId: number,
-  maxActiveBinSlippage: number,
   strategyType: StrategyType,
   checkRange?: {
     minBinId: number,
@@ -86,7 +85,7 @@ export class MeteoraDlmmIxGenerator {
     );
   }
 
-  async openPositionAndDepositAutomation(connection: web3.Connection, { userWallet, lbPair, position, relativeLowerBinId, relativeUpperBinId, maxActiveBinSlippage, strategyType, checkRange }: OpenPositionAndDepositAutomation): Promise<web3.TransactionInstruction> {
+  async redepositAutomation(connection: web3.Connection, { userWallet, lbPair, position, relativeLowerBinId, relativeUpperBinId, strategyType, checkRange }: OpenPositionAndDepositAutomation): Promise<web3.TransactionInstruction> {
     // Initialize anchor
     Anchor.initialize(connection);
 
@@ -125,10 +124,9 @@ export class MeteoraDlmmIxGenerator {
         userWallet,
         iyfExtensionIx: await Anchor.instance().iyfExtension
         .methods
-        .meteoraDlmmOpenPositionAndDepositAutomation(
+        .meteoraDlmmRedepositAutomation(
           relativeLowerBinId,
           relativeUpperBinId,
-          maxActiveBinSlippage,
           strategyType,
           _checkRange,
         )

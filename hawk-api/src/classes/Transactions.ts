@@ -37,6 +37,7 @@ import {
   OrcaWithdraw,
   OrcaClaimRewards,
   TransactionMetadataResponse,
+  MeteoraRebalance2,
 } from '../types';
 
 import {
@@ -69,8 +70,39 @@ import { TransactionBatchExecute2 } from "./TransactionBatchExecute2";
 import { CreateTxMetadata } from "./CreateTxMetadata";
 import { GeneralUtility } from "./GeneralUtility";
 import { MultiTransaction } from "./MultiTransaction";
+import { SimpleIxGenerator } from "./SimpleIxGenerator";
 
 export class Transactions {
+
+  /**
+   * Prohibit creating instance other than getInstance
+   */
+  private constructor() {
+    this.ix = new SimpleIxGenerator();
+  }
+
+  /**
+   * Singleton instance
+   */
+  private static instance: Transactions;
+
+  /**
+   * Simple IX Generator instance (overridable)
+   */
+  public ix: SimpleIxGenerator;
+
+  /**
+   * Get singleton instance
+   *
+   * @returns
+   */
+  static getInstance(): Transactions {
+    if (Transactions.instance === undefined) {
+      Transactions.instance = new Transactions();
+    }
+    return Transactions.instance;
+  }
+
   /**
    * Generate UserPDA
    *
@@ -627,6 +659,90 @@ export class Transactions {
 
       // Re-deposit liquidity
       ...initPositionAndAddLiquidityBuilder.mainIxs,
+    ];
+
+    return createTransactionMeta({
+      payer: params.userWallet,
+      description:
+        "Automation IX: Meteora Auto-rebalance instructions (Close position and deposit to new position)",
+      addressLookupTableAddresses: GLOBAL_ALT,
+      mainInstructions,
+    });
+  }
+
+  async rebalanceAutomationIx2({
+    connection,
+    params,
+  }: TxgenParams<MeteoraRebalance2>) {
+    const program = await MeteoraDLMM.program(connection);
+    const position = await program.account.positionV2.fetch(
+      params.currentPosition
+    );
+    const dlmmPool = await MeteoraDLMM.create(connection, position.lbPair);
+    const userPda = generateUserPda(params.userWallet);
+
+    // Step 1: Claim all fees/rewards, remove all liquidity and close current position
+    const { userPositions } = await dlmmPool.getPositionsByUserAndLbPair(userPda);
+    const userPosition = userPositions.find(userPosition => userPosition.publicKey.equals(params.currentPosition));
+    if (userPosition === undefined) {
+      throw new Error(`Position: ${params.currentPosition} does not exist.`);
+    }
+    const binIdsToRemove = userPosition.positionData.positionBinData.map(
+      (bin) => bin.binId
+    );
+    const removeLiquidityBuilder = await dlmmPool.removeLiquidity(
+      params.userWallet,
+      HS_AUTHORITY,
+      {
+        user: userPda,
+        position: params.currentPosition,
+        binIds: binIdsToRemove,
+        bps: new BN(10_000),
+        shouldClaimAndClose: true,
+      },
+      meteoraToHawksightAutomationIxs
+    );
+
+    if (!!params.useAta) {
+      removeLiquidityBuilder.replaceClaimFeeTokenToATA();
+      removeLiquidityBuilder.replaceClaimRewardToATA();
+    } else {
+      removeLiquidityBuilder.replaceClaimFeeTokenToSTA();
+      removeLiquidityBuilder.replaceClaimRewardToSTA();
+    }
+
+    // Re-deposit fees (TODO: How to re-deposit reward tokens that is not X or Y token?)
+
+    const {
+      userWallet,
+      newPosition,
+      relativeBinRange,
+      distribution,
+      checkRange
+    } = params;
+
+    const redepositIx = await this.ix.meteoraDlmm.redepositAutomation(connection, {
+      userWallet,
+      lbPair: position.lbPair,
+      position: newPosition,
+      relativeLowerBinId: relativeBinRange.lowerRange,
+      relativeUpperBinId: relativeBinRange.upperRange,
+      strategyType: StrategyTypeMap[distribution],
+      checkRange: checkRange ? {
+        minBinId: checkRange.lowerRange,
+        maxBinId: checkRange.upperRange,
+      } : undefined,
+    });
+
+    const mainInstructions = [
+      // Initialize required ATA
+      ...removeLiquidityBuilder.createAtaIxs,
+
+      // Remove liquidity
+      ...removeLiquidityBuilder.mainIxs,
+
+      // Re-deposit liquidity
+      redepositIx,
     ];
 
     return createTransactionMeta({
@@ -1338,4 +1454,4 @@ export class Transactions {
   }
 }
 
-export const txgen = new Transactions();
+export const txgen = Transactions.getInstance();

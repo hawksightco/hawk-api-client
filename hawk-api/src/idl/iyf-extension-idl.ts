@@ -3109,19 +3109,19 @@ export type IyfExtension = {
       ]
     },
     {
-      "name": "meteoraDlmmOpenPositionAndDepositAutomation",
+      "name": "meteoraDlmmRedepositAutomation",
       "docs": [
         "Meteora Open Position and Deposit (Part of rebalance automation)"
       ],
       "discriminator": [
-        26,
-        156,
-        94,
-        43,
-        104,
-        12,
-        250,
-        5
+        87,
+        159,
+        39,
+        164,
+        85,
+        25,
+        184,
+        77
       ],
       "accounts": [
         {
@@ -3285,15 +3285,11 @@ export type IyfExtension = {
       "args": [
         {
           "name": "relativeLowerBinId",
-          "type": "i32"
+          "type": "u8"
         },
         {
           "name": "relativeUpperBinId",
-          "type": "i32"
-        },
-        {
-          "name": "maxActiveBinSlippage",
-          "type": "i32"
+          "type": "u8"
         },
         {
           "name": "strategyType",
@@ -12778,19 +12774,19 @@ export const IDL: IyfExtension = {
       ]
     },
     {
-      "name": "meteoraDlmmOpenPositionAndDepositAutomation",
+      "name": "meteoraDlmmRedepositAutomation",
       "docs": [
         "Meteora Open Position and Deposit (Part of rebalance automation)"
       ],
       "discriminator": [
-        26,
-        156,
-        94,
-        43,
-        104,
-        12,
-        250,
-        5
+        87,
+        159,
+        39,
+        164,
+        85,
+        25,
+        184,
+        77
       ],
       "accounts": [
         {
@@ -12954,15 +12950,11 @@ export const IDL: IyfExtension = {
       "args": [
         {
           "name": "relativeLowerBinId",
-          "type": "i32"
+          "type": "u8"
         },
         {
           "name": "relativeUpperBinId",
-          "type": "i32"
-        },
-        {
-          "name": "maxActiveBinSlippage",
-          "type": "i32"
+          "type": "u8"
         },
         {
           "name": "strategyType",

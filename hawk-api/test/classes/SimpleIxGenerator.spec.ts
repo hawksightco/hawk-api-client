@@ -132,7 +132,7 @@ describe('SimpleIxGenerator', () => {
     expect(throwsException).toBe(false);
   });
 
-  it('Generate meteora.openPositionAndDepositAutomation instruction', async () => {
+  it('Generate meteora.redepositAutomation instruction', async () => {
     // Connection instance
     const connection = new web3.Connection(process.env.RPC_URL as string);
 
@@ -151,13 +151,12 @@ describe('SimpleIxGenerator', () => {
     // Generate instruction
     let throwsException = false;
     try {
-      const ix = await hawkAPI.ix.meteoraDlmm.openPositionAndDepositAutomation(connection, {
+      const ix = await hawkAPI.ix.meteoraDlmm.redepositAutomation(connection, {
         userWallet,
         lbPair,
         position: web3.SystemProgram.programId,
         relativeLowerBinId: 34,
         relativeUpperBinId: 34,
-        maxActiveBinSlippage: 3,
         strategyType: 8,
         checkRange: {
           minBinId: lbPairInfo.activeId - 20,
@@ -170,7 +169,7 @@ describe('SimpleIxGenerator', () => {
     expect(throwsException).toBe(false);
   });
 
-  it('Generate meteora.openPositionAndDepositAutomation instruction -- no check range', async () => {
+  it('Generate meteora.redepositAutomation instruction -- no check range', async () => {
     // Connection instance
     const connection = new web3.Connection(process.env.RPC_URL as string);
 
@@ -188,13 +187,12 @@ describe('SimpleIxGenerator', () => {
     // Generate instruction
     let throwsException = false;
     try {
-      const ix = await hawkAPI.ix.meteoraDlmm.openPositionAndDepositAutomation(connection, {
+      const ix = await hawkAPI.ix.meteoraDlmm.redepositAutomation(connection, {
         userWallet,
         lbPair,
         position: web3.SystemProgram.programId,
         relativeLowerBinId: 34,
         relativeUpperBinId: 34,
-        maxActiveBinSlippage: 3,
         strategyType: 8,
       });
     } catch {
