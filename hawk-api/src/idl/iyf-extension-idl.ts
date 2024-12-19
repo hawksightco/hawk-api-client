@@ -3285,11 +3285,11 @@ export type IyfExtension = {
       "args": [
         {
           "name": "relativeLowerBinId",
-          "type": "u8"
+          "type": "i16"
         },
         {
           "name": "relativeUpperBinId",
-          "type": "u8"
+          "type": "i16"
         },
         {
           "name": "strategyType",
@@ -12950,11 +12950,11 @@ export const IDL: IyfExtension = {
       "args": [
         {
           "name": "relativeLowerBinId",
-          "type": "u8"
+          "type": "i16"
         },
         {
           "name": "relativeUpperBinId",
-          "type": "u8"
+          "type": "i16"
         },
         {
           "name": "strategyType",
