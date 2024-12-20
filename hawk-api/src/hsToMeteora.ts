@@ -20,13 +20,15 @@ import * as util from "./functions";
  * @returns
  */
 export async function meteoraToHawksight({ixs, userPda, authority}: MeteoraToHawksightParams): Promise<web3.TransactionInstruction[]> {
-  return ixs.map((ix) => {
-    ix = HawksightMeteoraCpi.factory(ix, userPda, authority).getInstruction();
+  const _ixs: web3.TransactionInstruction[] = [];
+  for (const ix of ixs) {
+    const _ix = await HawksightMeteoraCpi.factory(ix, userPda, authority).getInstruction();
     if (ix.programId.toString() === ASSOCIATED_TOKEN_PROGRAM.toString() && ix.keys.length === 6) {
       ix.keys[0] = { ...ix.keys[0], pubkey: authority };
     }
-    return ix;
-  });
+    _ixs.push(_ix);
+  }
+  return _ixs;
 }
 
 /**
@@ -117,14 +119,32 @@ abstract class HawksightMeteoraCpi {
    * If a matching CPI is found in the chain, it performs modifications and returns the updated instruction.
    * @returns The (possibly modified) transaction instruction.
    */
-  getInstruction(): web3.TransactionInstruction {
+  async getInstruction(): Promise<web3.TransactionInstruction> {
     const matchInstance = this.sighashMatch();
     if (this.programIdMatch() && matchInstance !== undefined) {
       matchInstance.replace();
-      matchInstance.addHawksightCpi();
+      await matchInstance.addHawksightCpi();
       return this.ix;
     }
     return this.ix;
+  }
+
+  /**
+   * Modifies the transaction instruction to include specific Hawksight CPI details.
+   * Prepares the instruction for execution by adjusting its program ID and data based on Hawksight criteria.
+   */
+  protected async addHawksightCpi(): Promise<void> {
+    const METEORA_PROGRAM = METEORA_DLMM_PROGRAM;
+    const size = Buffer.alloc(4);
+    size.writeUint32LE(this.ix.data.length);
+    const data = Buffer.concat([util.sighash('meteora_dynamic_cpi'), size, this.ix.data]);
+    this.ix.programId = IYF_MAIN;
+    this.ix.data = data;
+    this.ix.keys.unshift(...[
+      { pubkey: this.userPda, isSigner: false, isWritable: false },
+      { pubkey: this.authority, isSigner: true, isWritable: true },
+      { pubkey: METEORA_PROGRAM, isSigner: false, isWritable: false },
+    ]);
   }
 
   /**
@@ -169,24 +189,6 @@ abstract class HawksightMeteoraCpi {
    */
   private programIdMatch(): boolean {
     return this.ix.programId.equals(METEORA_DLMM_PROGRAM);
-  }
-
-  /**
-   * Modifies the transaction instruction to include specific Hawksight CPI details.
-   * Prepares the instruction for execution by adjusting its program ID and data based on Hawksight criteria.
-   */
-  private addHawksightCpi(): void {
-    const METEORA_PROGRAM = METEORA_DLMM_PROGRAM;
-    const size = Buffer.alloc(4);
-    size.writeUint32LE(this.ix.data.length);
-    const data = Buffer.concat([util.sighash('meteora_dynamic_cpi'), size, this.ix.data]);
-    this.ix.programId = IYF_MAIN;
-    this.ix.data = data;
-    this.ix.keys.unshift(...[
-      { pubkey: this.userPda, isSigner: false, isWritable: false },
-      { pubkey: this.authority, isSigner: true, isWritable: true },
-      { pubkey: METEORA_PROGRAM, isSigner: false, isWritable: false },
-    ]);
   }
 }
 
@@ -411,6 +413,84 @@ class ClaimFee extends HawksightMeteoraCpi {
     this.ix.keys[4].pubkey = this.userPda;
     this.ix.keys[4].isSigner = false;
   }
+
+  /**
+   * Overrides default add hawksight cpi to use meteoraDlmmClaimFee instead of meteoraDynamicCpi
+   */
+  protected async addHawksightCpi(): Promise<void> {
+    // Common parameters
+    const farm = USDC_FARM;
+    const userPda = this.userPda;
+    const authority = this.authority;
+    const iyfProgram = IYF_MAIN;
+
+    // Get token mints X and Y
+    const tokenXMint = this.ix.keys[9].pubkey;
+    const tokenYMint = this.ix.keys[10].pubkey;
+
+    // Generate owner fee X and Y ATA
+    const ownerFeeX = util.generateAta(SITE_FEE_OWNER, tokenXMint);
+    const ownerFeeY = util.generateAta(SITE_FEE_OWNER, tokenYMint);
+
+    // Generate IX via extension contract
+    const claimFeeIx = await Anchor.instance().iyfExtension.methods
+      .meteoraDlmmClaimFee()
+      .accounts({
+        farm,
+        userPda,
+        authority,
+        iyfProgram,
+        lbPair: this.ix.keys[0].pubkey,
+        position: this.ix.keys[1].pubkey,
+        binArrayLower: this.ix.keys[2].pubkey,
+        binArrayUpper: this.ix.keys[3].pubkey,
+        reserveX: this.ix.keys[5].pubkey,
+        reserveY: this.ix.keys[6].pubkey,
+        userTokenX: this.ix.keys[7].pubkey,
+        userTokenY: this.ix.keys[8].pubkey,
+        tokenXMint: this.ix.keys[9].pubkey,
+        tokenYMint: this.ix.keys[10].pubkey,
+        tokenProgram: this.ix.keys[11].pubkey,
+        eventAuthority: this.ix.keys[12].pubkey,
+        meteoraDlmmProgram: this.ix.keys[13].pubkey,
+        ownerFeeX,
+        ownerFeeY,
+      }).instruction();
+
+    // Instruction via main hawksight contract
+    const ix = await Anchor.instance().iyfMain.methods
+      .iyfExtensionExecute(claimFeeIx.data)
+      .accounts({
+        farm,
+        userPda,
+        authority,
+        iyfProgram,
+        iyfExtensionProgram: IYF_EXTENSION,
+      })
+      .remainingAccounts([
+        claimFeeIx.keys[4],
+        claimFeeIx.keys[5],
+        claimFeeIx.keys[6],
+        claimFeeIx.keys[7],
+        claimFeeIx.keys[8],
+        claimFeeIx.keys[9],
+        claimFeeIx.keys[10],
+        claimFeeIx.keys[11],
+        claimFeeIx.keys[12],
+        claimFeeIx.keys[13],
+        claimFeeIx.keys[14],
+        claimFeeIx.keys[15],
+        claimFeeIx.keys[16],
+        claimFeeIx.keys[17],
+        claimFeeIx.keys[18],
+      ])
+      .instruction();
+
+    // Override the instruction
+    this.ix.programId = ix.programId;
+    this.ix.data = ix.data;
+    this.ix.keys = ix.keys;
+  }
 }
 
 /**
@@ -438,6 +518,77 @@ class ClaimReward extends HawksightMeteoraCpi {
   protected replace(): void {
     this.ix.keys[4].pubkey = this.userPda;
     this.ix.keys[4].isSigner = false;
+  }
+
+  /**
+   * Overrides default add hawksight cpi to use meteoraDlmmClaimReward instead of meteoraDynamicCpi
+   */
+  protected async addHawksightCpi(): Promise<void> {
+    // Common parameters
+    const farm = USDC_FARM;
+    const userPda = this.userPda;
+    const authority = this.authority;
+    const iyfProgram = IYF_MAIN;
+
+    // Get token mint
+    const rewardMint = this.ix.keys[9].pubkey;
+
+    // Generate owner fee X and Y ATA
+    const ownerFee = util.generateAta(SITE_FEE_OWNER, rewardMint);
+
+    // Get reward index from parameter
+    const rewardIndex = new BN(this.ix.data.readBigInt64LE(8).toString());
+
+    // Generate IX via extension contract
+    const claimReward = await Anchor.instance().iyfExtension.methods
+      .meteoraDlmmClaimReward(rewardIndex)
+      .accounts({
+        farm,
+        userPda,
+        authority,
+        iyfProgram,
+        lbPair: this.ix.keys[4].pubkey,
+        position: this.ix.keys[5].pubkey,
+        binArrayLower: this.ix.keys[6].pubkey,
+        binArrayUpper: this.ix.keys[7].pubkey,
+        rewardVault: this.ix.keys[8].pubkey,
+        rewardMint: this.ix.keys[9].pubkey,
+        userTokenAccount: this.ix.keys[10].pubkey,
+        tokenProgram: this.ix.keys[11].pubkey,
+        eventAuthority: this.ix.keys[12].pubkey,
+        meteoraDlmmProgram: this.ix.keys[13].pubkey,
+        ownerFee,
+      }).instruction();
+
+    // Instruction via main hawksight contract
+    const ix = await Anchor.instance().iyfMain.methods
+      .iyfExtensionExecute(claimReward.data)
+      .accounts({
+        farm,
+        userPda,
+        authority,
+        iyfProgram,
+        iyfExtensionProgram: IYF_EXTENSION,
+      })
+      .remainingAccounts([
+        claimReward.keys[4],
+        claimReward.keys[5],
+        claimReward.keys[6],
+        claimReward.keys[7],
+        claimReward.keys[8],
+        claimReward.keys[9],
+        claimReward.keys[10],
+        claimReward.keys[11],
+        claimReward.keys[12],
+        claimReward.keys[13],
+        claimReward.keys[14],
+      ])
+      .instruction();
+
+    // Override the instruction
+    this.ix.programId = ix.programId;
+    this.ix.data = ix.data;
+    this.ix.keys = ix.keys;
   }
 }
 
