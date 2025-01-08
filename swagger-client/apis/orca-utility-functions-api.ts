@@ -19,16 +19,57 @@ import { Configuration } from '../configuration';
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 import { InlineResponse2004 } from '../models';
 import { InlineResponse2005 } from '../models';
-import { InlineResponse2006 } from '../models';
 import { InlineResponse400 } from '../models';
-import { InlineResponse4001 } from '../models';
 import { OrcaPositionMint } from '../models';
+import { UtilActiveTickBody } from '../models';
 /**
  * OrcaUtilityFunctionsApi - axios parameter creator
  * @export
  */
 export const OrcaUtilityFunctionsApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * Returns orca tick current index of given whirlpool(s)
+         * @param {UtilActiveTickBody} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        orcaUtilActiveTickPost: async (body: UtilActiveTickBody, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'body' is not null or undefined
+            if (body === null || body === undefined) {
+                throw new RequiredError('body','Required parameter body was null or undefined when calling orcaUtilActiveTickPost.');
+            }
+            const localVarPath = `/orca/util/activeTick`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions :AxiosRequestConfig = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.params) {
+                query.set(key, options.params[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const needsSerialization = (typeof body !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(body !== undefined ? body : {}) : (body || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * Returns orca position mint from given position
          * @param {string} [position] Orca position address
@@ -49,49 +90,6 @@ export const OrcaUtilityFunctionsApiAxiosParamCreator = function (configuration?
 
             if (position !== undefined) {
                 localVarQueryParameter['position'] = position;
-            }
-
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.params) {
-                query.set(key, options.params[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * Returns information about a specified Orca pool, including token details, liquidity, volume, APR, and price range.
-         * @summary Retrieve details of a single Orca pool
-         * @param {string} pool Address of the Orca pool to retrieve.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        orcaUtilPoolGet: async (pool: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'pool' is not null or undefined
-            if (pool === null || pool === undefined) {
-                throw new RequiredError('pool','Required parameter pool was null or undefined when calling orcaUtilPoolGet.');
-            }
-            const localVarPath = `/orca/util/pool`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-            const localVarRequestOptions :AxiosRequestConfig = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            if (pool !== undefined) {
-                localVarQueryParameter['pool'] = pool;
             }
 
             const query = new URLSearchParams(localVarUrlObj.search);
@@ -200,6 +198,19 @@ export const OrcaUtilityFunctionsApiAxiosParamCreator = function (configuration?
 export const OrcaUtilityFunctionsApiFp = function(configuration?: Configuration) {
     return {
         /**
+         * Returns orca tick current index of given whirlpool(s)
+         * @param {UtilActiveTickBody} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async orcaUtilActiveTickPost(body: UtilActiveTickBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<{ [key: string]: number; }>>> {
+            const localVarAxiosArgs = await OrcaUtilityFunctionsApiAxiosParamCreator(configuration).orcaUtilActiveTickPost(body, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Returns orca position mint from given position
          * @param {string} [position] Orca position address
          * @param {*} [options] Override http request option.
@@ -207,20 +218,6 @@ export const OrcaUtilityFunctionsApiFp = function(configuration?: Configuration)
          */
         async orcaUtilGetPositionMintGet(position?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<OrcaPositionMint>>> {
             const localVarAxiosArgs = await OrcaUtilityFunctionsApiAxiosParamCreator(configuration).orcaUtilGetPositionMintGet(position, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
-        },
-        /**
-         * Returns information about a specified Orca pool, including token details, liquidity, volume, APR, and price range.
-         * @summary Retrieve details of a single Orca pool
-         * @param {string} pool Address of the Orca pool to retrieve.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async orcaUtilPoolGet(pool: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<InlineResponse2006>>>> {
-            const localVarAxiosArgs = await OrcaUtilityFunctionsApiAxiosParamCreator(configuration).orcaUtilPoolGet(pool, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -262,6 +259,15 @@ export const OrcaUtilityFunctionsApiFp = function(configuration?: Configuration)
 export const OrcaUtilityFunctionsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     return {
         /**
+         * Returns orca tick current index of given whirlpool(s)
+         * @param {UtilActiveTickBody} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async orcaUtilActiveTickPost(body: UtilActiveTickBody, options?: AxiosRequestConfig): Promise<AxiosResponse<{ [key: string]: number; }>> {
+            return OrcaUtilityFunctionsApiFp(configuration).orcaUtilActiveTickPost(body, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Returns orca position mint from given position
          * @param {string} [position] Orca position address
          * @param {*} [options] Override http request option.
@@ -269,16 +275,6 @@ export const OrcaUtilityFunctionsApiFactory = function (configuration?: Configur
          */
         async orcaUtilGetPositionMintGet(position?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<OrcaPositionMint>> {
             return OrcaUtilityFunctionsApiFp(configuration).orcaUtilGetPositionMintGet(position, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Returns information about a specified Orca pool, including token details, liquidity, volume, APR, and price range.
-         * @summary Retrieve details of a single Orca pool
-         * @param {string} pool Address of the Orca pool to retrieve.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async orcaUtilPoolGet(pool: string, options?: AxiosRequestConfig): Promise<AxiosResponse<Array<InlineResponse2006>>> {
-            return OrcaUtilityFunctionsApiFp(configuration).orcaUtilPoolGet(pool, options).then((request) => request(axios, basePath));
         },
         /**
          * Returns a list of active Orca whirlpools on Hawksight with detailed information about each pool.
@@ -309,6 +305,16 @@ export const OrcaUtilityFunctionsApiFactory = function (configuration?: Configur
  */
 export class OrcaUtilityFunctionsApi extends BaseAPI {
     /**
+     * Returns orca tick current index of given whirlpool(s)
+     * @param {UtilActiveTickBody} body 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrcaUtilityFunctionsApi
+     */
+    public async orcaUtilActiveTickPost(body: UtilActiveTickBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<{ [key: string]: number; }>> {
+        return OrcaUtilityFunctionsApiFp(this.configuration).orcaUtilActiveTickPost(body, options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
      * Returns orca position mint from given position
      * @param {string} [position] Orca position address
      * @param {*} [options] Override http request option.
@@ -317,17 +323,6 @@ export class OrcaUtilityFunctionsApi extends BaseAPI {
      */
     public async orcaUtilGetPositionMintGet(position?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<OrcaPositionMint>> {
         return OrcaUtilityFunctionsApiFp(this.configuration).orcaUtilGetPositionMintGet(position, options).then((request) => request(this.axios, this.basePath));
-    }
-    /**
-     * Returns information about a specified Orca pool, including token details, liquidity, volume, APR, and price range.
-     * @summary Retrieve details of a single Orca pool
-     * @param {string} pool Address of the Orca pool to retrieve.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof OrcaUtilityFunctionsApi
-     */
-    public async orcaUtilPoolGet(pool: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<InlineResponse2006>>> {
-        return OrcaUtilityFunctionsApiFp(this.configuration).orcaUtilPoolGet(pool, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * Returns a list of active Orca whirlpools on Hawksight with detailed information about each pool.

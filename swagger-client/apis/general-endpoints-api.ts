@@ -166,10 +166,11 @@ export const GeneralEndpointsApiAxiosParamCreator = function (configuration?: Co
         /**
          * Return info about the specified pool.
          * @param {string} pairAddress The address of the pool to query.
+         * @param {string} [protocol] Either meteora or orca.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        poolGet: async (pairAddress: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        poolGet: async (pairAddress: string, protocol?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'pairAddress' is not null or undefined
             if (pairAddress === null || pairAddress === undefined) {
                 throw new RequiredError('pairAddress','Required parameter pairAddress was null or undefined when calling poolGet.');
@@ -187,6 +188,10 @@ export const GeneralEndpointsApiAxiosParamCreator = function (configuration?: Co
 
             if (pairAddress !== undefined) {
                 localVarQueryParameter['pairAddress'] = pairAddress;
+            }
+
+            if (protocol !== undefined) {
+                localVarQueryParameter['protocol'] = protocol;
             }
 
             const query = new URLSearchParams(localVarUrlObj.search);
@@ -208,10 +213,85 @@ export const GeneralEndpointsApiAxiosParamCreator = function (configuration?: Co
         /**
          * Returns all pools integrated by Hawksight.
          * @param {string} [hash] Optional hash parameter
+         * @param {number} [page] Page number for pagination
+         * @param {number} [limit] Number of items per page
+         * @param {number} [skip] Number of items to skip
+         * @param {string} [sortedBy] Field to sort the results by
+         * @param {string} [orderBy] Order of sorting (ascending or descending)
+         * @param {string} [keyword] Optional keyword for filtering pools
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        poolsGet: async (hash?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        pools2Get: async (hash?: string, page?: number, limit?: number, skip?: number, sortedBy?: string, orderBy?: string, keyword?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/pools2`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions :AxiosRequestConfig = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (hash !== undefined) {
+                localVarQueryParameter['hash'] = hash;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (skip !== undefined) {
+                localVarQueryParameter['skip'] = skip;
+            }
+
+            if (sortedBy !== undefined) {
+                localVarQueryParameter['sortedBy'] = sortedBy;
+            }
+
+            if (orderBy !== undefined) {
+                localVarQueryParameter['orderBy'] = orderBy;
+            }
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
+            }
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.params) {
+                query.set(key, options.params[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Returns all pools integrated by Hawksight.
+         * @param {string} [hash] Optional hash parameter
+         * @param {number} [page] Page number for pagination
+         * @param {number} [limit] Number of items per page
+         * @param {number} [skip] Number of items to skip
+         * @param {string} [sortedBy] Field to sort the results by
+         * @param {string} [orderBy] Order of sorting (ascending or descending)
+         * @param {string} [keyword] Optional keyword for filtering pools
+         * @param {string} [protocol] Either meteora or orca.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        poolsGet: async (hash?: string, page?: number, limit?: number, skip?: number, sortedBy?: string, orderBy?: string, keyword?: string, protocol?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/pools`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -225,6 +305,34 @@ export const GeneralEndpointsApiAxiosParamCreator = function (configuration?: Co
 
             if (hash !== undefined) {
                 localVarQueryParameter['hash'] = hash;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (skip !== undefined) {
+                localVarQueryParameter['skip'] = skip;
+            }
+
+            if (sortedBy !== undefined) {
+                localVarQueryParameter['sortedBy'] = sortedBy;
+            }
+
+            if (orderBy !== undefined) {
+                localVarQueryParameter['orderBy'] = orderBy;
+            }
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
+            }
+
+            if (protocol !== undefined) {
+                localVarQueryParameter['protocol'] = protocol;
             }
 
             const query = new URLSearchParams(localVarUrlObj.search);
@@ -516,11 +624,12 @@ export const GeneralEndpointsApiFp = function(configuration?: Configuration) {
         /**
          * Return info about the specified pool.
          * @param {string} pairAddress The address of the pool to query.
+         * @param {string} [protocol] Either meteora or orca.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async poolGet(pairAddress: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<HawksightPoolResponse>>> {
-            const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).poolGet(pairAddress, options);
+        async poolGet(pairAddress: string, protocol?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<HawksightPoolResponse>>> {
+            const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).poolGet(pairAddress, protocol, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -529,11 +638,37 @@ export const GeneralEndpointsApiFp = function(configuration?: Configuration) {
         /**
          * Returns all pools integrated by Hawksight.
          * @param {string} [hash] Optional hash parameter
+         * @param {number} [page] Page number for pagination
+         * @param {number} [limit] Number of items per page
+         * @param {number} [skip] Number of items to skip
+         * @param {string} [sortedBy] Field to sort the results by
+         * @param {string} [orderBy] Order of sorting (ascending or descending)
+         * @param {string} [keyword] Optional keyword for filtering pools
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async poolsGet(hash?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<HawksightPool>>>> {
-            const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).poolsGet(hash, options);
+        async pools2Get(hash?: string, page?: number, limit?: number, skip?: number, sortedBy?: string, orderBy?: string, keyword?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<HawksightPool>>>> {
+            const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).pools2Get(hash, page, limit, skip, sortedBy, orderBy, keyword, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Returns all pools integrated by Hawksight.
+         * @param {string} [hash] Optional hash parameter
+         * @param {number} [page] Page number for pagination
+         * @param {number} [limit] Number of items per page
+         * @param {number} [skip] Number of items to skip
+         * @param {string} [sortedBy] Field to sort the results by
+         * @param {string} [orderBy] Order of sorting (ascending or descending)
+         * @param {string} [keyword] Optional keyword for filtering pools
+         * @param {string} [protocol] Either meteora or orca.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async poolsGet(hash?: string, page?: number, limit?: number, skip?: number, sortedBy?: string, orderBy?: string, keyword?: string, protocol?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Array<HawksightPool>>>> {
+            const localVarAxiosArgs = await GeneralEndpointsApiAxiosParamCreator(configuration).poolsGet(hash, page, limit, skip, sortedBy, orderBy, keyword, protocol, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -647,20 +782,43 @@ export const GeneralEndpointsApiFactory = function (configuration?: Configuratio
         /**
          * Return info about the specified pool.
          * @param {string} pairAddress The address of the pool to query.
+         * @param {string} [protocol] Either meteora or orca.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async poolGet(pairAddress: string, options?: AxiosRequestConfig): Promise<AxiosResponse<HawksightPoolResponse>> {
-            return GeneralEndpointsApiFp(configuration).poolGet(pairAddress, options).then((request) => request(axios, basePath));
+        async poolGet(pairAddress: string, protocol?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<HawksightPoolResponse>> {
+            return GeneralEndpointsApiFp(configuration).poolGet(pairAddress, protocol, options).then((request) => request(axios, basePath));
         },
         /**
          * Returns all pools integrated by Hawksight.
          * @param {string} [hash] Optional hash parameter
+         * @param {number} [page] Page number for pagination
+         * @param {number} [limit] Number of items per page
+         * @param {number} [skip] Number of items to skip
+         * @param {string} [sortedBy] Field to sort the results by
+         * @param {string} [orderBy] Order of sorting (ascending or descending)
+         * @param {string} [keyword] Optional keyword for filtering pools
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async poolsGet(hash?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<Array<HawksightPool>>> {
-            return GeneralEndpointsApiFp(configuration).poolsGet(hash, options).then((request) => request(axios, basePath));
+        async pools2Get(hash?: string, page?: number, limit?: number, skip?: number, sortedBy?: string, orderBy?: string, keyword?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<Array<HawksightPool>>> {
+            return GeneralEndpointsApiFp(configuration).pools2Get(hash, page, limit, skip, sortedBy, orderBy, keyword, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Returns all pools integrated by Hawksight.
+         * @param {string} [hash] Optional hash parameter
+         * @param {number} [page] Page number for pagination
+         * @param {number} [limit] Number of items per page
+         * @param {number} [skip] Number of items to skip
+         * @param {string} [sortedBy] Field to sort the results by
+         * @param {string} [orderBy] Order of sorting (ascending or descending)
+         * @param {string} [keyword] Optional keyword for filtering pools
+         * @param {string} [protocol] Either meteora or orca.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async poolsGet(hash?: string, page?: number, limit?: number, skip?: number, sortedBy?: string, orderBy?: string, keyword?: string, protocol?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<Array<HawksightPool>>> {
+            return GeneralEndpointsApiFp(configuration).poolsGet(hash, page, limit, skip, sortedBy, orderBy, keyword, protocol, options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieves the user's portfolio based on the provided wallet and optional pool address.
@@ -754,22 +912,46 @@ export class GeneralEndpointsApi extends BaseAPI {
     /**
      * Return info about the specified pool.
      * @param {string} pairAddress The address of the pool to query.
+     * @param {string} [protocol] Either meteora or orca.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof GeneralEndpointsApi
      */
-    public async poolGet(pairAddress: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<HawksightPoolResponse>> {
-        return GeneralEndpointsApiFp(this.configuration).poolGet(pairAddress, options).then((request) => request(this.axios, this.basePath));
+    public async poolGet(pairAddress: string, protocol?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<HawksightPoolResponse>> {
+        return GeneralEndpointsApiFp(this.configuration).poolGet(pairAddress, protocol, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * Returns all pools integrated by Hawksight.
      * @param {string} [hash] Optional hash parameter
+     * @param {number} [page] Page number for pagination
+     * @param {number} [limit] Number of items per page
+     * @param {number} [skip] Number of items to skip
+     * @param {string} [sortedBy] Field to sort the results by
+     * @param {string} [orderBy] Order of sorting (ascending or descending)
+     * @param {string} [keyword] Optional keyword for filtering pools
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof GeneralEndpointsApi
      */
-    public async poolsGet(hash?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<HawksightPool>>> {
-        return GeneralEndpointsApiFp(this.configuration).poolsGet(hash, options).then((request) => request(this.axios, this.basePath));
+    public async pools2Get(hash?: string, page?: number, limit?: number, skip?: number, sortedBy?: string, orderBy?: string, keyword?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<HawksightPool>>> {
+        return GeneralEndpointsApiFp(this.configuration).pools2Get(hash, page, limit, skip, sortedBy, orderBy, keyword, options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
+     * Returns all pools integrated by Hawksight.
+     * @param {string} [hash] Optional hash parameter
+     * @param {number} [page] Page number for pagination
+     * @param {number} [limit] Number of items per page
+     * @param {number} [skip] Number of items to skip
+     * @param {string} [sortedBy] Field to sort the results by
+     * @param {string} [orderBy] Order of sorting (ascending or descending)
+     * @param {string} [keyword] Optional keyword for filtering pools
+     * @param {string} [protocol] Either meteora or orca.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof GeneralEndpointsApi
+     */
+    public async poolsGet(hash?: string, page?: number, limit?: number, skip?: number, sortedBy?: string, orderBy?: string, keyword?: string, protocol?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<Array<HawksightPool>>> {
+        return GeneralEndpointsApiFp(this.configuration).poolsGet(hash, page, limit, skip, sortedBy, orderBy, keyword, protocol, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * Retrieves the user's portfolio based on the provided wallet and optional pool address.
