@@ -123,7 +123,29 @@ export class Util {
       pool: string,
     }
   ): Promise<ResponseWithStatus<any>> {
-    const result = await this.client.orcaUtilityFunctionsApi.orcaUtilPoolGet(params.pool).catch(e => e.response);
+    const result = await this.client.generalEndpoints.poolGet(params.pool, "orca");
+    return {
+      status: result.status,
+      data: result.data,
+    };
+  }
+
+  /**
+   * Returns orca tick current index of given whirlpool(s)
+   *
+   * @param params
+   * @returns
+   */
+  async orcaGetActiveTick(
+    params: {
+      pools: string[],
+      commitment?: string
+    }
+  ) {
+    const result = await this.client.orcaUtilityFunctionsApi.orcaUtilActiveTickPost({
+      pools: params.pools,
+      commitment: params.commitment,
+    }).catch(e => e.response);
     return {
       status: result.status,
       data: result.data,

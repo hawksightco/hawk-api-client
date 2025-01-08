@@ -4,6 +4,8 @@ import { ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, T
 import { Client } from "./Client";
 import { createTxMetadata, resultOrError } from "../functions";
 import { GeneralUtility } from "./GeneralUtility";
+import { InlineResponse200 } from '../../../swagger-client/dist/models/inline-response200';
+import { AxiosResponse } from 'axios';
 
 /**
  * Provides general utility functions for managing and querying blockchain-related data,
@@ -51,6 +53,21 @@ export class General {
   }
 
   /**
+   * @returns Returns a token supported by Hawksight
+   */
+  async token(
+    params: {
+      address: string,
+    }
+  ): Promise<ResponseWithStatus<InlineResponse200>> {
+    const result: AxiosResponse<InlineResponse200> = await this.client.generalEndpoints.tokenGet(params.address).catch(e => e.response);
+    return {
+      status: result.status,
+      data: result.data,
+    }
+  }
+
+  /**
    * Retrieves the portfolio information for a specified wallet and optionally a pool.
    *
    * @param params Object containing wallet address and optional pool identifier.
@@ -62,7 +79,7 @@ export class General {
       pool?: string,
     }
   ): Promise<ResponseWithStatus<UserPortfolioOut>> {
-    const result = await this.client.generalEndpoints.portfolioGet(params.wallet, params.pool).catch(e => e.response);
+    const result: AxiosResponse<UserPortfolioOut> = await this.client.generalEndpoints.portfolioGet(params.wallet, params.pool).catch(e => e.response);
     return {
       status: result.status,
       data: result.data,
@@ -85,6 +102,32 @@ export class General {
       status: result.status,
       data: result.data,
     };
+  }
+
+  /**
+   * Fetches a single pool either from Orca or Meteora.
+   *
+   * @param params Object containing hash of the pools
+   * @returns A Promise resolving to an array of pools, including metadata such as pool addresses and statistics.
+   */
+  async pool(
+    params: {
+      pairAddress: string,
+      protocol: string,
+    }
+  ): Promise<ResponseWithStatus<_client.HawksightPool[]>> {
+    if (["orca", "meteora"].includes(params.protocol)) {
+      const result = await this.client.generalEndpoints.poolGet(
+        params.pairAddress,
+        params.protocol,
+      ).catch(e => e.response);
+      return {
+        status: result.status,
+        data: result.data,
+      };
+    } else {
+      throw new Error(`Protocol can only be: "orca" or "meteora". Value passed: ${params.protocol}`);
+    }
   }
 
   /**
