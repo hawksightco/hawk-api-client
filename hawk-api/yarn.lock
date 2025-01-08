@@ -369,10 +369,10 @@
     bn.js "^5.1.2"
     buffer-layout "^1.2.0"
 
-"@hawksightco/swagger-client@^0.0.33":
-  version "0.0.33"
-  resolved "https://registry.yarnpkg.com/@hawksightco/swagger-client/-/swagger-client-0.0.33.tgz#e647ed51652344a67b6b563e8386db7ecf2e5dba"
-  integrity sha512-OILZ//uY6LZenqrzciiTLt3mrKX9rahR6rQ0pqMKIFMPP8LlD3LKedD+DeHajz8Ij+DT2DDD0M3OV3RwafPcyw==
+"@hawksightco/swagger-client@^0.0.34":
+  version "0.0.34"
+  resolved "https://registry.yarnpkg.com/@hawksightco/swagger-client/-/swagger-client-0.0.34.tgz#ce16acfe91809932ad887f45cd35402376c99d02"
+  integrity sha512-q4KAzmSxBTWPve4zpRXneDqN1UZOufL7k0ovX3N3NZETwNS4KPQOFji9/LLY8RLv+/g9xvDP4yPkqQVZFuU9YQ==
   dependencies:
     axios "^1.7.7"
 
