@@ -75,6 +75,7 @@ export enum Protocol {
   Saber = "saber",
   Orca = "orca",
   Meteora = "meteora",
+  Raydium = "raydium",
 }
 
 interface BasePool {
