@@ -531,7 +531,7 @@ class ClaimReward extends HawksightMeteoraCpi {
     const iyfProgram = IYF_MAIN;
 
     // Get token mint
-    const rewardMint = this.ix.keys[9].pubkey;
+    const rewardMint = this.ix.keys[6].pubkey;
 
     // Generate owner fee X and Y ATA
     const ownerFee = util.generateAta(SITE_FEE_OWNER, rewardMint);
