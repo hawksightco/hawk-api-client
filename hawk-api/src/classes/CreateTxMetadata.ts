@@ -198,7 +198,11 @@ export class CreateTxMetadata {
         if (!!_alt) {
           alts.push(_alt);
         } else {
-          alts.push(await this.loadSingleAlt(alt, connection));
+          try {
+            alts.push(await this.loadSingleAlt(alt, connection));
+          } catch {
+            console.error(`The ALT from Jupiter: ${alt} does not exist onchain. Skipping.`);
+          }
         }
       }
     } else {
