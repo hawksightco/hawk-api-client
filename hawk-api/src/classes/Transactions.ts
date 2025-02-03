@@ -1132,7 +1132,14 @@ export class Transactions {
     const userPda = generateUserPda(params.userWallet, farm);
     const position = generateOrcaPositionPDA(params.positionMint);
     const positionTokenAccount = generateAta(userPda, params.positionMint);
-    const positionData = await Anchor.instance().orcaProgram.account.position.fetch(position);
+    let positionData: any;
+    if (params.newPosition) {
+      positionData.whirlpool = params.newPosition.whirlpool;
+      positionData.tickLowerIndex = params.newPosition.tickLowerIndex;
+      positionData.tickUpperIndex = params.newPosition.tickUpperIndex;
+    } else {
+      positionData = await Anchor.instance().orcaProgram.account.position.fetch(position);
+    }
     if (positionData === null) {
       throw new Error(`Position: ${position} does not exist or already closed. Position mint: ${params.positionMint}`);
     }

@@ -415,6 +415,11 @@ export type OrcaDeposit = {
   positionMint: web3.PublicKey,
   totalXAmount: BN,
   totalYAmount: BN,
+  newPosition?: {
+    whirlpool: web3.PublicKey,
+    tickLowerIndex: number,
+    tickUpperIndex: number,
+  }
 }
 
 export type OrcaWithdraw = {
