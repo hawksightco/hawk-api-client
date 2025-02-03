@@ -425,6 +425,7 @@ export class TxGenerator {
           positionMint: params.positionMint,
           totalXAmount: params.totalXAmount,
           totalYAmount: params.totalYAmount,
+          newPosition: params.newPosition,
         }
       });
       return {
