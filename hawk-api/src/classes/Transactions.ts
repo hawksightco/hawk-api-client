@@ -1134,9 +1134,11 @@ export class Transactions {
     const positionTokenAccount = generateAta(userPda, params.positionMint);
     let positionData: any;
     if (params.newPosition) {
-      positionData.whirlpool = params.newPosition.whirlpool;
-      positionData.tickLowerIndex = params.newPosition.tickLowerIndex;
-      positionData.tickUpperIndex = params.newPosition.tickUpperIndex;
+      positionData = {
+        whirlpool: params.newPosition.whirlpool,
+        tickLowerIndex: params.newPosition.tickLowerIndex,
+        tickUpperIndex: params.newPosition.tickUpperIndex,
+      };
     } else {
       positionData = await Anchor.instance().orcaProgram.account.position.fetch(position);
     }
