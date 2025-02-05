@@ -617,6 +617,10 @@ export class Transactions {
       meteoraToHawksightAutomationIxs,
     );
 
+    // Change to STA because we want the tokens to be in the HawkFi wallet
+    claimBuilder.replaceClaimFeeTokenToSTA();
+    claimBuilder.replaceClaimRewardToSTA();
+
     const mainInstructions: web3.TransactionInstruction[] = [
       // Step 1: Initialize ATA
       ...claimBuilder.createAtaIxs,
