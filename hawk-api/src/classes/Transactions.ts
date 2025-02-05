@@ -589,6 +589,51 @@ export class Transactions {
     });
   }
 
+  async claimAutomationIx({
+    connection,
+    params,
+  }: TxgenParams<MeteoraCompound>) {
+    const program = await MeteoraDLMM.program(connection);
+    const position = await program.account.positionV2.fetch(params.position);
+    const dlmmPool = await MeteoraDLMM.create(connection, position.lbPair);
+    const userPda = generateUserPda(params.userWallet);
+    const { userPositions } = await dlmmPool.getPositionsByUserAndLbPair(userPda);
+    const userPosition = userPositions.find(userPosition => userPosition.publicKey.equals(params.position));
+    if (userPosition === undefined) {
+      throw new Error(`Position: ${params.position} does not exist.`);
+    }
+
+    // Claim fee and claim reward ixs
+    const fn = new MeteoraFunctions();
+    const claimBuilder = await fn.claimAllRewardsByPosition(
+      connection,
+      params.userWallet,
+      HS_AUTHORITY,
+      {
+        owner: userPda,
+        position: params.position,
+        lbPair: position.lbPair,
+      },
+      meteoraToHawksightAutomationIxs,
+    );
+
+    const mainInstructions: web3.TransactionInstruction[] = [
+      // Step 1: Initialize ATA
+      ...claimBuilder.createAtaIxs,
+
+      // Step 2: Claim rewards and fees
+      ...claimBuilder.mainIxs,
+
+    ];
+    return createTransactionMeta({
+      payer: params.userWallet,
+      description:
+        "Automation IX: Meteora Auto-claim instructions (claim fee, reward)",
+      addressLookupTableAddresses: GLOBAL_ALT,
+      mainInstructions,
+    });
+  }
+
   async rebalanceAutomationIx({
     connection,
     params,
