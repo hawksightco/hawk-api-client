@@ -139,13 +139,15 @@ export class CreateTxMetadata {
     const pubkeys: web3.PublicKey[] = notExist.map(index => new web3.PublicKey(alts[index]));
     const accountInfos = await this.connection!.getMultipleAccountsInfo(pubkeys);
     for (let i = 0; i < accountInfos.length; i++) {
-      const key = pubkeys[i].toString();
-      const alt = new web3.AddressLookupTableAccount({
-        key: pubkeys[i],
-        state: web3.AddressLookupTableAccount.deserialize(accountInfos[i]!.data)
-      });
-      this.alts[key] = alt;
-      _alts.push(alt);
+      if(accountInfos[i]?.data) {
+        const key = pubkeys[i].toString();
+        const alt = new web3.AddressLookupTableAccount({
+          key: pubkeys[i],
+          state: web3.AddressLookupTableAccount.deserialize(accountInfos[i]!.data)
+        });
+        this.alts[key] = alt;
+        _alts.push(alt);
+      }
     }
     return _alts;
   }
