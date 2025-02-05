@@ -1015,6 +1015,51 @@ export class ClaimAllRewardsByPositionBuilder {
       ...this.unwrapWsolIxs,
     ];
   }
+
+  /**
+   * Replaces claim fee token ixs into storage token account
+   */
+  replaceClaimFeeTokenToSTA() {
+    const index = this.mainIxs.findIndex(mainIx => {
+      const dataWithoutIyfExtensionExecute = mainIx.data.subarray(12);
+      return sighashMatch(dataWithoutIyfExtensionExecute, "MeteoraDlmmClaimFeeAutomation");
+    });
+
+    // Should never be empty
+    if (index === -1) {
+      // Throw error instead?
+      console.warn(`Warn: claim fee instruction not found! This should not happen.`);
+      return;
+    }
+    
+    const userPda = this.mainIxs[index].keys[1].pubkey;
+    const tokenXMint = this.mainIxs[index].keys[14].pubkey;
+    const tokenYMint = this.mainIxs[index].keys[15].pubkey;
+    const staTokenX = generateUserPdaStorageAccount(userPda, tokenXMint);
+    const staTokenY = generateUserPdaStorageAccount(userPda, tokenYMint);
+    this.mainIxs[index].keys[12].pubkey = staTokenX;
+    this.mainIxs[index].keys[13].pubkey = staTokenY;
+  }
+
+  /**
+   * Replaces reward token into storage token account
+   */
+  replaceClaimRewardToSTA() {
+    const index = this.mainIxs.findIndex(mainIx => {
+      const dataWithoutIyfExtensionExecute = mainIx.data.subarray(12);
+      return sighashMatch(dataWithoutIyfExtensionExecute, "MeteoraDlmmClaimRewardAutomation");
+    })
+
+    if (index === -1) {
+      console.warn(`Warn: Reward instruction not found! This may happen if pool has no rewards`);
+      return;
+    }
+
+    const userPda = this.mainIxs[index].keys[1].pubkey;
+    const tokenMint = this.mainIxs[index].keys[10].pubkey;
+    const staToken = generateUserPdaStorageAccount(userPda, tokenMint);
+    this.mainIxs[index].keys[11].pubkey = staToken;
+  }
 }
 
 /**
