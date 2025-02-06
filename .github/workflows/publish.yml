@@ -23,17 +23,17 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd hawk-sdk
+          cd hawk-api
           yarn install --frozen-lockfile
 
       - name: Build package (if needed)
         run: |
-          cd hawk-sdk
+          cd hawk-api
           yarn build # Remove this step if not required
 
       - name: Publish package
         run: |
-          cd hawk-sdk
+          cd hawk-api
           yarn publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
