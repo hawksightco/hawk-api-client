@@ -4,7 +4,6 @@ import { ResponseWithStatus, TransactionMetadata, TransactionMetadataResponse, T
 import { Client } from "./Client";
 import { createTxMetadata, resultOrError } from "../functions";
 import { GeneralUtility } from "./GeneralUtility";
-import { InlineResponse200 } from '../../../swagger-client/dist/models/inline-response200';
 import { AxiosResponse } from 'axios';
 
 /**
@@ -59,8 +58,8 @@ export class General {
     params: {
       address: string,
     }
-  ): Promise<ResponseWithStatus<InlineResponse200>> {
-    const result: AxiosResponse<InlineResponse200> = await this.client.generalEndpoints.tokenGet(params.address).catch(e => e.response);
+  ): Promise<ResponseWithStatus<_client.InlineResponse200>> {
+    const result: AxiosResponse<_client.InlineResponse200> = await this.client.generalEndpoints.tokenGet(params.address).catch(e => e.response);
     return {
       status: result.status,
       data: result.data,
