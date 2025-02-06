@@ -1,9 +1,9 @@
-name: Publish hawk-sdk to npm
+name: Publish hawk-api to npm
 
 on:
   push:
     branches:
-      - main # Change if needed
+      - main
   workflow_dispatch: # Allows manual trigger
 
 jobs:
@@ -11,27 +11,66 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Get the previous commit to compare versions
 
+      # Get current version
+      - name: Get current version
+        id: current_version
+        run: echo "VERSION=$(jq -r .version hawk-api/package.json)" >> $GITHUB_ENV
+
+      # Get previous version
+      - name: Get previous version
+        id: previous_version
+        run: |
+          if git show HEAD~1:hawk-api/package.json > /dev/null 2>&1; then
+            PREV_VERSION=$(git show HEAD~1:hawk-api/package.json | jq -r .version)
+          else
+            PREV_VERSION=""
+          fi
+          echo "PREV_VERSION=$PREV_VERSION" >> $GITHUB_ENV
+
+      # Check if version has changed
+      - name: Check if version changed
+        id: version_check
+        run: |
+          if [ "$VERSION" == "$PREV_VERSION" ]; then
+            echo "Version has not changed. Skipping workflow."
+            echo "run_publish=false" >> $GITHUB_ENV
+          else
+            echo "Version has changed."
+            echo "run_publish=true" >> $GITHUB_ENV
+          fi
+        shell: bash
+
+      # Setup Node.js (only if version has changed)
       - name: Setup Node.js
+        if: env.run_publish == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 18
           registry-url: 'https://registry.npmjs.org/'
-          scope: '@your-scope' # Change if using scoped packages
 
+      # Install dependencies (only if version has changed)
       - name: Install dependencies
+        if: env.run_publish == 'true'
         run: |
           cd hawk-api
           yarn install --frozen-lockfile
 
+      # Build package (only if version has changed)
       - name: Build package (if needed)
+        if: env.run_publish == 'true'
         run: |
           cd hawk-api
-          yarn build # Remove this step if not required
+          yarn build
 
+      # Publish package (only if version has changed)
       - name: Publish package
+        if: env.run_publish == 'true'
         run: |
           cd hawk-api
           yarn publish --access public
