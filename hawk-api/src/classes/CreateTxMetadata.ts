@@ -139,7 +139,7 @@ export class CreateTxMetadata {
     const pubkeys: web3.PublicKey[] = notExist.map(index => new web3.PublicKey(alts[index]));
     const accountInfos = await this.connection!.getMultipleAccountsInfo(pubkeys);
     for (let i = 0; i < accountInfos.length; i++) {
-      if(accountInfos[i]?.data) {
+      if(accountInfos[i]?.data && accountInfos[i]?.owner.toString() === "AddressLookupTab1e1111111111111111111111111") {
         const key = pubkeys[i].toString();
         const alt = new web3.AddressLookupTableAccount({
           key: pubkeys[i],
