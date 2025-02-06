@@ -1,9 +1,9 @@
-name: Publish to npm
+name: Publish hawk-sdk to npm
 
 on:
   push:
     branches:
-      - main # Change this to your release branch if needed
+      - main # Change if needed
   workflow_dispatch: # Allows manual trigger
 
 jobs:
@@ -22,12 +22,18 @@ jobs:
           scope: '@your-scope' # Change if using scoped packages
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: |
+          cd hawk-sdk
+          yarn install --frozen-lockfile
 
       - name: Build package (if needed)
-        run: yarn build # Change if you don't have a build step
+        run: |
+          cd hawk-sdk
+          yarn build # Remove this step if not required
 
       - name: Publish package
-        run: yarn publish --access public
+        run: |
+          cd hawk-sdk
+          yarn publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
