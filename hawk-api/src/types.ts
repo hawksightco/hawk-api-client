@@ -412,7 +412,10 @@ export type OrcaClosePosition = {
 
 export type OrcaDeposit = {
   userWallet: web3.PublicKey,
-  positionMint: web3.PublicKey,
+  mintOrPosition: {
+    positionMint?: web3.PublicKey,
+    position?: web3.PublicKey,
+  }
   totalXAmount: BN,
   totalYAmount: BN,
   newPosition?: {

@@ -422,7 +422,7 @@ export class TxGenerator {
         connection,
         params: {
           userWallet: params.userWallet,
-          positionMint: params.positionMint,
+          mintOrPosition: params.mintOrPosition,
           totalXAmount: params.totalXAmount,
           totalYAmount: params.totalYAmount,
           newPosition: params.newPosition,

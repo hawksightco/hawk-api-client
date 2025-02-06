@@ -1130,11 +1130,23 @@ export class Transactions {
   async orcaDeposit({ connection, params }: TxgenParams<OrcaDeposit>): Promise<TransactionMetadataResponse> {
     const farm = USDC_FARM;
     const userPda = generateUserPda(params.userWallet, farm);
-    const position = generateOrcaPositionPDA(params.positionMint);
-    const positionTokenAccount = generateAta(userPda, params.positionMint);
+    let position: web3.PublicKey;
+    let positionMint: web3.PublicKey;
     let positionData: any;
+    if (params.mintOrPosition.position !== undefined) {
+      position = params.mintOrPosition.position;
+      positionData = await Anchor.instance().orcaProgram.account.position.fetch(position);
+      positionMint = positionData.positionMint;
+    } else if (params.mintOrPosition.positionMint !== undefined) {
+      positionMint = params.mintOrPosition.positionMint;
+      position = generateOrcaPositionPDA(positionMint)
+    } else {
+      throw new Error('Position mint or orca position needs to be provided.');
+    }
+    const positionTokenAccount = generateAta(userPda, positionMint);
     if (params.newPosition) {
       positionData = {
+        positionMint,
         whirlpool: params.newPosition.whirlpool,
         tickLowerIndex: params.newPosition.tickLowerIndex,
         tickUpperIndex: params.newPosition.tickUpperIndex,
@@ -1143,7 +1155,7 @@ export class Transactions {
       positionData = await Anchor.instance().orcaProgram.account.position.fetch(position);
     }
     if (positionData === null) {
-      throw new Error(`Position: ${position} does not exist or already closed. Position mint: ${params.positionMint}`);
+      throw new Error(`Position: ${position} does not exist or already closed. Position mint: ${positionMint}`);
     }
     const whirlpool = positionData.whirlpool;
     const whirlpoolData = await Anchor.instance().orcaProgram.account.whirlpool.fetch(whirlpool);
@@ -1192,7 +1204,7 @@ export class Transactions {
         userPda,
         authority: params.userWallet,
         iyfProgram: IYF_MAIN,
-        positionMint: params.positionMint,
+        positionMint,
         whirlpool,
         position,
         positionTokenAccount,

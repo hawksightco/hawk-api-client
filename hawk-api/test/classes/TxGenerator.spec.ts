@@ -23,7 +23,9 @@ describe('TxGenerationAutomations: Test orcaDeposit ix', () => {
       connection, web3.SystemProgram.programId.toString(),
       {
         userWallet: web3.SystemProgram.programId,
-        positionMint: web3.SystemProgram.programId,
+        mintOrPosition: {
+          positionMint: web3.SystemProgram.programId,
+        },
         totalXAmount: new BN(1_000_000),
         totalYAmount: new BN(1_000_000),
         newPosition: {
