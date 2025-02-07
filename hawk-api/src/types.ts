@@ -427,7 +427,7 @@ export type OrcaDeposit = {
 
 export type OrcaWithdraw = {
   userWallet: web3.PublicKey,
-  positionMint: web3.PublicKey,
+  position: web3.PublicKey,
   liquidityAmount: BN,
 }
 

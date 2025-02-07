@@ -465,7 +465,7 @@ export class TxGenerator {
         connection,
         params: {
           userWallet: params.userWallet,
-          positionMint: params.positionMint,
+          position: params.position,
           liquidityAmount: params.liquidityAmount,
         }
       });
