@@ -466,7 +466,7 @@ export class TxGenerator {
         params: {
           userWallet: params.userWallet,
           position: params.position,
-          liquidityAmount: params.liquidityAmount,
+          percentage: params.percentage,
         }
       });
       return {

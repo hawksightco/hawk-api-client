@@ -1334,6 +1334,9 @@ export class Transactions {
     if (positionData === null) {
       throw new Error(`Position: ${params.position} does not exist or already closed.`);
     }
+    const liquidityAmount = positionData.liquidity
+      .mul(new BN(Math.round(params.percentage * 100)))
+      .div(new BN(10000));
     const positionTokenAccount = generateAta(userPda, positionData.positionMint);
     const whirlpool = positionData.whirlpool;
     const whirlpoolData = await Anchor.instance().orcaProgram.account.whirlpool.fetch(whirlpool);
@@ -1346,7 +1349,7 @@ export class Transactions {
     const ownerFeeA = generateAta(SITE_FEE_OWNER, mintA);
     const ownerFeeB = generateAta(SITE_FEE_OWNER, mintB);
     const extensionIx = await Anchor.instance().iyfExtension.methods
-      .orcaWithdraw(params.liquidityAmount)
+      .orcaWithdraw(liquidityAmount)
       .accounts({
         farm,
         userPda,
