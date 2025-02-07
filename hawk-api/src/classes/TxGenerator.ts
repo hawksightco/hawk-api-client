@@ -382,7 +382,7 @@ export class TxGenerator {
         connection,
         params: {
           userWallet: params.userWallet,
-          positionMint: params.positionMint,
+          position: params.position,
         }
       });
       return {
@@ -506,7 +506,7 @@ export class TxGenerator {
         connection,
         params: {
           userWallet: params.userWallet,
-          positionMint: params.positionMint,
+          position: params.position,
         }
       });
       return {

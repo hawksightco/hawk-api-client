@@ -407,7 +407,7 @@ export type OrcaOpenPosition = {
 
 export type OrcaClosePosition = {
   userWallet: web3.PublicKey,
-  positionMint: web3.PublicKey,
+  position: web3.PublicKey,
 }
 
 export type OrcaDeposit = {
@@ -433,7 +433,7 @@ export type OrcaWithdraw = {
 
 export type OrcaClaimRewards = {
   userWallet: web3.PublicKey,
-  positionMint: web3.PublicKey,
+  position: web3.PublicKey,
 }
 
 export const StrategyTypeMap: Record<Distribution, StrategyType> = {

@@ -1121,8 +1121,11 @@ export class Transactions {
   async orcaClosePosition({ connection, params }: TxgenParams<OrcaClosePosition>): Promise<TransactionMetadataResponse> {
     const farm = USDC_FARM;
     const userPda = generateUserPda(params.userWallet, farm);
-    const position = generateOrcaPositionPDA(params.positionMint);
-    const positionTokenAccount = generateAta(userPda, params.positionMint);
+    const positionData = await Anchor.instance().orcaProgram.account.position.fetch(params.position);
+    if (positionData === null) {
+      throw new Error(`Position: ${params.position} does not exist or already closed.`);
+    }
+    const positionTokenAccount = generateAta(userPda, positionData.positionMint);
     const extensionIx = await Anchor.instance().iyfExtension.methods
       .orcaClosePosition()
       .accounts({
@@ -1130,8 +1133,8 @@ export class Transactions {
         userPda,
         authority: params.userWallet,
         iyfProgram: IYF_MAIN,
-        positionMint: params.positionMint,
-        position,
+        positionMint: positionData.positionMint,
+        position: params.position,
         positionTokenAccount,
         orcaWhirlpoolProgram: ORCA_WHIRLPOOL_PROGRAM,
         tokenProgram: TOKEN_PROGRAM_ID,
@@ -1423,12 +1426,11 @@ export class Transactions {
   async orcaClaimRewards({ connection, params }: TxgenParams<OrcaClaimRewards>): Promise<TransactionMetadataResponse> {
     const farm = USDC_FARM;
     const userPda = generateUserPda(params.userWallet, farm);
-    const position = generateOrcaPositionPDA(params.positionMint);
-    const positionTokenAccount = generateAta(userPda, params.positionMint);
-    const positionData = await Anchor.instance().orcaProgram.account.position.fetch(position);
+    const positionData = await Anchor.instance().orcaProgram.account.position.fetch(params.position);
     if (positionData === null) {
-      throw new Error(`Position: ${position} does not exist or already closed. Position mint: ${params.positionMint}`);
+      throw new Error(`Position: ${params.position} does not exist or already closed.`);
     }
+    const positionTokenAccount = generateAta(userPda, positionData.positionMint);
     const whirlpool = positionData.whirlpool;
     const whirlpoolData = await Anchor.instance().orcaProgram.account.whirlpool.fetch(whirlpool);
     const mintA = whirlpoolData!.tokenMintA;
@@ -1459,8 +1461,8 @@ export class Transactions {
         authority: params.userWallet,
         iyfProgram: IYF_MAIN,
         whirlpool,
-        positionMint: params.positionMint,
-        position,
+        positionMint: positionData.positionMint,
+        position: params.position,
         tickArrayLower,
         tickArrayUpper,
         positionTokenAccount,
@@ -1516,7 +1518,7 @@ export class Transactions {
     const mainInstructions = [orcaIx, withdrawFromPda];
     return createTransactionMeta({
       payer: params.userWallet,
-      description: `Claim rewards from Orca Position: ${position}`,
+      description: `Claim rewards from Orca Position: ${params.position}`,
       addressLookupTableAddresses: GLOBAL_ALT,
       mainInstructions,
     });
